@@ -1,26 +1,105 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
+/* Scholars Opportunity Fund Design System */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Brand palette */
+  --ink: #0B1221;
+  --gunmetal: #2A3241;
+  --copper: #A0755A;
+  --copper-hover: #8B6249;
+  --signal: #7BB8D6;
+  --signal-hover: #6AA8C6;
+  --slate: #8892A0;
+  --cloud: #F3F5F8;
+
+  /* Semantic tokens — light theme */
+  --background: #F3F5F8;
+  --background-alt: #FFFFFF;
+  --background-dark: #0B1221;
+  --background-elevated: #FFFFFF;
+
+  --foreground: #0B1221;
+  --foreground-secondary: #2A3241;
+  --foreground-muted: #8892A0;
+  --foreground-on-dark: #F3F5F8;
+  --foreground-on-dark-muted: #8892A0;
+
+  --accent: #A0755A;
+  --accent-hover: #8B6249;
+  --link: #7BB8D6;
+  --link-hover: #6AA8C6;
+
+  --border: #E2E5EA;
+  --border-dark: #2A3241;
+  --overlay: rgba(11, 18, 33, 0.6);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-ink: var(--ink);
+  --color-gunmetal: var(--gunmetal);
+  --color-copper: var(--copper);
+  --color-copper-hover: var(--copper-hover);
+  --color-signal: var(--signal);
+  --color-signal-hover: var(--signal-hover);
+  --color-slate: var(--slate);
+  --color-cloud: var(--cloud);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-background: var(--background);
+  --color-background-alt: var(--background-alt);
+  --color-background-dark: var(--background-dark);
+  --color-background-elevated: var(--background-elevated);
+  --color-foreground: var(--foreground);
+  --color-foreground-secondary: var(--foreground-secondary);
+  --color-foreground-muted: var(--foreground-muted);
+  --color-foreground-on-dark: var(--foreground-on-dark);
+  --color-foreground-on-dark-muted: var(--foreground-on-dark-muted);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-link: var(--link);
+  --color-link-hover: var(--link-hover);
+  --color-border: var(--border);
+  --color-border-dark: var(--border-dark);
+  --color-overlay: var(--overlay);
+
+  --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
+  --font-heading: var(--font-playfair-display), Georgia, serif;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-heading);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+::selection {
+  background: var(--copper);
+  color: var(--cloud);
+}
+
+*:focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: 2px;
+}
+
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
