@@ -1,5 +1,4 @@
 import Container from "@/components/ui/Container";
-import Card from "@/components/ui/Card";
 import { generatePageMetadata } from "@/lib/seo";
 
 export const metadata = generatePageMetadata({
@@ -11,7 +10,6 @@ export const metadata = generatePageMetadata({
 
 interface TeamMemberDisplay {
   name: string;
-  role: string;
   title: string;
   bio?: string;
 }
@@ -19,16 +17,13 @@ interface TeamMemberDisplay {
 const leadership: TeamMemberDisplay[] = [
   {
     name: "Dr. Jonathan Brogaard",
-    role: "leadership",
     title: "Chief Investment Officer",
     bio: "Tenured finance professor, FINRA Market Regulation Committee member, and one of the most cited researchers in market microstructure. All investment decisions are made by Dr. Brogaard.",
   },
 ];
 
-// Placeholder for the remaining 12 team members
 const team: TeamMemberDisplay[] = Array.from({ length: 12 }, (_, i) => ({
   name: `Team Member ${i + 1}`,
-  role: i < 2 ? "Senior Associate" : i < 6 ? "Associate" : "Analyst",
   title: i < 2 ? "Senior Associate" : i < 6 ? "Associate" : "Analyst",
 }));
 
@@ -36,15 +31,15 @@ export default function TeamPage() {
   return (
     <>
       {/* Hero */}
-      <section className="bg-ink py-20 sm:py-28">
-        <Container className="text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-copper">
+      <section className="bg-ink py-36 sm:py-44">
+        <Container>
+          <p className="text-xs font-medium tracking-[0.2em] text-copper uppercase">
             Our Team
           </p>
-          <h1 className="mt-4 text-4xl font-bold tracking-tight text-cloud sm:text-5xl font-heading">
-            The People Behind SOF
+          <h1 className="mt-6 max-w-3xl text-5xl text-cloud sm:text-6xl lg:text-[72px] lg:leading-[1.1]">
+            The people behind SOF
           </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-foreground-on-dark-muted leading-relaxed">
+          <p className="mt-8 max-w-xl text-[17px] text-foreground-on-dark-muted leading-[1.8]">
             Experienced leadership, rigorous process, and a team of analysts
             building the next generation of institutional investors.
           </p>
@@ -52,58 +47,54 @@ export default function TeamPage() {
       </section>
 
       {/* CIO */}
-      <section className="py-20 sm:py-24">
+      <section className="py-32 sm:py-40">
         <Container>
-          <div className="mx-auto max-w-3xl">
-            {leadership.map((member) => (
-              <div key={member.name} className="text-center">
-                <div className="mx-auto h-32 w-32 rounded-full bg-gunmetal flex items-center justify-center">
-                  <span className="text-3xl font-heading font-bold text-copper">
+          {leadership.map((member) => (
+            <div key={member.name} className="grid gap-16 lg:grid-cols-[280px_1fr] lg:gap-24">
+              <div>
+                <div className="h-72 w-full bg-gunmetal/10 flex items-end justify-center overflow-hidden">
+                  <span className="text-5xl font-heading text-slate/30 pb-8">
                     {member.name.split(" ").map((n) => n[0]).join("")}
                   </span>
                 </div>
-                <h2 className="mt-6 text-2xl font-bold font-heading text-ink">
-                  {member.name}
-                </h2>
-                <p className="mt-1 text-sm font-medium uppercase tracking-widest text-copper">
+              </div>
+              <div>
+                <h2 className="text-4xl sm:text-5xl">{member.name}</h2>
+                <p className="mt-3 text-[14px] font-medium tracking-[0.15em] text-copper uppercase">
                   {member.title}
                 </p>
                 {member.bio && (
-                  <p className="mx-auto mt-6 max-w-xl text-foreground-secondary leading-relaxed">
+                  <p className="mt-8 max-w-xl text-[17px] text-foreground-secondary leading-[1.8]">
                     {member.bio}
                   </p>
                 )}
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </Container>
       </section>
 
       {/* Team Grid */}
-      <section className="bg-background-alt py-20 sm:py-24">
+      <section className="border-t border-border/60 py-32 sm:py-40">
         <Container>
-          <h2 className="text-center text-3xl font-bold tracking-tight sm:text-4xl">
-            Analyst Team
-          </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-center text-foreground-muted">
+          <h2 className="text-4xl sm:text-5xl">Analyst Team</h2>
+          <p className="mt-6 max-w-xl text-[17px] text-foreground-muted leading-[1.8]">
             SOF maintains a steady cohort of 12 to 16 students, progressing
             through defined roles: Analyst, Associate, and Senior Associate.
           </p>
-          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="mt-16 grid gap-px bg-border/40 sm:grid-cols-2 lg:grid-cols-4">
             {team.map((member, i) => (
-              <Card key={i} variant="elevated" className="text-center">
-                <div className="mx-auto h-16 w-16 rounded-full bg-cloud flex items-center justify-center">
-                  <span className="text-sm font-heading font-bold text-slate">
+              <div key={i} className="bg-background p-8">
+                <div className="h-48 w-full bg-gunmetal/5 flex items-end justify-center overflow-hidden mb-6">
+                  <span className="text-2xl font-heading text-slate/20 pb-4">
                     {member.name.split(" ").map((n) => n[0]).join("")}
                   </span>
                 </div>
-                <h3 className="mt-4 text-base font-bold font-heading text-ink">
-                  {member.name}
-                </h3>
-                <p className="mt-1 text-xs font-medium uppercase tracking-widest text-copper">
+                <p className="font-heading text-lg text-ink">{member.name}</p>
+                <p className="mt-1 text-[13px] font-medium tracking-[0.1em] text-copper uppercase">
                   {member.title}
                 </p>
-              </Card>
+              </div>
             ))}
           </div>
         </Container>

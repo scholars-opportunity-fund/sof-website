@@ -24,13 +24,13 @@ type ButtonProps = ButtonAsButton | ButtonAsLink;
 
 const variants: Record<ButtonVariant, string> = {
   primary:
-    "bg-copper text-cloud hover:bg-copper-hover",
-  secondary:
     "bg-ink text-cloud hover:bg-gunmetal",
+  secondary:
+    "bg-copper text-cloud hover:bg-copper-hover",
   outline:
-    "border border-copper text-copper hover:bg-copper hover:text-cloud",
+    "border border-ink/20 text-ink hover:border-ink/40",
   ghost:
-    "text-slate hover:text-ink",
+    "text-foreground-secondary hover:text-ink",
 };
 
 export default function Button({
@@ -41,7 +41,7 @@ export default function Button({
   ...rest
 }: ButtonProps) {
   const baseClasses =
-    "inline-flex items-center justify-center px-6 py-3 text-sm font-medium tracking-wide uppercase transition-colors duration-200 rounded";
+    "inline-flex items-center justify-center px-8 py-3.5 text-[14px] font-medium tracking-wide transition-colors duration-200";
 
   const classes = `${baseClasses} ${variants[variant]} ${className}`;
 

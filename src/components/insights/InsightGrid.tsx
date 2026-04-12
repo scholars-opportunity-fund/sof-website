@@ -4,7 +4,7 @@ import InsightCard from "./InsightCard";
 export default function InsightGrid({ insights }: { insights: InsightMeta[] }) {
   if (insights.length === 0) {
     return (
-      <div className="rounded-lg border border-border bg-background-alt py-16 text-center">
+      <div className="border-t border-border/60 pt-12">
         <p className="text-foreground-muted">
           Insights coming soon.
         </p>
@@ -13,7 +13,7 @@ export default function InsightGrid({ insights }: { insights: InsightMeta[] }) {
   }
 
   return (
-    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-3">
       {insights.map((insight) => (
         <InsightCard key={insight.slug} insight={insight} />
       ))}

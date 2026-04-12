@@ -49,16 +49,15 @@ export default async function InsightPage({ params }: PageProps) {
         })}
       />
 
-      {/* Header */}
-      <section className="bg-ink py-20 sm:py-28">
-        <Container className="text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-copper">
+      <section className="bg-ink py-36 sm:py-44">
+        <Container>
+          <p className="text-xs font-medium tracking-[0.2em] text-copper uppercase">
             {insight.meta.category.replace("-", " ")}
           </p>
-          <h1 className="mt-4 text-3xl font-bold tracking-tight text-cloud sm:text-4xl lg:text-5xl font-heading">
+          <h1 className="mt-6 max-w-4xl text-4xl text-cloud sm:text-5xl lg:text-[64px] lg:leading-[1.15]">
             {insight.meta.title}
           </h1>
-          <div className="mt-6 flex items-center justify-center gap-4 text-sm text-foreground-on-dark-muted">
+          <div className="mt-8 flex items-center gap-4 text-[15px] text-foreground-on-dark-muted">
             <span>{insight.meta.author}</span>
             <span>&middot;</span>
             <time dateTime={insight.meta.date}>{formattedDate}</time>
@@ -66,16 +65,15 @@ export default async function InsightPage({ params }: PageProps) {
         </Container>
       </section>
 
-      {/* Content */}
-      <section className="py-20 sm:py-24">
+      <section className="py-32 sm:py-40">
         <Container>
-          <article className="prose prose-lg mx-auto max-w-3xl prose-headings:font-heading prose-headings:text-ink prose-a:text-signal hover:prose-a:text-signal-hover">
+          <article className="prose prose-lg mx-auto max-w-3xl prose-headings:font-heading prose-headings:font-normal prose-a:text-signal hover:prose-a:text-signal-hover">
             <MDXRemote source={insight.content} />
           </article>
-          <div className="mx-auto mt-16 max-w-3xl border-t border-border pt-8">
+          <div className="mx-auto mt-20 max-w-3xl border-t border-border/60 pt-8">
             <Link
               href="/insights"
-              className="text-sm font-medium text-signal hover:text-signal-hover transition-colors"
+              className="text-[15px] text-foreground-secondary hover:text-ink transition-colors"
             >
               &larr; Back to Insights
             </Link>

@@ -16,29 +16,29 @@ export default function InsightsPage() {
   return (
     <>
       {/* Hero */}
-      <section className="bg-ink py-20 sm:py-28">
-        <Container className="text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-copper">
+      <section className="bg-ink py-36 sm:py-44">
+        <Container>
+          <p className="text-xs font-medium tracking-[0.2em] text-copper uppercase">
             Insights
           </p>
-          <h1 className="mt-4 text-4xl font-bold tracking-tight text-cloud sm:text-5xl font-heading">
-            Research &amp; Analysis
+          <h1 className="mt-6 max-w-3xl text-5xl text-cloud sm:text-6xl lg:text-[72px] lg:leading-[1.1]">
+            Research &amp; analysis
           </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-foreground-on-dark-muted leading-relaxed">
+          <p className="mt-8 max-w-xl text-[17px] text-foreground-on-dark-muted leading-[1.8]">
             Market research, investment post mortems, and commentary from the
             Scholars Opportunity Fund team.
           </p>
         </Container>
       </section>
 
-      {/* Overview */}
-      <section className="py-20 sm:py-24">
+      {/* Perspective */}
+      <section className="py-32 sm:py-40">
         <Container>
-          <div className="mx-auto max-w-3xl">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              Our Perspective
-            </h2>
-            <div className="mt-8 space-y-6 text-foreground-secondary leading-relaxed">
+          <div className="grid gap-16 lg:grid-cols-[1fr_1.5fr] lg:gap-24">
+            <div>
+              <h2 className="text-4xl sm:text-5xl">Our perspective</h2>
+            </div>
+            <div className="space-y-8 text-[17px] text-foreground-secondary leading-[1.8]">
               <p>
                 The public equity markets are being reshaped by systematic
                 strategies, quantitative infrastructure, and an accelerating
@@ -57,13 +57,11 @@ export default function InsightsPage() {
         </Container>
       </section>
 
-      {/* Insights Grid */}
-      <section className="bg-background-alt py-20 sm:py-24">
+      {/* Grid */}
+      <section className="border-t border-border/60 py-32 sm:py-40">
         <Container>
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            Latest
-          </h2>
-          <div className="mt-10">
+          <h2 className="text-4xl sm:text-5xl">Latest</h2>
+          <div className="mt-16">
             <InsightGrid insights={insights} />
           </div>
         </Container>

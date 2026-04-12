@@ -17,21 +17,21 @@ export default function InsightCard({ insight }: { insight: InsightMeta }) {
   return (
     <Link
       href={`/insights/${insight.slug}`}
-      className="group block rounded-lg border border-border bg-background-alt p-6 transition-all duration-200 hover:border-signal hover:shadow-sm"
+      className="group block border-t border-border/60 pt-8 transition-colors"
     >
-      <div className="flex items-center gap-3 text-xs">
-        <span className="font-medium uppercase tracking-widest text-copper">
+      <div className="flex items-center gap-3 text-[13px]">
+        <span className="font-medium tracking-[0.1em] text-copper uppercase">
           {categoryLabels[insight.category] || insight.category}
         </span>
         <span className="text-foreground-muted">{formattedDate}</span>
       </div>
-      <h3 className="mt-3 text-xl font-bold text-ink group-hover:text-copper transition-colors font-heading">
+      <h3 className="mt-4 font-heading text-2xl text-ink group-hover:text-copper transition-colors">
         {insight.title}
       </h3>
-      <p className="mt-2 text-sm text-foreground-muted leading-relaxed line-clamp-2">
+      <p className="mt-3 text-[15px] text-foreground-muted leading-relaxed line-clamp-2">
         {insight.description}
       </p>
-      <p className="mt-4 text-xs font-medium text-slate">
+      <p className="mt-4 text-[13px] text-foreground-muted/60">
         {insight.author}
       </p>
     </Link>

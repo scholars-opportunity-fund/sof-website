@@ -12,30 +12,30 @@ export default function AboutPage() {
   return (
     <>
       {/* Hero */}
-      <section className="bg-ink py-20 sm:py-28">
-        <Container className="text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-copper">
+      <section className="bg-ink py-36 sm:py-44">
+        <Container>
+          <p className="text-xs font-medium tracking-[0.2em] text-copper uppercase">
             About the Fund
           </p>
-          <h1 className="mt-4 text-4xl font-bold tracking-tight text-cloud sm:text-5xl font-heading">
+          <h1 className="mt-6 max-w-3xl text-5xl text-cloud sm:text-6xl lg:text-[72px] lg:leading-[1.1]">
             Scholars Opportunity Fund
           </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-foreground-on-dark-muted leading-relaxed">
-            A quantitative investment process targeting special situations in
-            the public equity universe, where institutional coverage is
+          <p className="mt-8 max-w-xl text-[17px] text-foreground-on-dark-muted leading-[1.8]">
+            A quantitative investment process targeting special situations
+            in the public equity universe, where institutional coverage is
             thinnest and pricing inefficiency is highest.
           </p>
         </Container>
       </section>
 
-      {/* Fund Overview */}
-      <section className="py-20 sm:py-24">
+      {/* Investment Process */}
+      <section className="py-32 sm:py-40">
         <Container>
-          <div className="mx-auto max-w-3xl">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              Investment Process
-            </h2>
-            <div className="mt-8 space-y-6 text-foreground-secondary leading-relaxed">
+          <div className="grid gap-16 lg:grid-cols-[1fr_1.5fr] lg:gap-24">
+            <div>
+              <h2 className="text-4xl sm:text-5xl">Investment Process</h2>
+            </div>
+            <div className="space-y-8 text-[17px] text-foreground-secondary leading-[1.8]">
               <p>
                 Scholars Opportunity Fund operates a proprietary quantitative
                 screening and analysis platform built specifically for
@@ -64,16 +64,16 @@ export default function AboutPage() {
       </section>
 
       {/* Leadership */}
-      <section className="bg-background-alt py-20 sm:py-24">
+      <section className="border-t border-border/60 py-32 sm:py-40">
         <Container>
-          <div className="mx-auto max-w-3xl">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              Leadership
-            </h2>
-            <div className="mt-8 space-y-6 text-foreground-secondary leading-relaxed">
+          <div className="grid gap-16 lg:grid-cols-[1fr_1.5fr] lg:gap-24">
+            <div>
+              <h2 className="text-4xl sm:text-5xl">Leadership</h2>
+            </div>
+            <div className="space-y-8 text-[17px] text-foreground-secondary leading-[1.8]">
               <p>
                 Scholars Opportunity Fund is led by{" "}
-                <strong className="text-ink">Dr. Jonathan Brogaard</strong>,
+                <strong className="font-medium text-ink">Dr. Jonathan Brogaard</strong>,
                 Chief Investment Officer. Dr. Brogaard is a tenured finance
                 professor, FINRA Market Regulation Committee member, and one
                 of the most cited researchers in market microstructure.
@@ -90,13 +90,13 @@ export default function AboutPage() {
       </section>
 
       {/* Structure */}
-      <section className="py-20 sm:py-24">
+      <section className="bg-ink py-32 sm:py-40">
         <Container>
-          <div className="mx-auto max-w-3xl">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              Fund Structure
-            </h2>
-            <div className="mt-8 space-y-6 text-foreground-secondary leading-relaxed">
+          <div className="grid gap-16 lg:grid-cols-[1fr_1.5fr] lg:gap-24">
+            <div>
+              <h2 className="text-4xl text-cloud sm:text-5xl">Fund Structure</h2>
+            </div>
+            <div className="space-y-8 text-[17px] text-foreground-on-dark-muted leading-[1.8]">
               <p>
                 Scholars Opportunity Fund is independently operated. The fund
                 combines experienced GP oversight with a structured student

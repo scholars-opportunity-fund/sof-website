@@ -5,8 +5,8 @@ interface CardProps {
 }
 
 const cardVariants = {
-  default: "bg-background-alt border border-border",
-  elevated: "bg-background-elevated shadow-sm border border-border",
+  default: "bg-background-alt border border-border/60",
+  elevated: "bg-background-elevated border border-border/40",
   dark: "bg-gunmetal text-foreground-on-dark",
 };
 
@@ -16,7 +16,7 @@ export default function Card({
   variant = "default",
 }: CardProps) {
   return (
-    <div className={`rounded-lg p-6 ${cardVariants[variant]} ${className}`}>
+    <div className={`p-8 ${cardVariants[variant]} ${className}`}>
       {children}
     </div>
   );
