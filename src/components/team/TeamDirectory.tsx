@@ -42,12 +42,12 @@ export default function TeamDirectory({ cio, cofounders, analysts }: Props) {
   return (
     <>
       {/* Leadership — CIO and Head of Research & Operations together */}
-      <section className="py-16 sm:py-24">
+      <section className="pt-16 pb-10 sm:pt-24 sm:pb-14">
         <div className="mx-auto w-full max-w-7xl px-8 lg:px-12">
-          <p className="text-xs font-medium tracking-[0.2em] text-copper uppercase">
+          <p className="text-center text-xs font-medium tracking-[0.2em] text-copper uppercase">
             Leadership
           </p>
-          <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mx-auto mt-8 grid max-w-2xl grid-cols-1 gap-6 sm:grid-cols-2">
             <HeadshotCard member={cio} onClick={() => setOpenSlug(cio.slug)} />
             {cofounders.map((m) => (
               <HeadshotCard
@@ -61,7 +61,7 @@ export default function TeamDirectory({ cio, cofounders, analysts }: Props) {
       </section>
 
       {/* Analysts */}
-      <section className="border-t border-border/60 py-16 sm:py-24">
+      <section className="border-t border-border/60 pt-10 pb-16 sm:pt-14 sm:pb-24">
         <div className="mx-auto w-full max-w-7xl px-8 lg:px-12">
           <div className="flex items-baseline justify-between">
             <p className="text-xs font-medium tracking-[0.2em] text-copper uppercase">

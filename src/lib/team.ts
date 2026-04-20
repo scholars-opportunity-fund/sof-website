@@ -37,9 +37,9 @@ export const CIO: TeamMember = {
   role: "Chief Investment Officer",
   image: "/team/brogaard.jpg",
   headline:
-    "Tenured finance professor, FINRA Market Regulation Committee member, and one of the most cited researchers in market microstructure.",
-  bio: "Dr. Brogaard chairs every investment decision at Scholar Opportunity Fund. His research on high-frequency trading, market structure, and liquidity has been cited thousands of times and is standard reading on institutional trading desks. He serves on the FINRA Market Regulation Committee, advising on how systematic activity shapes U.S. equity markets. At SOF, his role is narrow and absolute. Every capital decision passes through him, and process authority stops where his judgment begins.",
-  credentials: "Ph.D. Finance, Northwestern University",
+    "Associate Dean of Research and Kendall D. Garff Chaired Professor at the University of Utah's David Eccles School of Business.",
+  bio: "Dr. Brogaard is the Associate Dean of Research and Kendall D. Garff Chaired Professor of Finance at the University of Utah's David Eccles School of Business. His research on trading microstructure and empirical asset pricing has been published in the Journal of Finance, Journal of Financial Economics, and Review of Financial Studies, and cited in Bloomberg, The Economist, the Financial Times, the New York Times, and the Wall Street Journal. He has worked with the U.S. Commodity Futures Trading Commission, the U.K. Financial Services Authority, and the Canadian Investment Industry Regulatory Organization, and currently serves on FINRA's Market Regulation Committee. In 2023 he founded the University of Utah's Institute for Advanced Investment Management. He was named one of Poets & Quants' Best 40-Under-40 Business School Professors in 2021 and holds a J.D. and a Ph.D. in Finance from Northwestern University.",
+  credentials: "J.D. and Ph.D. Finance, Northwestern University",
   linkedin: "https://www.linkedin.com/in/jonathan-brogaard/",
 };
 

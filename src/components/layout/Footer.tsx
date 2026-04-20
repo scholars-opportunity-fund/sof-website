@@ -87,7 +87,6 @@ export default function Footer() {
         <div className="mt-12 border-t border-border-dark/40 pt-6">
           <p className="text-[13px] text-foreground-on-dark-muted/60">
             &copy; {new Date().getFullYear()} {FUND.name}. All rights reserved.
-            All investment decisions are made by the Chief Investment Officer.
           </p>
         </div>
       </div>

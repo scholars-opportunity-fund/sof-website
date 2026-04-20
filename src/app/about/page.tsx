@@ -23,8 +23,8 @@ const PROCESS_STEPS = [
   },
   {
     step: "03",
-    title: "CIO Decision",
-    text: "A final investment memo reaches Dr. Brogaard, who makes every capital decision. Position sizing, entry, and exit stay with him.",
+    title: "Decision",
+    text: "A final investment memo reaches the Chief Investment Officer, who owns position sizing, entry, and exit.",
   },
   {
     step: "04",
@@ -64,10 +64,9 @@ export default function AboutPage() {
       {/* Fund at a glance */}
       <section className="border-b border-border/60 bg-cloud py-10 sm:py-14">
         <Container>
-          <div className="grid grid-cols-2 gap-px bg-border/60 sm:grid-cols-4">
+          <div className="grid grid-cols-3 gap-px bg-border/60">
             <Stat label="Universe" value="Public Equities" />
             <Stat label="Strategy" value="Special Situations" />
-            <Stat label="Investment Decisions" value="CIO-Only" />
             <Stat label="Cohort Size" value="11 Analysts" />
           </div>
         </Container>
@@ -147,15 +146,21 @@ export default function AboutPage() {
                 <strong className="font-medium text-ink">
                   Dr. Jonathan Brogaard
                 </strong>
-                , Chief Investment Officer. Dr. Brogaard is a tenured finance
-                professor, FINRA Market Regulation Committee member, and one of
-                the most cited researchers in market microstructure.
+                , Associate Dean of Research and Kendall D. Garff Chaired
+                Professor of Finance at the University of Utah&apos;s David
+                Eccles School of Business. His research on trading
+                microstructure and empirical asset pricing has been published
+                in the Journal of Finance, Journal of Financial Economics, and
+                Review of Financial Studies, and cited in Bloomberg, the
+                Financial Times, and the Wall Street Journal.
               </p>
               <p className="mt-6 text-[17px] leading-[1.8] text-foreground-secondary">
-                All investment decisions are made exclusively by the CIO.
-                Student analysts operate within defined process boundaries,
-                contributing analytical throughput without introducing
-                uncontrolled investment risk.
+                He serves on FINRA&apos;s Market Regulation Committee and, in
+                2023, founded the University of Utah&apos;s Institute for
+                Advanced Investment Management. Every capital decision at SOF
+                passes through him; analysts operate within defined process
+                boundaries that surface work for his judgment without
+                introducing uncontrolled investment risk.
               </p>
             </div>
           </div>

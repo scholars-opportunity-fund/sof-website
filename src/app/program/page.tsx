@@ -5,7 +5,7 @@ import { generatePageMetadata } from "@/lib/seo";
 export const metadata = generatePageMetadata({
   title: "Student Program",
   description:
-    "The SOF Student Analyst Program puts students inside a live quantitative investment process before their careers begin. Apply to join the next cohort.",
+    "The SOF Student Analyst Program puts students inside a live quantitative investment process before their careers begin.",
   path: "/program",
 });
 
@@ -34,7 +34,6 @@ export default function ProgramPage() {
             consequences, under a CIO whose research has shaped the field.
           </p>
           <div className="mt-12 flex flex-wrap items-center gap-5">
-            <Button href="/apply">Apply Now</Button>
             <Button href="/team" variant="outline">
               <span className="text-cloud">Meet the cohort</span>
             </Button>
@@ -69,7 +68,7 @@ export default function ProgramPage() {
                 candidates. The student team takes it from there. They conduct
                 company-level research, stress-test the analytical case among
                 themselves, and deliver a collective investment memo to the
-                CIO. He makes every investment decision.
+                Chief Investment Officer.
               </p>
               <div className="mt-16 space-y-12">
                 {[
@@ -236,7 +235,6 @@ export default function ProgramPage() {
             </div>
           </div>
           <div className="mt-16 flex flex-wrap items-center gap-5">
-            <Button href="/apply">Apply Now</Button>
             <Button href="/team" variant="outline">
               <span className="text-cloud">Meet the cohort</span>
             </Button>

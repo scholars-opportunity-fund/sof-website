@@ -71,7 +71,7 @@ export default function Home() {
           <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
             <Stat label="Universe" value="Public Equities" />
             <Stat label="Strategy" value="Special Situations" />
-            <Stat label="Investment Decisions" value="CIO-Only" />
+            <Stat label="Home" value="Salt Lake City" />
             <Stat label="Analyst Cohort" value="11 Students" />
           </div>
         </Container>
@@ -177,10 +177,16 @@ export default function Home() {
                 Led by Dr. Jonathan Brogaard
               </h2>
               <p className="mt-8 max-w-2xl text-[17px] leading-[1.8] text-foreground-secondary">
-                Tenured finance professor, FINRA Market Regulation Committee
-                member, and one of the most cited researchers in market
-                microstructure. All investment decisions at SOF are made by
-                the CIO.
+                Dr. Brogaard is the Associate Dean of Research and Kendall D.
+                Garff Chaired Professor at the University of Utah&apos;s David
+                Eccles School of Business. His research on trading
+                microstructure and empirical asset pricing has been published
+                in the Journal of Finance, Journal of Financial Economics, and
+                Review of Financial Studies, and cited in Bloomberg, the
+                Financial Times, and the Wall Street Journal. He serves on
+                FINRA&apos;s Market Regulation Committee and, in 2023, founded
+                the University of Utah&apos;s Institute for Advanced Investment
+                Management.
               </p>
               <div className="mt-10">
                 <Link
@@ -222,7 +228,6 @@ export default function Home() {
               <Button href="/program" variant="outline">
                 <span className="text-cloud">Explore the Program</span>
               </Button>
-              <Button href="/apply">Apply Now</Button>
             </div>
           </div>
         </Container>

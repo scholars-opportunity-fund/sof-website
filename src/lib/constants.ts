@@ -20,7 +20,6 @@ export const NAV_ITEMS = [
   { label: "Our Team", href: "/team" },
   { label: "Insights", href: "/insights" },
   { label: "Student Program", href: "/program" },
-  { label: "Apply", href: "/apply" },
 ] as const;
 
 export const FOOTER_LINKS = {
@@ -29,10 +28,7 @@ export const FOOTER_LINKS = {
     { label: "Our Team", href: "/team" },
     { label: "Insights", href: "/insights" },
   ],
-  program: [
-    { label: "Student Program", href: "/program" },
-    { label: "Apply", href: "/apply" },
-  ],
+  program: [{ label: "Student Program", href: "/program" }],
   contact: [
     {
       label: CONTACT_EMAIL,
