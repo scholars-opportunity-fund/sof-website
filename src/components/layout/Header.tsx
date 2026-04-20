@@ -12,7 +12,7 @@ export default function Header() {
           className="group flex items-center gap-3 font-heading tracking-tight text-ink transition-colors hover:text-copper"
         >
           <Image
-            src="/brand/logo.png"
+            src="/brand/logo-on-light.png"
             alt=""
             width={40}
             height={40}
