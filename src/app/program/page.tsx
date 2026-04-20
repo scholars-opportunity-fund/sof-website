@@ -9,9 +9,9 @@ import { generatePageMetadata } from "@/lib/seo";
 import { CIO } from "@/lib/team";
 
 export const metadata = generatePageMetadata({
-  title: "Student Program",
+  title: "Process",
   description:
-    "The SOF Student Analyst Program puts students inside a live quantitative investment process before their careers begin.",
+    "How Scholars Opportunity Fund sources, researches, and underwrites event-driven opportunities in public equities.",
   path: "/program",
 });
 
@@ -36,9 +36,9 @@ export default function ProgramPage() {
               Build what&apos;s next in finance
             </h1>
             <p className="mt-8 max-w-xl text-[17px] leading-[1.8] text-foreground-on-dark-muted">
-              SOF puts students inside a live quantitative investment process
-              before their careers begin. Real work product, real capital
-              consequences, under a CIO whose research has shaped the field.
+              SOF places analysts inside a live event-driven investment
+              process. Real work product, real capital consequences, under a
+              CIO whose research has shaped the field.
             </p>
             <div className="mt-12 flex flex-wrap items-center gap-5">
               <Button href="/team" variant="outline">
@@ -53,7 +53,7 @@ export default function ProgramPage() {
       <section className="border-b border-border/60 bg-cloud py-14">
         <Container>
           <div className="grid grid-cols-3 gap-8">
-            <AnimatedStat label="Cohort Size" numeric to={11} />
+            <AnimatedStat label="Structure" value="Analyst Cohort" />
             <AnimatedStat
               label="Hours / Week"
               numeric
@@ -80,11 +80,11 @@ export default function ProgramPage() {
               </div>
               <div>
                 <p className="text-[17px] leading-[1.8] text-foreground-secondary">
-                  The fund&apos;s quantitative model surfaces special situation
-                  candidates. The student team takes it from there. They
-                  conduct company-level research, stress-test the analytical
-                  case among themselves, and deliver a collective investment
-                  memo to the Chief Investment Officer.
+                  The fund&apos;s sourcing process surfaces catalyst-driven
+                  candidates across the public equity universe. The analyst
+                  team takes it from there: company-level diligence, internal
+                  pressure-testing, and a collective investment memo
+                  delivered to the Chief Investment Officer.
                 </p>
                 <div className="mt-16 space-y-8">
                   {[
@@ -94,7 +94,7 @@ export default function ProgramPage() {
                     },
                     {
                       title: "Position Monitoring",
-                      text: "When the model flags drift or a material event occurs, the team investigates and delivers a position update within 24 hours.",
+                      text: "When a position drifts from thesis or a material event occurs, the team investigates and delivers an update within 24 hours.",
                     },
                     {
                       title: "Quarterly Reporting",
@@ -120,7 +120,7 @@ export default function ProgramPage() {
         </Container>
       </section>
 
-      {/* A week in the life — interactive tabs */}
+      {/* A week in the life: interactive tabs */}
       <section className="border-t border-border/60 bg-cloud py-16 sm:py-24">
         <Container>
           <Reveal>
@@ -133,8 +133,8 @@ export default function ProgramPage() {
                   A week in the life
                 </h2>
                 <p className="mt-6 text-[17px] leading-[1.8] text-foreground-muted">
-                  A typical analyst week, from the model&apos;s weekly digest
-                  on Monday to the memo handoff on Friday.
+                  A typical analyst week, from Monday&apos;s sourcing digest
+                  to Friday&apos;s memo handoff.
                 </p>
               </div>
               <WeekInLife />
@@ -165,7 +165,7 @@ export default function ProgramPage() {
                   {[
                     {
                       phase: "First Semester",
-                      text: "Learn the model methodology, shadow live screening, and contribute to collective memos under supervision.",
+                      text: "Learn the research methodology, shadow live sourcing and diligence, and contribute to collective memos under supervision.",
                     },
                     {
                       phase: "Returning Analyst",
@@ -173,7 +173,7 @@ export default function ProgramPage() {
                     },
                     {
                       phase: "Senior Cohort",
-                      text: "Co-lead model development, mentor new analysts, and run internal review sessions before memos reach the CIO.",
+                      text: "Co-lead the research process, mentor new analysts, and run internal review sessions before memos reach the CIO.",
                     },
                   ].map((phase, i) => (
                     <div

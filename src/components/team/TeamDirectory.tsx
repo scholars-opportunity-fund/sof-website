@@ -41,7 +41,7 @@ export default function TeamDirectory({ cio, cofounders, analysts }: Props) {
 
   return (
     <>
-      {/* Leadership — CIO and Head of Research & Operations together */}
+      {/* Leadership: CIO and Head of Research & Operations together */}
       <section className="pt-16 pb-10 sm:pt-24 sm:pb-14">
         <div className="mx-auto w-full max-w-7xl px-8 lg:px-12">
           <p className="text-center text-xs font-medium tracking-[0.2em] text-copper uppercase">

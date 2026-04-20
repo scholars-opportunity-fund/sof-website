@@ -23,7 +23,7 @@ const libreBaskerville = Libre_Baskerville({
 
 export const metadata: Metadata = {
   title: {
-    default: `${FUND.name} | Quantitative Special Situations`,
+    default: `${FUND.name} | Event-Driven Public Equities`,
     template: `%s | ${FUND.name}`,
   },
   description: FUND.description,

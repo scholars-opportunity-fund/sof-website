@@ -7,7 +7,7 @@ export const FUND = {
   name: "Scholars Opportunity Fund",
   shortName: "SOF",
   description:
-    "A quantitative investment fund targeting special situations in public equities, led by Dr. Jonathan Brogaard.",
+    "Student-run event-driven fund in public equities, led by Professor Jonathan Brogaard. Focused on special situations and catalyst-driven opportunities.",
   foundedYear: 2025,
   cio: "Dr. Jonathan Brogaard",
   cioTitle: "Chief Investment Officer",
@@ -16,19 +16,20 @@ export const FUND = {
 } as const;
 
 export const NAV_ITEMS = [
-  { label: "About", href: "/about" },
-  { label: "Our Team", href: "/team" },
+  { label: "Overview", href: "/about" },
+  { label: "Team", href: "/team" },
+  { label: "Process", href: "/program" },
   { label: "Insights", href: "/insights" },
-  { label: "Student Program", href: "/program" },
+  { label: "Contact", href: `mailto:${CONTACT_EMAIL}` },
 ] as const;
 
 export const FOOTER_LINKS = {
   fund: [
-    { label: "About", href: "/about" },
-    { label: "Our Team", href: "/team" },
+    { label: "Overview", href: "/about" },
+    { label: "Team", href: "/team" },
     { label: "Insights", href: "/insights" },
   ],
-  program: [{ label: "Student Program", href: "/program" }],
+  program: [{ label: "Process", href: "/program" }],
   contact: [
     {
       label: CONTACT_EMAIL,

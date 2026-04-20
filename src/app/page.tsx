@@ -3,7 +3,6 @@ import Link from "next/link";
 import Container from "@/components/ui/Container";
 import Button from "@/components/ui/Button";
 import Reveal from "@/components/ui/Reveal";
-import CountUp from "@/components/ui/CountUp";
 import { getAllInsights } from "@/lib/insights";
 import InsightCard from "@/components/insights/InsightCard";
 import { CIO } from "@/lib/team";
@@ -50,18 +49,17 @@ export default function Home() {
             Scholars Opportunity Fund
           </p>
           <h1 className="max-w-4xl text-5xl tracking-tight text-cloud sm:text-6xl lg:text-[80px] lg:leading-[1.05]">
-            Quantitative investing in{" "}
-            <span className="text-copper">special situations</span>
+            Student-run event-driven fund in{" "}
+            <span className="text-copper">public equities</span>
           </h1>
           <p className="mt-8 max-w-xl text-[17px] leading-relaxed text-foreground-on-dark-muted">
-            A proprietary investment process targeting inefficiencies in public
-            equities, powered by systematic detection and rigorous fundamental
-            review. All decisions made by the Chief Investment Officer.
+            Led by Professor Jonathan Brogaard. Focused on special situations
+            and catalyst-driven opportunities in the public equity universe.
           </p>
           <div className="mt-12 flex flex-wrap items-center gap-5">
-            <Button href="/about">Learn More</Button>
+            <Button href="/about">View Overview</Button>
             <Button href="/program" variant="outline">
-              <span className="text-cloud">Student Program</span>
+              <span className="text-cloud">Join the Fund</span>
             </Button>
           </div>
         </Container>
@@ -72,12 +70,9 @@ export default function Home() {
         <Container>
           <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
             <Stat label="Universe" value="Public Equities" />
-            <Stat label="Strategy" value="Special Situations" />
+            <Stat label="Strategy" value="Event-Driven" />
+            <Stat label="Focus" value="Special Situations" />
             <Stat label="Home" value="Salt Lake City" />
-            <Stat
-              label="Analyst Cohort"
-              render={<CountUp to={11} suffix=" Students" />}
-            />
           </div>
         </Container>
       </section>
@@ -91,33 +86,31 @@ export default function Home() {
                 Our Approach
               </p>
               <h2 className="mt-6 text-4xl sm:text-5xl">
-                Systematic where it scales. Human where it matters.
+                Event-driven. Catalyst-focused. Selective.
               </h2>
             </div>
             <div className="space-y-8 text-[17px] leading-[1.8] text-foreground-secondary">
               <p>
-                We combine quantitative screening with fundamental analysis to
-                identify opportunities where institutional coverage is thinnest
-                and pricing inefficiency is highest.
+                SOF underwrites catalyst-driven opportunities in public
+                equities, situations where a defined event reshapes the
+                risk-reward and institutional coverage is uneven.
               </p>
               <p>
-                Our proprietary platform monitors regulatory filings
-                continuously, scoring and surfacing candidates that meet the
-                fund&apos;s criteria. Every candidate undergoes structured
-                fundamental review before reaching the Chief Investment
-                Officer.
+                Idea sourcing, screening, and diligence feed a structured
+                investment memo. Each memo is pressure-tested by the analyst
+                team before reaching the investment committee.
               </p>
               <p>
-                From signal detection to investment outcome, every step is
-                documented, measured, and auditable. Process integrity drives
-                performance.
+                The Chief Investment Officer owns every capital decision.
+                Positions are monitored continuously against the original
+                thesis.
               </p>
               <Link
                 href="/about"
                 className="group inline-flex items-center gap-2 pt-2 text-[15px] font-medium text-ink hover:text-copper"
               >
                 <span className="border-b border-copper/60 pb-0.5 transition-colors group-hover:border-copper">
-                  Read how the process works
+                  View the overview
                 </span>
                 <span aria-hidden="true" className="transition-transform group-hover:translate-x-1">&rarr;</span>
               </Link>
@@ -133,18 +126,18 @@ export default function Home() {
             {[
               {
                 number: "01",
-                title: "Systematic Detection",
-                text: "A proprietary platform monitors regulatory filings continuously, scoring and surfacing candidates that meet the fund's investment criteria.",
+                title: "Catalyst Sourcing",
+                text: "Structured idea generation across event-driven situations in the public equity universe.",
               },
               {
                 number: "02",
-                title: "Rigorous Analysis",
-                text: "Every candidate undergoes structured fundamental review by the analyst team before reaching the Chief Investment Officer.",
+                title: "Rigorous Diligence",
+                text: "Every candidate enters a disciplined research and memo process before it reaches the investment committee.",
               },
               {
                 number: "03",
-                title: "Disciplined Process",
-                text: "From signal detection to investment outcome, every step is documented, measured, and auditable.",
+                title: "Selective Underwriting",
+                text: "The Chief Investment Officer owns sizing, entry, and exit. Positions are monitored against the original thesis.",
               },
             ].map((pillar) => (
               <div
@@ -228,19 +221,20 @@ export default function Home() {
         <Container>
           <div className="max-w-3xl">
             <p className="text-xs font-medium tracking-[0.2em] text-copper uppercase">
-              Student Analyst Program
+              The Analyst Team
             </p>
             <h2 className="mt-6 text-4xl text-cloud sm:text-5xl">
-              Training the next generation
+              Institutional discipline, selective by design
             </h2>
             <p className="mt-8 text-[17px] leading-[1.8] text-foreground-on-dark-muted">
-              SOF puts students inside a live quantitative investment process
-              before their careers begin. Analysts own real work product with
-              real capital consequences, under experienced GP supervision.
+              SOF is student-run but institutionally structured. Analysts
+              carry live research responsibility under experienced GP
+              oversight, and every capital decision routes through the
+              Chief Investment Officer.
             </p>
             <div className="mt-12 flex flex-wrap items-center gap-5">
               <Button href="/program" variant="outline">
-                <span className="text-cloud">Explore the Program</span>
+                <span className="text-cloud">How We Work</span>
               </Button>
             </div>
           </div>

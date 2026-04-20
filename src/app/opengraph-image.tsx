@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const alt =
-  "Scholars Opportunity Fund. Quantitative investing in special situations.";
+  "Scholars Opportunity Fund. Student-run event-driven fund in public equities.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -55,7 +55,7 @@ export default async function Image() {
               display: "flex",
             }}
           >
-            Quantitative investing in special situations
+            Event-driven investing in public equities
           </div>
           <div
             style={{

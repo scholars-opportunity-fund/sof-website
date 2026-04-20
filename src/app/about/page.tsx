@@ -1,37 +1,36 @@
 import Image from "next/image";
 import Container from "@/components/ui/Container";
 import Reveal from "@/components/ui/Reveal";
-import CountUp from "@/components/ui/CountUp";
 import { generatePageMetadata } from "@/lib/seo";
 import { CIO } from "@/lib/team";
 
 export const metadata = generatePageMetadata({
   title: "About",
   description:
-    "Scholars Opportunity Fund runs a quantitative investment process targeting special situations in public equities. Led by Dr. Jonathan Brogaard.",
+    "Scholars Opportunity Fund is a student-run event-driven fund in public equities, focused on special situations and catalyst-driven opportunities. Led by Professor Jonathan Brogaard.",
   path: "/about",
 });
 
 const PROCESS_STEPS = [
   {
     step: "01",
-    title: "Systematic Detection",
-    text: "A proprietary platform continuously monitors regulatory filings and market data, scoring candidates against the fund's special-situation criteria.",
+    title: "Idea Sourcing",
+    text: "Structured sourcing across event-driven situations in the public equity universe.",
   },
   {
     step: "02",
-    title: "Analyst Review",
-    text: "Candidates clearing the threshold enter structured fundamental review. Student analysts build a collective case, stress-tested internally before it leaves the team.",
+    title: "Screening & Diligence",
+    text: "Candidates clearing an initial screen enter rigorous diligence. Analysts build the case and pressure-test it internally before it leaves the team.",
   },
   {
     step: "03",
-    title: "Decision",
-    text: "A final investment memo reaches the Chief Investment Officer, who owns position sizing, entry, and exit.",
+    title: "Investment Committee",
+    text: "A final memo reaches the Chief Investment Officer, who owns sizing, entry, and exit.",
   },
   {
     step: "04",
-    title: "Monitoring & Reporting",
-    text: "Positions are continuously monitored for drift and material events. LP reporting closes the loop between analytical work and capital outcome.",
+    title: "Monitoring",
+    text: "Positions are monitored against the original thesis and material events. Reporting closes the loop between research and capital outcome.",
   },
 ];
 
@@ -56,9 +55,9 @@ export default function AboutPage() {
             Scholars Opportunity Fund
           </h1>
           <p className="mt-8 max-w-xl text-[17px] leading-[1.8] text-foreground-on-dark-muted">
-            A quantitative investment process targeting special situations in
-            the public equity universe, where institutional coverage is thinnest
-            and pricing inefficiency is highest.
+            A student-run event-driven fund in public equities, focused on
+            special situations and catalyst-driven opportunities. Led by
+            Professor Jonathan Brogaard.
           </p>
         </Container>
       </section>
@@ -68,11 +67,8 @@ export default function AboutPage() {
         <Container>
           <div className="grid grid-cols-3 gap-px bg-border/60">
             <Stat label="Universe" value="Public Equities" />
-            <Stat label="Strategy" value="Special Situations" />
-            <Stat
-              label="Cohort Size"
-              render={<CountUp to={11} suffix=" Analysts" />}
-            />
+            <Stat label="Strategy" value="Event-Driven" />
+            <Stat label="Focus" value="Special Situations" />
           </div>
         </Container>
       </section>
@@ -86,11 +82,11 @@ export default function AboutPage() {
                 Investment Process
               </p>
               <h2 className="mt-6 text-4xl sm:text-5xl">
-                From signal to decision
+                From sourcing to decision
               </h2>
               <p className="mt-8 text-[17px] leading-[1.8] text-foreground-muted">
-                A single pipeline from detection to outcome, with complete
-                transparency at every stage.
+                A disciplined research pipeline from idea to outcome, with
+                clear accountability at every stage.
               </p>
             </div>
             <div className="space-y-8">
@@ -195,9 +191,8 @@ export default function AboutPage() {
                 decision.
               </p>
               <p>
-                Every step from signal detection to investment outcome is
-                documented, measured, and auditable. Process integrity drives
-                performance.
+                Every step from idea to investment outcome is documented and
+                auditable. Process integrity drives performance.
               </p>
             </div>
           </Reveal>

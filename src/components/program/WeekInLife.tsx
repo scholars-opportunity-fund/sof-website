@@ -17,8 +17,8 @@ const DAYS: Day[] = [
     title: "Screen & Intake",
     focus: "Weekly digest review",
     items: [
-      "The quantitative model's new candidate set lands in the team inbox.",
-      "Analysts skim every new filing and claim one for the week.",
+      "The week's sourcing digest lands in the team inbox.",
+      "Analysts review new candidates and claim one for the week.",
       "Initial hypothesis and capital-at-risk framing drafted before close of day.",
     ],
   },
@@ -36,10 +36,10 @@ const DAYS: Day[] = [
   {
     key: "wed",
     label: "Wed",
-    title: "Quant Layer",
-    focus: "Modeling & validation",
+    title: "Validation",
+    focus: "Modeling & base rates",
     items: [
-      "Layer the model's signal contribution onto your fundamental thesis.",
+      "Build the valuation and downside framing around the catalyst.",
       "Stress-test assumptions against historical base rates for comparable situations.",
       "Identify the weakest link in the bull case and write it up honestly.",
     ],

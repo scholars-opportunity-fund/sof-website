@@ -58,17 +58,16 @@ export default function InsightsPage() {
             </div>
             <div className="space-y-8 text-[17px] leading-[1.8] text-foreground-secondary">
               <p>
-                The public equity markets are being reshaped by systematic
-                strategies, quantitative infrastructure, and an accelerating
-                shift toward data-driven decision-making. Our insights reflect
-                the fund&apos;s approach to understanding these dynamics from
-                the inside.
+                Public equity markets are being reshaped by systematic
+                strategies, data-driven decision-making, and a shifting
+                opportunity set in special situations. Our insights reflect
+                the fund&apos;s view on these dynamics from the inside.
               </p>
               <p>
                 We publish market research on the special situations universe
                 we operate in, post mortems on completed investment cases, and
-                commentary on the quantitative methods and market structure
-                themes that inform our process.
+                commentary on the market structure themes that inform our
+                process.
               </p>
             </div>
           </div>
