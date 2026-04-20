@@ -14,7 +14,7 @@ export default function ApplyPage() {
   return (
     <>
       {/* Hero */}
-      <section className="relative overflow-hidden bg-ink py-36 sm:py-44">
+      <section className="relative overflow-hidden bg-ink py-24 sm:py-32">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0"
@@ -57,7 +57,7 @@ export default function ApplyPage() {
       </section>
 
       {/* How to apply */}
-      <section className="py-32 sm:py-40">
+      <section className="py-16 sm:py-24">
         <Container>
           <div className="grid gap-16 lg:grid-cols-[1fr_1.5fr] lg:gap-24">
             <div>
@@ -131,7 +131,7 @@ export default function ApplyPage() {
       </section>
 
       {/* Commitment */}
-      <section className="border-t border-border/60 bg-cloud py-28 sm:py-36">
+      <section className="border-t border-border/60 bg-cloud py-16 sm:py-24">
         <Container>
           <div className="grid gap-12 lg:grid-cols-[1fr_1.5fr] lg:gap-20">
             <div>
@@ -170,7 +170,7 @@ export default function ApplyPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-32 sm:py-40">
+      <section className="py-16 sm:py-24">
         <Container>
           <div className="grid gap-16 lg:grid-cols-[1fr_1.5fr] lg:gap-24">
             <div>
@@ -211,7 +211,7 @@ export default function ApplyPage() {
       </section>
 
       {/* Final CTA */}
-      <section className="bg-ink py-24 sm:py-32">
+      <section className="bg-ink py-16 sm:py-24">
         <Container>
           <div className="grid gap-12 lg:grid-cols-[1.2fr_1fr] lg:items-center">
             <div>

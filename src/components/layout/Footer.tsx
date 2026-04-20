@@ -4,7 +4,7 @@ import { FUND, FOOTER_LINKS } from "@/lib/constants";
 export default function Footer() {
   return (
     <footer className="border-t border-border/60 bg-ink text-foreground-on-dark">
-      <div className="mx-auto max-w-7xl px-8 py-20 lg:px-12">
+      <div className="mx-auto max-w-7xl px-8 py-14 lg:px-12">
         <div className="grid grid-cols-1 gap-16 sm:grid-cols-5">
           <div className="sm:col-span-2">
             <Link
@@ -82,7 +82,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-20 border-t border-border-dark/40 pt-8">
+        <div className="mt-12 border-t border-border-dark/40 pt-6">
           <p className="text-[13px] text-foreground-on-dark-muted/60">
             &copy; {new Date().getFullYear()} {FUND.name}. All rights reserved.
             All investment decisions are made by the Chief Investment Officer.

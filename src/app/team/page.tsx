@@ -14,7 +14,7 @@ export default function TeamPage() {
   return (
     <>
       {/* Hero */}
-      <section className="bg-ink py-36 sm:py-44">
+      <section className="bg-ink py-24 sm:py-32">
         <Container>
           <p className="text-xs font-medium tracking-[0.2em] text-copper uppercase">
             Our Team
@@ -31,7 +31,7 @@ export default function TeamPage() {
       </section>
 
       {/* CIO */}
-      <section className="py-28 sm:py-36">
+      <section className="py-16 sm:py-24">
         <Container>
           <p className="text-xs font-medium tracking-[0.2em] text-copper uppercase">
             Chief Investment Officer
@@ -69,7 +69,7 @@ export default function TeamPage() {
       </section>
 
       {/* Co-Founder, Head of Research & Operations */}
-      <section className="border-t border-border/60 bg-cloud py-28 sm:py-36">
+      <section className="border-t border-border/60 bg-cloud py-16 sm:py-24">
         <Container>
           <p className="text-xs font-medium tracking-[0.2em] text-copper uppercase">
             Co-Founder
@@ -111,7 +111,7 @@ export default function TeamPage() {
       </section>
 
       {/* Analyst cohort */}
-      <section className="border-t border-border/60 py-28 sm:py-36">
+      <section className="border-t border-border/60 py-16 sm:py-24">
         <Container>
           <div className="grid gap-12 lg:grid-cols-[1fr_1.5fr] lg:gap-20">
             <div>

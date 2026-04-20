@@ -49,7 +49,7 @@ export default async function InsightPage({ params }: PageProps) {
         })}
       />
 
-      <section className="bg-ink py-36 sm:py-44">
+      <section className="bg-ink py-24 sm:py-32">
         <Container>
           <p className="text-xs font-medium tracking-[0.2em] text-copper uppercase">
             {insight.meta.category.replace("-", " ")}
@@ -65,7 +65,7 @@ export default async function InsightPage({ params }: PageProps) {
         </Container>
       </section>
 
-      <section className="py-32 sm:py-40">
+      <section className="py-16 sm:py-24">
         <Container>
           <article className="prose prose-lg mx-auto max-w-3xl prose-headings:font-heading prose-headings:font-normal prose-a:text-signal hover:prose-a:text-signal-hover">
             <MDXRemote source={insight.content} />

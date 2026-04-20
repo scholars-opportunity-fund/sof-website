@@ -13,7 +13,7 @@ export default function ProgramPage() {
   return (
     <>
       {/* Hero */}
-      <section className="relative overflow-hidden bg-ink py-36 sm:py-44">
+      <section className="relative overflow-hidden bg-ink py-24 sm:py-32">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0"
@@ -54,7 +54,7 @@ export default function ProgramPage() {
       </section>
 
       {/* What Students Do */}
-      <section className="py-32 sm:py-40">
+      <section className="py-16 sm:py-24">
         <Container>
           <div className="grid gap-16 lg:grid-cols-[1fr_1.5fr] lg:gap-24">
             <div>
@@ -103,7 +103,7 @@ export default function ProgramPage() {
       </section>
 
       {/* Selection Process */}
-      <section className="border-t border-border/60 bg-cloud py-32 sm:py-40">
+      <section className="border-t border-border/60 bg-cloud py-16 sm:py-24">
         <Container>
           <p className="text-xs font-medium tracking-[0.2em] text-copper uppercase">
             How We Select
@@ -153,7 +153,7 @@ export default function ProgramPage() {
       </section>
 
       {/* How responsibility grows */}
-      <section className="py-32 sm:py-40">
+      <section className="py-16 sm:py-24">
         <Container>
           <div className="grid gap-16 lg:grid-cols-[1fr_1.5fr] lg:gap-24">
             <div>
@@ -201,7 +201,7 @@ export default function ProgramPage() {
       </section>
 
       {/* Who We Recruit + Career Outcomes */}
-      <section className="bg-ink py-32 sm:py-40">
+      <section className="bg-ink py-16 sm:py-24">
         <Container>
           <div className="grid gap-24 lg:grid-cols-2">
             <div>

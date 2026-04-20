@@ -12,7 +12,7 @@ export default function Home() {
   return (
     <>
       {/* Hero */}
-      <section className="relative overflow-hidden bg-ink py-40 sm:py-52">
+      <section className="relative overflow-hidden bg-ink py-24 sm:py-32">
         {/* Decorative gradient accents */}
         <div
           aria-hidden="true"
@@ -78,7 +78,7 @@ export default function Home() {
       </section>
 
       {/* Approach */}
-      <section className="py-32 sm:py-40">
+      <section className="py-16 sm:py-24">
         <Container>
           <div className="grid gap-16 lg:grid-cols-[1fr_1.5fr] lg:gap-24">
             <div>
@@ -122,7 +122,7 @@ export default function Home() {
       </section>
 
       {/* Pillars */}
-      <section className="border-t border-border/60 py-32 sm:py-40">
+      <section className="border-t border-border/60 py-16 sm:py-24">
         <Container>
           <div className="grid gap-px bg-border/60 sm:grid-cols-3">
             {[
@@ -157,7 +157,7 @@ export default function Home() {
       </section>
 
       {/* Leadership / CIO feature */}
-      <section className="bg-cloud py-32 sm:py-40">
+      <section className="bg-cloud py-16 sm:py-24">
         <Container>
           <div className="grid items-center gap-16 lg:grid-cols-[320px_1fr] lg:gap-24">
             <div className="relative mx-auto aspect-[4/5] w-full max-w-[320px] overflow-hidden bg-gunmetal/10">
@@ -204,7 +204,7 @@ export default function Home() {
       </section>
 
       {/* Student Program */}
-      <section className="bg-ink py-32 sm:py-40">
+      <section className="bg-ink py-16 sm:py-24">
         <Container>
           <div className="max-w-3xl">
             <p className="text-xs font-medium tracking-[0.2em] text-copper uppercase">
@@ -229,7 +229,7 @@ export default function Home() {
       </section>
 
       {/* Insights */}
-      <section className="py-32 sm:py-40">
+      <section className="py-16 sm:py-24">
         <Container>
           <div className="flex items-end justify-between">
             <div>

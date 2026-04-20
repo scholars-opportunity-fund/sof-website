@@ -37,7 +37,7 @@ export default function AboutPage() {
   return (
     <>
       {/* Hero */}
-      <section className="relative overflow-hidden bg-ink py-36 sm:py-44">
+      <section className="relative overflow-hidden bg-ink py-24 sm:py-32">
         {/* Subtle signal/copper accents */}
         <div
           aria-hidden="true"
@@ -62,7 +62,7 @@ export default function AboutPage() {
       </section>
 
       {/* Fund at a glance */}
-      <section className="border-b border-border/60 bg-cloud py-16 sm:py-20">
+      <section className="border-b border-border/60 bg-cloud py-10 sm:py-14">
         <Container>
           <div className="grid grid-cols-2 gap-px bg-border/60 sm:grid-cols-4">
             <Stat label="Universe" value="Public Equities" />
@@ -74,7 +74,7 @@ export default function AboutPage() {
       </section>
 
       {/* Investment process */}
-      <section className="py-32 sm:py-40">
+      <section className="py-16 sm:py-24">
         <Container>
           <div className="grid gap-16 lg:grid-cols-[1fr_1.5fr] lg:gap-24">
             <div>
@@ -117,7 +117,7 @@ export default function AboutPage() {
       </section>
 
       {/* Leadership with CIO headshot */}
-      <section className="border-t border-border/60 bg-cloud py-32 sm:py-40">
+      <section className="border-t border-border/60 bg-cloud py-16 sm:py-24">
         <Container>
           <div className="grid items-start gap-16 lg:grid-cols-[320px_1fr] lg:gap-24">
             <div>
@@ -163,7 +163,7 @@ export default function AboutPage() {
       </section>
 
       {/* Structure */}
-      <section className="bg-ink py-32 sm:py-40">
+      <section className="bg-ink py-16 sm:py-24">
         <Container>
           <div className="grid gap-16 lg:grid-cols-[1fr_1.5fr] lg:gap-24">
             <div>
