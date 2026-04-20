@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { FUND, FOOTER_LINKS } from "@/lib/constants";
 
@@ -11,12 +12,13 @@ export default function Footer() {
               href="/"
               className="inline-flex items-center gap-3 font-heading text-lg text-cloud hover:text-copper transition-colors"
             >
-              <span
-                aria-hidden="true"
-                className="flex h-9 w-9 items-center justify-center bg-gunmetal text-[11px] font-bold tracking-[0.15em] text-cloud"
-              >
-                SOF
-              </span>
+              <Image
+                src="/brand/logo.png"
+                alt=""
+                width={40}
+                height={40}
+                className="h-10 w-10 flex-shrink-0"
+              />
               Scholar Opportunity Fund
             </Link>
             <p className="mt-6 max-w-sm text-[14px] leading-relaxed text-foreground-on-dark-muted">

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import HeaderClient from "./HeaderClient";
 
@@ -10,16 +11,18 @@ export default function Header() {
           aria-label="Scholar Opportunity Fund home"
           className="group flex items-center gap-3 font-heading tracking-tight text-ink transition-colors hover:text-copper"
         >
-          <span
-            aria-hidden="true"
-            className="flex h-9 w-9 items-center justify-center bg-ink text-[11px] font-bold tracking-[0.15em] text-cloud transition-colors group-hover:bg-copper"
-          >
-            SOF
-          </span>
+          <Image
+            src="/brand/logo.png"
+            alt=""
+            width={40}
+            height={40}
+            priority
+            className="h-10 w-10 flex-shrink-0"
+          />
           <span className="hidden text-xl sm:inline">
             Scholar Opportunity Fund
           </span>
-          <span className="text-xl sm:hidden">SOF</span>
+          <span className="text-xl sm:hidden">Scholar Opportunity Fund</span>
         </Link>
         <HeaderClient />
       </div>
