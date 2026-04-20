@@ -14,10 +14,10 @@ export default function Header() {
           <Image
             src="/brand/logo-on-light.png"
             alt=""
-            width={40}
-            height={40}
+            width={56}
+            height={56}
             priority
-            className="h-10 w-10 flex-shrink-0"
+            className="h-14 w-14 flex-shrink-0"
           />
           <span className="hidden text-xl sm:inline">
             Scholars Opportunity Fund
