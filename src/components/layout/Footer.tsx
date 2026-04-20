@@ -5,13 +5,25 @@ export default function Footer() {
   return (
     <footer className="border-t border-border/60 bg-ink text-foreground-on-dark">
       <div className="mx-auto max-w-7xl px-8 py-20 lg:px-12">
-        <div className="grid grid-cols-1 gap-16 sm:grid-cols-3">
-          <div>
-            <Link href="/" className="font-heading text-lg text-cloud hover:text-copper transition-colors">
-              Scholars Opportunity Fund
+        <div className="grid grid-cols-1 gap-16 sm:grid-cols-5">
+          <div className="sm:col-span-2">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-3 font-heading text-lg text-cloud hover:text-copper transition-colors"
+            >
+              <span
+                aria-hidden="true"
+                className="flex h-9 w-9 items-center justify-center bg-gunmetal text-[11px] font-bold tracking-[0.15em] text-cloud"
+              >
+                SOF
+              </span>
+              Scholar Opportunity Fund
             </Link>
-            <p className="mt-6 text-[14px] text-foreground-on-dark-muted leading-relaxed max-w-xs">
+            <p className="mt-6 max-w-sm text-[14px] leading-relaxed text-foreground-on-dark-muted">
               {FUND.description}
+            </p>
+            <p className="mt-6 text-[13px] text-foreground-on-dark-muted/70">
+              {FUND.location}
             </p>
           </div>
 
@@ -46,6 +58,24 @@ export default function Footer() {
                   >
                     {link.label}
                   </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <p className="text-xs font-medium tracking-[0.15em] text-copper uppercase">
+              Contact
+            </p>
+            <ul className="mt-6 space-y-4">
+              {FOOTER_LINKS.contact.map((link) => (
+                <li key={link.href}>
+                  <a
+                    href={link.href}
+                    className="break-all text-[14px] text-foreground-on-dark-muted transition-colors hover:text-cloud"
+                  >
+                    {link.label}
+                  </a>
                 </li>
               ))}
             </ul>

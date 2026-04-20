@@ -6,27 +6,40 @@ import { generatePageMetadata } from "@/lib/seo";
 export const metadata = generatePageMetadata({
   title: "Insights",
   description:
-    "Market research, post mortems, and commentary from the Scholars Opportunity Fund team.",
+    "Market research, post mortems, and commentary from the Scholar Opportunity Fund team.",
   path: "/insights",
 });
 
+const CATEGORY_LABELS: Record<string, string> = {
+  "market-research": "Market Research",
+  "post-mortem": "Post Mortems",
+  commentary: "Commentary",
+};
+
 export default function InsightsPage() {
   const insights = getAllInsights();
+  const categories = Array.from(new Set(insights.map((i) => i.category)));
 
   return (
     <>
       {/* Hero */}
-      <section className="bg-ink py-36 sm:py-44">
-        <Container>
+      <section className="relative overflow-hidden bg-ink py-36 sm:py-44">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+        >
+          <div className="absolute -top-40 right-1/4 h-[500px] w-[500px] rounded-full bg-signal/10 blur-3xl" />
+        </div>
+        <Container className="relative">
           <p className="text-xs font-medium tracking-[0.2em] text-copper uppercase">
             Insights
           </p>
           <h1 className="mt-6 max-w-3xl text-5xl text-cloud sm:text-6xl lg:text-[72px] lg:leading-[1.1]">
             Research &amp; analysis
           </h1>
-          <p className="mt-8 max-w-xl text-[17px] text-foreground-on-dark-muted leading-[1.8]">
+          <p className="mt-8 max-w-xl text-[17px] leading-[1.8] text-foreground-on-dark-muted">
             Market research, investment post mortems, and commentary from the
-            Scholars Opportunity Fund team.
+            Scholar Opportunity Fund team.
           </p>
         </Container>
       </section>
@@ -36,9 +49,14 @@ export default function InsightsPage() {
         <Container>
           <div className="grid gap-16 lg:grid-cols-[1fr_1.5fr] lg:gap-24">
             <div>
-              <h2 className="text-4xl sm:text-5xl">Our perspective</h2>
+              <p className="text-xs font-medium tracking-[0.2em] text-copper uppercase">
+                Perspective
+              </p>
+              <h2 className="mt-6 text-4xl sm:text-5xl">
+                What we publish, and why
+              </h2>
             </div>
-            <div className="space-y-8 text-[17px] text-foreground-secondary leading-[1.8]">
+            <div className="space-y-8 text-[17px] leading-[1.8] text-foreground-secondary">
               <p>
                 The public equity markets are being reshaped by systematic
                 strategies, quantitative infrastructure, and an accelerating
@@ -57,10 +75,39 @@ export default function InsightsPage() {
         </Container>
       </section>
 
+      {/* Category chips */}
+      {insights.length > 0 && categories.length > 1 && (
+        <section className="border-t border-border/60 bg-cloud py-8">
+          <Container>
+            <div className="flex flex-wrap items-center gap-x-8 gap-y-3">
+              <span className="text-[11px] font-medium tracking-[0.18em] text-copper uppercase">
+                Categories
+              </span>
+              {categories.map((c) => (
+                <span
+                  key={c}
+                  className="text-[13px] tracking-wide text-foreground-muted"
+                >
+                  {CATEGORY_LABELS[c] ?? c}
+                </span>
+              ))}
+            </div>
+          </Container>
+        </section>
+      )}
+
       {/* Grid */}
       <section className="border-t border-border/60 py-32 sm:py-40">
         <Container>
-          <h2 className="text-4xl sm:text-5xl">Latest</h2>
+          <div className="flex items-end justify-between">
+            <h2 className="text-4xl sm:text-5xl">Latest</h2>
+            {insights.length > 0 && (
+              <p className="text-[13px] text-foreground-muted">
+                {insights.length}{" "}
+                {insights.length === 1 ? "piece" : "pieces"}
+              </p>
+            )}
+          </div>
           <div className="mt-16">
             <InsightGrid insights={insights} />
           </div>

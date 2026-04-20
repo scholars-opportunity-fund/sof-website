@@ -17,23 +17,35 @@ export default function InsightCard({ insight }: { insight: InsightMeta }) {
   return (
     <Link
       href={`/insights/${insight.slug}`}
-      className="group block border-t border-border/60 pt-8 transition-colors"
+      className="group flex h-full flex-col border-t-2 border-ink/90 pt-8 transition-colors hover:border-copper"
     >
       <div className="flex items-center gap-3 text-[13px]">
         <span className="font-medium tracking-[0.1em] text-copper uppercase">
           {categoryLabels[insight.category] || insight.category}
         </span>
-        <span className="text-foreground-muted">{formattedDate}</span>
+        <span className="h-px w-4 bg-border" aria-hidden="true" />
+        <time
+          dateTime={insight.date}
+          className="text-foreground-muted"
+        >
+          {formattedDate}
+        </time>
       </div>
-      <h3 className="mt-4 font-heading text-2xl text-ink group-hover:text-copper transition-colors">
+      <h3 className="mt-5 font-heading text-2xl leading-tight text-ink transition-colors group-hover:text-copper">
         {insight.title}
       </h3>
-      <p className="mt-3 text-[15px] text-foreground-muted leading-relaxed line-clamp-2">
+      <p className="mt-4 line-clamp-3 text-[15px] leading-relaxed text-foreground-muted">
         {insight.description}
       </p>
-      <p className="mt-4 text-[13px] text-foreground-muted/60">
-        {insight.author}
-      </p>
+      <div className="mt-6 flex items-center justify-between border-t border-border/40 pt-4">
+        <p className="text-[13px] text-foreground-muted/80">{insight.author}</p>
+        <span
+          aria-hidden="true"
+          className="text-[13px] font-medium text-foreground-muted transition-all group-hover:translate-x-0.5 group-hover:text-copper"
+        >
+          Read &rarr;
+        </span>
+      </div>
     </Link>
   );
 }

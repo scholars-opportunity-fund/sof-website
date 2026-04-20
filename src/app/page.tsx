@@ -1,8 +1,10 @@
+import Image from "next/image";
 import Link from "next/link";
 import Container from "@/components/ui/Container";
 import Button from "@/components/ui/Button";
 import { getAllInsights } from "@/lib/insights";
 import InsightCard from "@/components/insights/InsightCard";
+import { CIO } from "@/lib/team";
 
 export default function Home() {
   const latestInsights = getAllInsights().slice(0, 3);
@@ -10,17 +12,51 @@ export default function Home() {
   return (
     <>
       {/* Hero */}
-      <section className="bg-ink py-40 sm:py-52">
-        <Container>
-          <h1 className="max-w-4xl text-5xl tracking-tight text-cloud sm:text-6xl lg:text-[80px] lg:leading-[1.1]">
-            Quantitative investing in special situations
+      <section className="relative overflow-hidden bg-ink py-40 sm:py-52">
+        {/* Decorative gradient accents */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+        >
+          <div className="absolute -top-40 -right-20 h-[560px] w-[560px] rounded-full bg-copper/10 blur-3xl" />
+          <div className="absolute -bottom-60 left-1/3 h-[600px] w-[600px] rounded-full bg-signal/5 blur-3xl" />
+          {/* Thin copper/signal "signal" marks */}
+          <svg
+            className="absolute bottom-0 left-0 h-24 w-full opacity-[0.18]"
+            viewBox="0 0 1200 100"
+            preserveAspectRatio="none"
+            fill="none"
+          >
+            <path
+              d="M0 80 L300 60 L480 72 L660 30 L820 55 L1000 35 L1200 52"
+              stroke="#7BB8D6"
+              strokeWidth="1.5"
+            />
+            <path
+              d="M0 90 L200 85 L400 78 L600 82 L800 70 L1000 80 L1200 72"
+              stroke="#A0755A"
+              strokeWidth="1.5"
+            />
+          </svg>
+        </div>
+        <Container className="relative">
+          <p className="mb-6 inline-flex items-center gap-3 text-xs font-medium tracking-[0.2em] text-copper uppercase">
+            <span
+              aria-hidden="true"
+              className="inline-block h-px w-8 bg-copper"
+            />
+            Scholar Opportunity Fund
+          </p>
+          <h1 className="max-w-4xl text-5xl tracking-tight text-cloud sm:text-6xl lg:text-[80px] lg:leading-[1.05]">
+            Quantitative investing in{" "}
+            <span className="text-copper">special situations</span>
           </h1>
           <p className="mt-8 max-w-xl text-[17px] leading-relaxed text-foreground-on-dark-muted">
-            A proprietary investment process targeting inefficiencies in
-            public equities, powered by systematic research and rigorous
-            analysis.
+            A proprietary investment process targeting inefficiencies in public
+            equities, powered by systematic detection and rigorous fundamental
+            review — all decisions made by the Chief Investment Officer.
           </p>
-          <div className="mt-12 flex items-center gap-5">
+          <div className="mt-12 flex flex-wrap items-center gap-5">
             <Button href="/about">Learn More</Button>
             <Button href="/program" variant="outline">
               <span className="text-cloud">Student Program</span>
@@ -29,14 +65,31 @@ export default function Home() {
         </Container>
       </section>
 
-      {/* Approach — asymmetric two-column */}
+      {/* Stats strip */}
+      <section className="border-b border-border/60 bg-cloud py-14">
+        <Container>
+          <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
+            <Stat label="Universe" value="Public Equities" />
+            <Stat label="Strategy" value="Special Situations" />
+            <Stat label="Investment Decisions" value="CIO-Only" />
+            <Stat label="Analyst Cohort" value="11 Students" />
+          </div>
+        </Container>
+      </section>
+
+      {/* Approach */}
       <section className="py-32 sm:py-40">
         <Container>
           <div className="grid gap-16 lg:grid-cols-[1fr_1.5fr] lg:gap-24">
             <div>
-              <h2 className="text-4xl sm:text-5xl">Our Approach</h2>
+              <p className="text-xs font-medium tracking-[0.2em] text-copper uppercase">
+                Our Approach
+              </p>
+              <h2 className="mt-6 text-4xl sm:text-5xl">
+                Systematic where it scales. Human where it matters.
+              </h2>
             </div>
-            <div className="space-y-8 text-[17px] text-foreground-secondary leading-[1.8]">
+            <div className="space-y-8 text-[17px] leading-[1.8] text-foreground-secondary">
               <p>
                 We combine quantitative screening with fundamental analysis to
                 identify opportunities where institutional coverage is thinnest
@@ -44,15 +97,25 @@ export default function Home() {
               </p>
               <p>
                 Our proprietary platform monitors regulatory filings
-                continuously, scoring and surfacing candidates that meet our
-                investment criteria. Every candidate undergoes structured
-                fundamental review before reaching the Chief Investment Officer.
+                continuously, scoring and surfacing candidates that meet the
+                fund&apos;s criteria. Every candidate undergoes structured
+                fundamental review before reaching the Chief Investment
+                Officer.
               </p>
               <p>
                 From signal detection to investment outcome, every step is
                 documented, measured, and auditable. Process integrity drives
                 performance.
               </p>
+              <Link
+                href="/about"
+                className="group inline-flex items-center gap-2 pt-2 text-[15px] font-medium text-ink hover:text-copper"
+              >
+                <span className="border-b border-copper/60 pb-0.5 transition-colors group-hover:border-copper">
+                  Read how the process works
+                </span>
+                <span aria-hidden="true" className="transition-transform group-hover:translate-x-1">&rarr;</span>
+              </Link>
             </div>
           </div>
         </Container>
@@ -64,28 +127,78 @@ export default function Home() {
           <div className="grid gap-px bg-border/60 sm:grid-cols-3">
             {[
               {
+                number: "01",
                 title: "Systematic Detection",
-                text: "Our platform monitors regulatory filings continuously, scoring and surfacing candidates that meet our investment criteria.",
+                text: "A proprietary platform monitors regulatory filings continuously, scoring and surfacing candidates that meet the fund's investment criteria.",
               },
               {
+                number: "02",
                 title: "Rigorous Analysis",
-                text: "Every candidate undergoes structured fundamental review by our analyst team before reaching the Chief Investment Officer.",
+                text: "Every candidate undergoes structured fundamental review by the analyst team before reaching the Chief Investment Officer.",
               },
               {
+                number: "03",
                 title: "Disciplined Process",
                 text: "From signal detection to investment outcome, every step is documented, measured, and auditable.",
               },
             ].map((pillar) => (
-              <div
-                key={pillar.title}
-                className="bg-background p-10 sm:p-12"
-              >
-                <h3 className="text-xl font-heading">{pillar.title}</h3>
-                <p className="mt-4 text-[15px] text-foreground-muted leading-relaxed">
+              <div key={pillar.title} className="bg-background p-10 sm:p-12">
+                <span className="font-heading text-sm tracking-[0.15em] text-copper/70 uppercase">
+                  {pillar.number}
+                </span>
+                <h3 className="mt-6 font-heading text-xl">{pillar.title}</h3>
+                <p className="mt-4 text-[15px] leading-relaxed text-foreground-muted">
                   {pillar.text}
                 </p>
               </div>
             ))}
+          </div>
+        </Container>
+      </section>
+
+      {/* Leadership / CIO feature */}
+      <section className="bg-cloud py-32 sm:py-40">
+        <Container>
+          <div className="grid items-center gap-16 lg:grid-cols-[320px_1fr] lg:gap-24">
+            <div className="relative mx-auto aspect-[4/5] w-full max-w-[320px] overflow-hidden bg-gunmetal/10">
+              <Image
+                src={CIO.image}
+                alt={`${CIO.name}, Chief Investment Officer`}
+                fill
+                sizes="(min-width: 1024px) 320px, 80vw"
+                className="object-cover"
+              />
+            </div>
+            <div>
+              <p className="text-xs font-medium tracking-[0.2em] text-copper uppercase">
+                Leadership
+              </p>
+              <h2 className="mt-6 text-4xl sm:text-5xl">
+                Led by Dr. Jonathan Brogaard
+              </h2>
+              <p className="mt-8 max-w-2xl text-[17px] leading-[1.8] text-foreground-secondary">
+                Tenured finance professor, FINRA Market Regulation Committee
+                member, and one of the most cited researchers in market
+                microstructure. All investment decisions at SOF are made by
+                the CIO.
+              </p>
+              <div className="mt-10">
+                <Link
+                  href="/team"
+                  className="group inline-flex items-center gap-2 text-[15px] font-medium text-ink hover:text-copper"
+                >
+                  <span className="border-b border-copper/60 pb-0.5 transition-colors group-hover:border-copper">
+                    Meet the team
+                  </span>
+                  <span
+                    aria-hidden="true"
+                    className="transition-transform group-hover:translate-x-1"
+                  >
+                    &rarr;
+                  </span>
+                </Link>
+              </div>
+            </div>
           </div>
         </Container>
       </section>
@@ -100,15 +213,16 @@ export default function Home() {
             <h2 className="mt-6 text-4xl text-cloud sm:text-5xl">
               Training the next generation
             </h2>
-            <p className="mt-8 text-[17px] text-foreground-on-dark-muted leading-[1.8]">
+            <p className="mt-8 text-[17px] leading-[1.8] text-foreground-on-dark-muted">
               SOF puts students inside a live quantitative investment process
               before their careers begin. Analysts own real work product with
               real capital consequences, under experienced GP supervision.
             </p>
-            <div className="mt-12">
+            <div className="mt-12 flex flex-wrap items-center gap-5">
               <Button href="/program" variant="outline">
                 <span className="text-cloud">Explore the Program</span>
               </Button>
+              <Button href="/apply">Apply Now</Button>
             </div>
           </div>
         </Container>
@@ -118,11 +232,16 @@ export default function Home() {
       <section className="py-32 sm:py-40">
         <Container>
           <div className="flex items-end justify-between">
-            <h2 className="text-4xl sm:text-5xl">Insights</h2>
+            <div>
+              <p className="text-xs font-medium tracking-[0.2em] text-copper uppercase">
+                Research & Analysis
+              </p>
+              <h2 className="mt-6 text-4xl sm:text-5xl">Insights</h2>
+            </div>
             {latestInsights.length > 0 && (
               <Link
                 href="/insights"
-                className="text-[15px] text-foreground-secondary hover:text-ink transition-colors"
+                className="text-[15px] text-foreground-secondary transition-colors hover:text-ink"
               >
                 View all &rarr;
               </Link>
@@ -146,5 +265,16 @@ export default function Home() {
         </Container>
       </section>
     </>
+  );
+}
+
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="text-[11px] font-medium tracking-[0.18em] text-copper uppercase">
+        {label}
+      </p>
+      <p className="mt-2 font-heading text-lg text-ink sm:text-xl">{value}</p>
+    </div>
   );
 }
