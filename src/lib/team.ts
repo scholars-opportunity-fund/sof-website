@@ -4,15 +4,14 @@
  * Single source of truth for the team page and any other place that needs
  * to render team members. Update this file to add, remove, or reorder.
  *
- * Three tiers:
- *   1. CIO. Dr. Brogaard. Every capital decision.
- *   2. Co-Founder. Head of Research and Operations.
- *   3. Analysts. The cohort doing the fundamental work.
+ * Two tiers:
+ *   1. Leadership. CIO + Head of Research and Operations.
+ *   2. Analysts. The cohort doing the fundamental work.
  */
 
 export type TeamRole =
   | "Chief Investment Officer"
-  | "Co-Founder, Head of Research & Operations"
+  | "Head of Research & Operations"
   | "Analyst";
 
 export interface TeamMember {
@@ -48,7 +47,7 @@ export const GPS: TeamMember[] = [
   {
     slug: "ronan-schultz",
     name: "Ronan Schultz",
-    role: "Co-Founder, Head of Research & Operations",
+    role: "Head of Research & Operations",
     image: "/team/ronan.jpg",
     headline:
       "Co-founder of Scholar Opportunity Fund. Oversees the analyst team, the research pipeline, and fund operations.",

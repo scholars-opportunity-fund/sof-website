@@ -41,28 +41,14 @@ export default function TeamDirectory({ cio, cofounders, analysts }: Props) {
 
   return (
     <>
-      {/* CIO */}
+      {/* Leadership — CIO and Head of Research & Operations together */}
       <section className="py-16 sm:py-24">
         <div className="mx-auto w-full max-w-7xl px-8 lg:px-12">
           <p className="text-xs font-medium tracking-[0.2em] text-copper uppercase">
-            Chief Investment Officer
+            Leadership
           </p>
           <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            <HeadshotCard
-              member={cio}
-              onClick={() => setOpenSlug(cio.slug)}
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* Co-Founder */}
-      <section className="border-t border-border/60 bg-cloud py-16 sm:py-24">
-        <div className="mx-auto w-full max-w-7xl px-8 lg:px-12">
-          <p className="text-xs font-medium tracking-[0.2em] text-copper uppercase">
-            Co-Founder
-          </p>
-          <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <HeadshotCard member={cio} onClick={() => setOpenSlug(cio.slug)} />
             {cofounders.map((m) => (
               <HeadshotCard
                 key={m.slug}
