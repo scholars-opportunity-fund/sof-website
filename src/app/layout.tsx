@@ -36,6 +36,23 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
   },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+    other: {
+      "msvalidate.01":
+        process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION ?? "",
+    },
+  },
 };
 
 export default function RootLayout({
