@@ -130,72 +130,40 @@ export default function ApplyPage() {
         </Container>
       </section>
 
-      {/* Requirements / profile */}
-      <section className="border-t border-border/60 bg-cloud py-32 sm:py-40">
+      {/* Commitment */}
+      <section className="border-t border-border/60 bg-cloud py-28 sm:py-36">
         <Container>
-          <div className="grid gap-16 lg:grid-cols-2">
-            <div>
-              <p className="text-xs font-medium tracking-[0.2em] text-copper uppercase">
-                What We Look For
-              </p>
-              <h2 className="mt-6 text-4xl sm:text-5xl">
-                A serious analyst profile
-              </h2>
-              <ul className="mt-10 space-y-5">
-                {[
-                  "Strong quantitative foundation — calculus, statistics, linear algebra.",
-                  "Demonstrated comfort with Python, R, or equivalent — enough to load data, test a hypothesis, and produce an output.",
-                  "Fluency with a company's financials; ability to read a 10-K and surface what matters.",
-                  "Intellectual honesty. Willingness to be wrong publicly in front of the team so the work gets better.",
-                  "Sustained interest in markets — an investing track record, a written thesis, or something you built.",
-                ].map((item) => (
-                  <li
-                    key={item}
-                    className="flex items-start gap-4 text-[15px] leading-relaxed text-foreground-secondary"
-                  >
-                    <span
-                      aria-hidden="true"
-                      className="mt-2 inline-block h-[3px] w-5 shrink-0 bg-copper"
-                    />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+          <div className="grid gap-12 lg:grid-cols-[1fr_1.5fr] lg:gap-20">
             <div>
               <p className="text-xs font-medium tracking-[0.2em] text-copper uppercase">
                 Commitment
               </p>
               <h2 className="mt-6 text-4xl sm:text-5xl">What to expect</h2>
-              <div className="mt-10 grid gap-px bg-border/60">
-                {[
-                  {
-                    label: "Time Commitment",
-                    value: "8–12 hours/week during term",
-                  },
-                  { label: "Minimum Term", value: "Two consecutive semesters" },
-                  {
-                    label: "Compensation",
-                    value: "Unpaid; eligible for academic credit",
-                  },
-                  {
-                    label: "Location",
-                    value: "In-person, Salt Lake City — hybrid as work permits",
-                  },
-                ].map((row) => (
-                  <div
-                    key={row.label}
-                    className="flex flex-col gap-1 bg-background p-6 sm:flex-row sm:items-baseline sm:justify-between sm:gap-8"
-                  >
-                    <p className="text-[12px] font-medium tracking-[0.15em] text-copper uppercase">
-                      {row.label}
-                    </p>
-                    <p className="text-[15px] text-foreground-secondary">
-                      {row.value}
-                    </p>
-                  </div>
-                ))}
-              </div>
+            </div>
+            <div className="grid gap-px bg-border/60">
+              {[
+                {
+                  label: "Time Commitment",
+                  value: "8 to 12 hours per week during term",
+                },
+                { label: "Minimum Term", value: "Two consecutive semesters" },
+                {
+                  label: "Location",
+                  value: "In person, Salt Lake City",
+                },
+              ].map((row) => (
+                <div
+                  key={row.label}
+                  className="flex flex-col gap-1 bg-background p-6 sm:flex-row sm:items-baseline sm:justify-between sm:gap-8"
+                >
+                  <p className="text-[12px] font-medium tracking-[0.15em] text-copper uppercase">
+                    {row.label}
+                  </p>
+                  <p className="text-[15px] text-foreground-secondary">
+                    {row.value}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
         </Container>
@@ -215,7 +183,7 @@ export default function ApplyPage() {
               {[
                 {
                   q: "Do I need to be a finance major?",
-                  a: "No. Current analysts come from quantitative analysis, finance, mathematics, and applied math. What matters is demonstrated quantitative and analytical capability — not degree name.",
+                  a: "No. Current analysts come from quantitative analysis, finance, mathematics, and applied math. What matters is demonstrated quantitative and analytical capability, not degree name.",
                 },
                 {
                   q: "Can I apply as a freshman?",
@@ -227,7 +195,7 @@ export default function ApplyPage() {
                 },
                 {
                   q: "How is this different from a university-backed fund?",
-                  a: "SOF is independently operated. All investment decisions are made by the CIO. Students contribute analytical throughput within defined process boundaries — closer to how a real analyst pod operates.",
+                  a: "SOF is independently operated. All investment decisions are made by the CIO. Students contribute analytical throughput within defined process boundaries, closer to how a real analyst pod operates.",
                 },
               ].map((item) => (
                 <div key={item.q} className="py-8">

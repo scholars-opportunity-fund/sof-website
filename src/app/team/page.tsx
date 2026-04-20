@@ -27,28 +27,16 @@ export default function TeamPage() {
             selected for depth of technical preparation and professional
             trajectory.
           </p>
-          <div className="mt-16 grid max-w-xl grid-cols-3 gap-px bg-gunmetal/60">
-            <Stat label="Cohort" value={String(ANALYSTS.length)} />
-            <Stat
-              label="4.0 GPAs"
-              value={String(
-                ANALYSTS.filter((a) =>
-                  (a.credentials ?? "").includes("4.00")
-                ).length
-              )}
-            />
-            <Stat label="Institution" value="Utah" />
-          </div>
         </Container>
       </section>
 
       {/* CIO */}
-      <section className="py-32 sm:py-40">
+      <section className="py-28 sm:py-36">
         <Container>
           <p className="text-xs font-medium tracking-[0.2em] text-copper uppercase">
             Chief Investment Officer
           </p>
-          <div className="mt-10 grid items-start gap-16 lg:grid-cols-[360px_1fr] lg:gap-24">
+          <div className="mt-10 grid items-start gap-12 lg:grid-cols-[360px_1fr] lg:gap-20">
             <div className="relative aspect-[4/5] overflow-hidden bg-gunmetal/10">
               <Image
                 src={CIO.image}
@@ -80,17 +68,17 @@ export default function TeamPage() {
         </Container>
       </section>
 
-      {/* General Partner(s) — co-founders, oversee the cohort */}
-      <section className="border-t border-border/60 bg-cloud py-32 sm:py-40">
+      {/* Co-Founder, Head of Research & Operations */}
+      <section className="border-t border-border/60 bg-cloud py-28 sm:py-36">
         <Container>
           <p className="text-xs font-medium tracking-[0.2em] text-copper uppercase">
-            General Partner
+            Co-Founder
           </p>
-          <div className="mt-10 space-y-20">
+          <div className="mt-10 space-y-16">
             {GPS.map((gp) => (
               <div
                 key={gp.slug}
-                className="grid items-start gap-16 lg:grid-cols-[300px_1fr] lg:gap-24"
+                className="grid items-start gap-12 lg:grid-cols-[300px_1fr] lg:gap-20"
               >
                 <div className="relative aspect-[4/5] overflow-hidden bg-gunmetal/10">
                   <Image
@@ -122,10 +110,10 @@ export default function TeamPage() {
         </Container>
       </section>
 
-      {/* Analyst cohort — flat */}
-      <section className="border-t border-border/60 py-32 sm:py-40">
+      {/* Analyst cohort */}
+      <section className="border-t border-border/60 py-28 sm:py-36">
         <Container>
-          <div className="grid gap-16 lg:grid-cols-[1fr_1.5fr] lg:gap-24">
+          <div className="grid gap-12 lg:grid-cols-[1fr_1.5fr] lg:gap-20">
             <div>
               <p className="text-xs font-medium tracking-[0.2em] text-copper uppercase">
                 Analyst Cohort
@@ -140,14 +128,14 @@ export default function TeamPage() {
             </p>
           </div>
 
-          <div className="mt-16 border-t border-border/60 pt-6">
+          <div className="mt-14 border-t border-border/60 pt-6">
             <div className="flex items-baseline justify-between">
               <h3 className="font-heading text-2xl">Analysts</h3>
               <span className="text-[13px] font-medium tracking-[0.15em] text-foreground-muted uppercase">
                 {ANALYSTS.length} members
               </span>
             </div>
-            <div className="mt-12 grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-10 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {ANALYSTS.map((m) => (
                 <MemberCard key={m.slug} member={m} />
               ))}
@@ -167,35 +155,24 @@ function MemberCard({ member }: { member: TeamMember }) {
           src={member.image}
           alt={`${member.name}, ${member.role}`}
           fill
-          sizes="(min-width: 1024px) 320px, (min-width: 640px) 45vw, 90vw"
+          sizes="(min-width: 1280px) 260px, (min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw"
           className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
         />
       </div>
-      <div className="mt-5">
-        <h4 className="font-heading text-xl text-ink">{member.name}</h4>
-        <p className="mt-1 text-[12px] font-medium tracking-[0.15em] text-copper uppercase">
+      <div className="mt-4">
+        <h4 className="font-heading text-lg text-ink">{member.name}</h4>
+        <p className="mt-1 text-[11px] font-medium tracking-[0.15em] text-copper uppercase">
           {member.role}
         </p>
         {member.credentials && (
-          <p className="mt-3 text-[13px] leading-relaxed text-foreground-muted">
+          <p className="mt-2 text-[12px] leading-snug text-foreground-muted">
             {member.credentials}
           </p>
         )}
-        <p className="mt-3 text-[14px] leading-relaxed text-foreground-secondary">
+        <p className="mt-2 text-[13px] leading-snug text-foreground-secondary">
           {member.headline}
         </p>
       </div>
     </article>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="bg-ink p-6">
-      <p className="font-heading text-3xl text-cloud sm:text-4xl">{value}</p>
-      <p className="mt-2 text-[11px] font-medium tracking-[0.18em] text-copper uppercase">
-        {label}
-      </p>
-    </div>
   );
 }

@@ -54,7 +54,7 @@ export default function Home() {
           <p className="mt-8 max-w-xl text-[17px] leading-relaxed text-foreground-on-dark-muted">
             A proprietary investment process targeting inefficiencies in public
             equities, powered by systematic detection and rigorous fundamental
-            review — all decisions made by the Chief Investment Officer.
+            review. All decisions made by the Chief Investment Officer.
           </p>
           <div className="mt-12 flex flex-wrap items-center gap-5">
             <Button href="/about">Learn More</Button>

@@ -45,11 +45,10 @@ export default function ProgramPage() {
       {/* Quick stats */}
       <section className="border-b border-border/60 bg-cloud py-14">
         <Container>
-          <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
+          <div className="grid grid-cols-3 gap-8">
             <Stat label="Cohort Size" value="11" />
             <Stat label="Selection Stages" value="3" />
             <Stat label="Term Length" value="Multi-Semester" />
-            <Stat label="Compensation" value="Unpaid / Credit" />
           </div>
         </Container>
       </section>
@@ -67,10 +66,10 @@ export default function ProgramPage() {
             <div>
               <p className="text-[17px] leading-[1.8] text-foreground-secondary">
                 The fund&apos;s quantitative model surfaces special situation
-                candidates. The student team takes it from there — conducting
-                company-level research, stress-testing the analytical case
-                among themselves, and delivering a collective investment memo
-                to the CIO. He makes every investment decision.
+                candidates. The student team takes it from there. They conduct
+                company-level research, stress-test the analytical case among
+                themselves, and deliver a collective investment memo to the
+                CIO. He makes every investment decision.
               </p>
               <div className="mt-16 space-y-12">
                 {[
@@ -84,7 +83,7 @@ export default function ProgramPage() {
                   },
                   {
                     title: "Quarterly Reporting",
-                    text: "Students produce the analytical inputs for LP reporting — a direct line of accountability from their work product to the people whose capital is deployed.",
+                    text: "Students produce the analytical inputs for LP reporting, a direct line of accountability from their work product to the people whose capital is deployed.",
                   },
                 ].map((item) => (
                   <div
