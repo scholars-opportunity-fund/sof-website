@@ -41,6 +41,7 @@ export const CIO: TeamMember = {
     "Tenured finance professor, FINRA Market Regulation Committee member, and one of the most cited researchers in market microstructure.",
   bio: "Dr. Brogaard chairs every investment decision at Scholar Opportunity Fund. His research on high-frequency trading, market structure, and liquidity has been cited thousands of times and is standard reading on institutional trading desks. He serves on the FINRA Market Regulation Committee, advising on how systematic activity shapes U.S. equity markets. At SOF, his role is narrow and absolute. Every capital decision passes through him, and process authority stops where his judgment begins.",
   credentials: "Ph.D. Finance, Northwestern University",
+  linkedin: "https://www.linkedin.com/in/jonathan-brogaard/",
 };
 
 export const GPS: TeamMember[] = [
@@ -54,6 +55,7 @@ export const GPS: TeamMember[] = [
     bio: "Ronan co-founded Scholar Opportunity Fund alongside Dr. Brogaard and will be with the fund for its full lifespan. As Head of Research and Operations, he owns the day-to-day engine of the fund: the analyst cohort, the research workflow from candidate detection to memo delivery, and all operating infrastructure supporting the CIO's investment decisions.",
     gradYear: "May 2028",
     credentials: "B.S. Quantitative Analysis of Markets & Organizations",
+    linkedin: "https://www.linkedin.com/in/ronanschultz/",
   },
 ];
 
@@ -89,6 +91,7 @@ export const ANALYSTS: TeamMember[] = [
       "Incoming Data Science Intern at Pattern. Selected for the Goldman Sachs Emerging Leaders Series.",
     gradYear: "May 2028",
     credentials: "B.S. QAMO",
+    linkedin: "https://www.linkedin.com/in/cash-francis/",
   },
   {
     slug: "joel-bryan",
@@ -99,6 +102,7 @@ export const ANALYSTS: TeamMember[] = [
       "Founder of Bryan Car Care, LLC. Data Analytics Competition winner (1st of 70+ teams).",
     gradYear: "May 2028",
     credentials: "B.S. QAMO",
+    linkedin: "https://www.linkedin.com/in/joelhbryan/",
   },
   {
     slug: "maxwell-white",
@@ -109,6 +113,7 @@ export const ANALYSTS: TeamMember[] = [
       "Growth Equity Intern at UGF ($90M AUM). Analyst Intern at Spacestation Investments.",
     gradYear: "May 2028",
     credentials: "B.S. QAMO, Finance emphasis",
+    linkedin: "https://www.linkedin.com/in/maxwell-n-white/",
   },
   {
     slug: "caden-campbell",
@@ -131,6 +136,7 @@ export const ANALYSTS: TeamMember[] = [
     gradYear: "May 2029",
     credentials:
       "Honors B.S. QAMO (Finance) and B.S. Mathematics (Statistics)",
+    linkedin: "https://www.linkedin.com/in/tyler-teo/",
   },
   {
     slug: "maretta-henriksen",
@@ -141,6 +147,7 @@ export const ANALYSTS: TeamMember[] = [
       "Marketing & Data Analyst at Eccles Graduate Programs. Women in Business member.",
     gradYear: "May 2029",
     credentials: "B.S. QAMO",
+    linkedin: "https://www.linkedin.com/in/maretta-henriksen-b3409b353/",
   },
   {
     slug: "nicholas-kouzmanoff",
