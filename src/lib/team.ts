@@ -20,15 +20,15 @@ export interface TeamMember {
   name: string;
   role: TeamRole;
   image: string;
-  /** 1-sentence headline shown in the grid. */
+  /** 1-sentence headline shown in modal. */
   headline: string;
-  /** Optional longer bio for expanded treatments. */
+  /** Optional longer bio for expanded treatments (shown in modal if present). */
   bio?: string;
   /** Optional graduation year, e.g. "May 2029". */
   gradYear?: string;
-  /** Optional credentials shown below role (e.g. degree). */
+  /** Degree / major line shown in the modal. */
   credentials?: string;
-  /** Optional LinkedIn URL. */
+  /** Optional LinkedIn profile URL. */
   linkedin?: string;
 }
 
@@ -67,6 +67,7 @@ export const ANALYSTS: TeamMember[] = [
       "Incoming Bain & Company consultant. Co-founded the University of Utah's first quantitative finance student organization.",
     gradYear: "May 2027",
     credentials: "B.S. QAMO, Mathematics minor",
+    linkedin: "https://www.linkedin.com/in/gdhawranek/",
   },
   {
     slug: "adam-ferrell",
@@ -77,6 +78,7 @@ export const ANALYSTS: TeamMember[] = [
       "Growth Equity Intern at University Growth Fund. Sorenson Capital Case Competition finalist.",
     gradYear: "May 2028",
     credentials: "B.S. QAMO",
+    linkedin: "https://www.linkedin.com/in/a-ferrell",
   },
   {
     slug: "cash-francis",
@@ -117,6 +119,7 @@ export const ANALYSTS: TeamMember[] = [
       "Incoming Summer Analyst at Cimarron Healthcare Capital. Summer Growth Equity Intern at UGF.",
     gradYear: "May 2029",
     credentials: "Honors B.S. Finance, Mathematics minor",
+    linkedin: "https://www.linkedin.com/in/caden-campbell-an7",
   },
   {
     slug: "tyler-teo",
@@ -148,6 +151,7 @@ export const ANALYSTS: TeamMember[] = [
       "Utah Real Estate Competition development team. Eagle Scout and former Associated Student Body President.",
     gradYear: "May 2029",
     credentials: "B.S. Finance",
+    linkedin: "https://www.linkedin.com/in/nicholas-kouzmanoff",
   },
   {
     slug: "taggart-severson",
@@ -158,6 +162,7 @@ export const ANALYSTS: TeamMember[] = [
       "Bloomberg Finance Fundamentals certified. Incoming Treasurer, Business Economics Society.",
     gradYear: "May 2029",
     credentials: "B.S. QAMO",
+    linkedin: "https://www.linkedin.com/in/taggart-severson",
   },
   {
     slug: "ian-elvington",
@@ -168,6 +173,7 @@ export const ANALYSTS: TeamMember[] = [
       "Dual-path in QAMO and Applied Mathematics. Independent research in Bayesian statistics and alternative data.",
     gradYear: "May 2029",
     credentials: "B.S. QAMO / Applied Mathematics",
+    linkedin: "https://www.linkedin.com/in/ian-elvington",
   },
 ];
 
