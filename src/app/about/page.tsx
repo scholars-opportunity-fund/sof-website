@@ -8,7 +8,7 @@ import { CIO } from "@/lib/team";
 export const metadata = generatePageMetadata({
   title: "About",
   description:
-    "Scholar Opportunity Fund runs a quantitative investment process targeting special situations in public equities. Led by Dr. Jonathan Brogaard.",
+    "Scholars Opportunity Fund runs a quantitative investment process targeting special situations in public equities. Led by Dr. Jonathan Brogaard.",
   path: "/about",
 });
 
@@ -53,7 +53,7 @@ export default function AboutPage() {
             About the Fund
           </p>
           <h1 className="mt-6 max-w-3xl text-5xl text-cloud sm:text-6xl lg:text-[72px] lg:leading-[1.1]">
-            Scholar Opportunity Fund
+            Scholars Opportunity Fund
           </h1>
           <p className="mt-8 max-w-xl text-[17px] leading-[1.8] text-foreground-on-dark-muted">
             A quantitative investment process targeting special situations in
@@ -144,7 +144,7 @@ export default function AboutPage() {
                 A CIO whose research shaped the field
               </h2>
               <p className="mt-8 text-[17px] leading-[1.8] text-foreground-secondary">
-                Scholar Opportunity Fund is led by{" "}
+                Scholars Opportunity Fund is led by{" "}
                 <strong className="font-medium text-ink">
                   Dr. Jonathan Brogaard
                 </strong>
@@ -183,7 +183,7 @@ export default function AboutPage() {
             </div>
             <div className="space-y-8 text-[17px] leading-[1.8] text-foreground-on-dark-muted">
               <p>
-                Scholar Opportunity Fund is independently operated. The fund
+                Scholars Opportunity Fund is independently operated. The fund
                 combines experienced GP oversight with a structured student
                 analyst program that produces institutional-grade analytical
                 throughput and exceptional talent development.

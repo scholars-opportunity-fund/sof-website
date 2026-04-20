@@ -77,7 +77,7 @@ export default function WeekInLife() {
       {/* Tab strip */}
       <div
         role="tablist"
-        aria-label="A week at Scholar Opportunity Fund"
+        aria-label="A week at Scholars Opportunity Fund"
         className="flex flex-wrap gap-px bg-border/60"
       >
         {DAYS.map((d) => {

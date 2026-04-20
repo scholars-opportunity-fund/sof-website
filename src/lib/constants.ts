@@ -1,10 +1,10 @@
 export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://scholaroppfund.com";
+  process.env.NEXT_PUBLIC_SITE_URL || "https://scholarsoppfund.com";
 
-const CONTACT_EMAIL = "contact@scholaroppfund.com";
+const CONTACT_EMAIL = "contact@scholarsoppfund.com";
 
 export const FUND = {
-  name: "Scholar Opportunity Fund",
+  name: "Scholars Opportunity Fund",
   shortName: "SOF",
   description:
     "A quantitative investment fund targeting special situations in public equities, led by Dr. Jonathan Brogaard.",

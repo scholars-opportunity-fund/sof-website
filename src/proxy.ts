@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 /**
- * Edge proxy (formerly `middleware`) for Scholar Opportunity Fund.
+ * Edge proxy (formerly `middleware`) for Scholars Opportunity Fund.
  *
  * - Canonicalize apex → www for the production domain.
  * - Strip trailing slashes (except root) to match `trailingSlash: false`.
@@ -12,7 +12,7 @@ import type { NextRequest } from "next/server";
  */
 const APEX_HOST =
   process.env.NEXT_PUBLIC_APEX_HOST?.replace(/^https?:\/\//, "") ||
-  "scholaroppfund.com";
+  "scholarsoppfund.com";
 
 export function proxy(request: NextRequest) {
   const url = request.nextUrl.clone();

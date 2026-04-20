@@ -1,7 +1,7 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
-/* Scholar Opportunity Fund Design System */
+/* Scholars Opportunity Fund Design System */
 :root {
   /* Brand palette */
   --ink: #0B1221;

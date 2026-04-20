@@ -5,7 +5,7 @@ import { generatePageMetadata } from "@/lib/seo";
 export const metadata = generatePageMetadata({
   title: "Apply",
   description:
-    "Applications to the Scholar Opportunity Fund Student Analyst Program are not currently open.",
+    "Applications to the Scholars Opportunity Fund Student Analyst Program are not currently open.",
   path: "/apply",
   noIndex: true,
 });

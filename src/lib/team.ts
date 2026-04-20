@@ -1,5 +1,5 @@
 /**
- * Scholar Opportunity Fund. Team Roster.
+ * Scholars Opportunity Fund. Team Roster.
  *
  * Single source of truth for the team page and any other place that needs
  * to render team members. Update this file to add, remove, or reorder.
@@ -50,8 +50,8 @@ export const GPS: TeamMember[] = [
     role: "Head of Research & Operations",
     image: "/team/ronan.jpg",
     headline:
-      "Co-founder of Scholar Opportunity Fund. Oversees the analyst team, the research pipeline, and fund operations.",
-    bio: "Ronan co-founded Scholar Opportunity Fund alongside Dr. Brogaard and will be with the fund for its full lifespan. As Head of Research and Operations, he owns the day-to-day engine of the fund: the analyst cohort, the research workflow from candidate detection to memo delivery, and all operating infrastructure supporting the CIO's investment decisions.",
+      "Co-founder of Scholars Opportunity Fund. Oversees the analyst team, the research pipeline, and fund operations.",
+    bio: "Ronan co-founded Scholars Opportunity Fund alongside Dr. Brogaard and will be with the fund for its full lifespan. As Head of Research and Operations, he owns the day-to-day engine of the fund: the analyst cohort, the research workflow from candidate detection to memo delivery, and all operating infrastructure supporting the CIO's investment decisions.",
     gradYear: "May 2028",
     credentials: "B.S. Quantitative Analysis of Markets & Organizations",
     linkedin: "https://www.linkedin.com/in/ronanschultz/",

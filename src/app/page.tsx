@@ -47,7 +47,7 @@ export default function Home() {
               aria-hidden="true"
               className="inline-block h-px w-8 bg-copper"
             />
-            Scholar Opportunity Fund
+            Scholars Opportunity Fund
           </p>
           <h1 className="max-w-4xl text-5xl tracking-tight text-cloud sm:text-6xl lg:text-[80px] lg:leading-[1.05]">
             Quantitative investing in{" "}

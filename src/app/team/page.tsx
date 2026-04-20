@@ -6,7 +6,7 @@ import { CIO, GPS, ANALYSTS } from "@/lib/team";
 export const metadata = generatePageMetadata({
   title: "Our Team",
   description:
-    "Meet the Scholar Opportunity Fund team. Led by Dr. Jonathan Brogaard, with a rigorously selected cohort of student analysts from the University of Utah.",
+    "Meet the Scholars Opportunity Fund team. Led by Dr. Jonathan Brogaard, with a rigorously selected cohort of student analysts from the University of Utah.",
   path: "/team",
 });
 

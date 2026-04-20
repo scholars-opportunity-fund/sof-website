@@ -19,7 +19,7 @@ export default function Footer() {
                 height={40}
                 className="h-10 w-10 flex-shrink-0"
               />
-              Scholar Opportunity Fund
+              Scholars Opportunity Fund
             </Link>
             <p className="mt-6 max-w-sm text-[14px] leading-relaxed text-foreground-on-dark-muted">
               {FUND.description}

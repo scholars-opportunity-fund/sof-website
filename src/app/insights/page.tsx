@@ -6,7 +6,7 @@ import { generatePageMetadata } from "@/lib/seo";
 export const metadata = generatePageMetadata({
   title: "Insights",
   description:
-    "Market research, post mortems, and commentary from the Scholar Opportunity Fund team.",
+    "Market research, post mortems, and commentary from the Scholars Opportunity Fund team.",
   path: "/insights",
 });
 
@@ -39,7 +39,7 @@ export default function InsightsPage() {
           </h1>
           <p className="mt-8 max-w-xl text-[17px] leading-[1.8] text-foreground-on-dark-muted">
             Market research, investment post mortems, and commentary from the
-            Scholar Opportunity Fund team.
+            Scholars Opportunity Fund team.
           </p>
         </Container>
       </section>

@@ -8,7 +8,7 @@ export default function Header() {
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-8 lg:px-12">
         <Link
           href="/"
-          aria-label="Scholar Opportunity Fund home"
+          aria-label="Scholars Opportunity Fund home"
           className="group flex items-center gap-3 font-heading tracking-tight text-ink transition-colors hover:text-copper"
         >
           <Image
@@ -20,9 +20,9 @@ export default function Header() {
             className="h-10 w-10 flex-shrink-0"
           />
           <span className="hidden text-xl sm:inline">
-            Scholar Opportunity Fund
+            Scholars Opportunity Fund
           </span>
-          <span className="text-xl sm:hidden">Scholar Opportunity Fund</span>
+          <span className="text-xl sm:hidden">Scholars Opportunity Fund</span>
         </Link>
         <HeaderClient />
       </div>
