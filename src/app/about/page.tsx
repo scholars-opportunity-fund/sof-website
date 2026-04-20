@@ -1,5 +1,7 @@
 import Image from "next/image";
 import Container from "@/components/ui/Container";
+import Reveal from "@/components/ui/Reveal";
+import CountUp from "@/components/ui/CountUp";
 import { generatePageMetadata } from "@/lib/seo";
 import { CIO } from "@/lib/team";
 
@@ -67,7 +69,10 @@ export default function AboutPage() {
           <div className="grid grid-cols-3 gap-px bg-border/60">
             <Stat label="Universe" value="Public Equities" />
             <Stat label="Strategy" value="Special Situations" />
-            <Stat label="Cohort Size" value="11 Analysts" />
+            <Stat
+              label="Cohort Size"
+              render={<CountUp to={11} suffix=" Analysts" />}
+            />
           </div>
         </Container>
       </section>
@@ -75,7 +80,7 @@ export default function AboutPage() {
       {/* Investment process */}
       <section className="py-16 sm:py-24">
         <Container>
-          <div className="grid gap-16 lg:grid-cols-[1fr_1.5fr] lg:gap-24">
+          <Reveal className="grid gap-16 lg:grid-cols-[1fr_1.5fr] lg:gap-24">
             <div>
               <p className="text-xs font-medium tracking-[0.2em] text-copper uppercase">
                 Investment Process
@@ -88,37 +93,34 @@ export default function AboutPage() {
                 transparency at every stage.
               </p>
             </div>
-            <div className="space-y-10">
-              {PROCESS_STEPS.map((step, i) => (
+            <div className="space-y-8">
+              {PROCESS_STEPS.map((step) => (
                 <div
                   key={step.step}
-                  className="grid grid-cols-[80px_1fr] gap-6 border-l-2 border-copper/30 pb-2 pl-8"
+                  className="group grid grid-cols-[80px_1fr] gap-6 border-l-2 border-copper/30 pb-2 pl-8 transition-colors duration-300 hover:border-copper"
                 >
-                  <span className="font-heading text-3xl text-copper/70">
+                  <span className="font-heading text-3xl text-copper/70 transition-colors group-hover:text-copper">
                     {step.step}
                   </span>
                   <div>
-                    <h3 className="font-heading text-xl text-ink">
+                    <h3 className="font-heading text-xl text-ink transition-colors group-hover:text-copper">
                       {step.title}
                     </h3>
                     <p className="mt-3 text-[15px] leading-relaxed text-foreground-muted">
                       {step.text}
                     </p>
                   </div>
-                  {i < PROCESS_STEPS.length - 1 && (
-                    <span className="sr-only">Next:</span>
-                  )}
                 </div>
               ))}
             </div>
-          </div>
+          </Reveal>
         </Container>
       </section>
 
       {/* Leadership with CIO headshot */}
       <section className="border-t border-border/60 bg-cloud py-16 sm:py-24">
         <Container>
-          <div className="grid items-start gap-16 lg:grid-cols-[320px_1fr] lg:gap-24">
+          <Reveal className="grid items-start gap-16 lg:grid-cols-[320px_1fr] lg:gap-24">
             <div>
               <div className="relative aspect-[4/5] overflow-hidden bg-gunmetal/10">
                 <Image
@@ -163,14 +165,14 @@ export default function AboutPage() {
                 introducing uncontrolled investment risk.
               </p>
             </div>
-          </div>
+          </Reveal>
         </Container>
       </section>
 
       {/* Structure */}
       <section className="bg-ink py-16 sm:py-24">
         <Container>
-          <div className="grid gap-16 lg:grid-cols-[1fr_1.5fr] lg:gap-24">
+          <Reveal className="grid gap-16 lg:grid-cols-[1fr_1.5fr] lg:gap-24">
             <div>
               <p className="text-xs font-medium tracking-[0.2em] text-copper uppercase">
                 Fund Structure
@@ -198,20 +200,30 @@ export default function AboutPage() {
                 performance.
               </p>
             </div>
-          </div>
+          </Reveal>
         </Container>
       </section>
     </>
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+function Stat({
+  label,
+  value,
+  render,
+}: {
+  label: string;
+  value?: string;
+  render?: React.ReactNode;
+}) {
   return (
     <div className="bg-cloud p-6 sm:p-8">
       <p className="text-[11px] font-medium tracking-[0.18em] text-copper uppercase">
         {label}
       </p>
-      <p className="mt-3 font-heading text-xl text-ink sm:text-2xl">{value}</p>
+      <p className="mt-3 font-heading text-xl text-ink sm:text-2xl">
+        {render ?? value}
+      </p>
     </div>
   );
 }

@@ -2,6 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import Container from "@/components/ui/Container";
 import Button from "@/components/ui/Button";
+import Reveal from "@/components/ui/Reveal";
+import CountUp from "@/components/ui/CountUp";
 import { getAllInsights } from "@/lib/insights";
 import InsightCard from "@/components/insights/InsightCard";
 import { CIO } from "@/lib/team";
@@ -72,7 +74,10 @@ export default function Home() {
             <Stat label="Universe" value="Public Equities" />
             <Stat label="Strategy" value="Special Situations" />
             <Stat label="Home" value="Salt Lake City" />
-            <Stat label="Analyst Cohort" value="11 Students" />
+            <Stat
+              label="Analyst Cohort"
+              render={<CountUp to={11} suffix=" Students" />}
+            />
           </div>
         </Container>
       </section>
@@ -80,7 +85,7 @@ export default function Home() {
       {/* Approach */}
       <section className="py-16 sm:py-24">
         <Container>
-          <div className="grid gap-16 lg:grid-cols-[1fr_1.5fr] lg:gap-24">
+          <Reveal className="grid gap-16 lg:grid-cols-[1fr_1.5fr] lg:gap-24">
             <div>
               <p className="text-xs font-medium tracking-[0.2em] text-copper uppercase">
                 Our Approach
@@ -117,7 +122,7 @@ export default function Home() {
                 <span aria-hidden="true" className="transition-transform group-hover:translate-x-1">&rarr;</span>
               </Link>
             </div>
-          </div>
+          </Reveal>
         </Container>
       </section>
 
@@ -142,14 +147,23 @@ export default function Home() {
                 text: "From signal detection to investment outcome, every step is documented, measured, and auditable.",
               },
             ].map((pillar) => (
-              <div key={pillar.title} className="bg-background p-10 sm:p-12">
+              <div
+                key={pillar.title}
+                className="group relative overflow-hidden bg-background p-10 sm:p-12"
+              >
                 <span className="font-heading text-sm tracking-[0.15em] text-copper/70 uppercase">
                   {pillar.number}
                 </span>
-                <h3 className="mt-6 font-heading text-xl">{pillar.title}</h3>
+                <h3 className="mt-6 font-heading text-xl transition-colors group-hover:text-copper">
+                  {pillar.title}
+                </h3>
                 <p className="mt-4 text-[15px] leading-relaxed text-foreground-muted">
                   {pillar.text}
                 </p>
+                <span
+                  aria-hidden="true"
+                  className="absolute bottom-0 left-0 h-0.5 w-0 bg-copper transition-[width] duration-500 group-hover:w-full"
+                />
               </div>
             ))}
           </div>
@@ -159,7 +173,7 @@ export default function Home() {
       {/* Leadership / CIO feature */}
       <section className="bg-cloud py-16 sm:py-24">
         <Container>
-          <div className="grid items-center gap-16 lg:grid-cols-[320px_1fr] lg:gap-24">
+          <Reveal className="grid items-center gap-16 lg:grid-cols-[320px_1fr] lg:gap-24">
             <div className="relative mx-auto aspect-[4/5] w-full max-w-[320px] overflow-hidden bg-gunmetal/10">
               <Image
                 src={CIO.image}
@@ -205,7 +219,7 @@ export default function Home() {
                 </Link>
               </div>
             </div>
-          </div>
+          </Reveal>
         </Container>
       </section>
 
@@ -273,13 +287,23 @@ export default function Home() {
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+function Stat({
+  label,
+  value,
+  render,
+}: {
+  label: string;
+  value?: string;
+  render?: React.ReactNode;
+}) {
   return (
     <div>
       <p className="text-[11px] font-medium tracking-[0.18em] text-copper uppercase">
         {label}
       </p>
-      <p className="mt-2 font-heading text-lg text-ink sm:text-xl">{value}</p>
+      <p className="mt-2 font-heading text-lg text-ink sm:text-xl">
+        {render ?? value}
+      </p>
     </div>
   );
 }
