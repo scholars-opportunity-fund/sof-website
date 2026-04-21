@@ -1,0 +1,40 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p \"C:/Users/ronan/SOF/resume-book-extracted\")",
+      "Bash(unzip -o \"C:/Users/ronan/Downloads/Resume Book - Scholar Opportunity Fund.zip\")",
+      "Bash(cp \"Brogaard Headshot.jpg\" \"C:/Users/ronan/OneDrive/Documents/GitHub/SOFWebsite/public/team/brogaard.jpg\")",
+      "Bash(cp \"Adam Headshot.jpg\" \"C:/Users/ronan/OneDrive/Documents/GitHub/SOFWebsite/public/team/adam.jpg\")",
+      "Bash(cp \"Caden headshot.jpg\" \"C:/Users/ronan/OneDrive/Documents/GitHub/SOFWebsite/public/team/caden.jpg\")",
+      "Bash(cp \"Cash Headshot.jpg\" \"C:/Users/ronan/OneDrive/Documents/GitHub/SOFWebsite/public/team/cash.jpg\")",
+      "Bash(cp \"Gregor Headshot.jpg\" \"C:/Users/ronan/OneDrive/Documents/GitHub/SOFWebsite/public/team/gregor.jpg\")",
+      "Bash(npm run:*)",
+      "Bash(vercel --version)",
+      "Bash(where vercel:*)",
+      "Bash(npx vercel:*)",
+      "Bash(vercel --prod --yes)",
+      "WebFetch(domain:ugrowthfund.com)",
+      "Bash(cp \"sof-linkedin-primary-copper-on-ink.png\" logo.png)",
+      "Bash(node -e \"const fs=require\\('fs'\\); const b=fs.readFileSync\\('logo.png'\\); if\\(b.slice\\(0,8\\).toString\\('hex'\\)==='89504e470d0a1a0a'\\){ const w=b.readUInt32BE\\(16\\), h=b.readUInt32BE\\(20\\); console.log\\('PNG', w+'x'+h\\); } else console.log\\('not PNG'\\);\")",
+      "Bash(vercel ls *)",
+      "Bash(tasklist)",
+      "Bash(vercel --prod --yes --archive=tgz --force)",
+      "Bash(vercel --prod --yes --archive=tgz)",
+      "Bash(vercel inspect *)",
+      "Bash(find src *)",
+      "Bash(node -e \"const fs=require\\('fs'\\); const b=fs.readFileSync\\('C:/Users/ronan/OneDrive/Documents/GitHub/SOFWebsite/public/brand/logo-on-light.png'\\); if\\(b.slice\\(0,8\\).toString\\('hex'\\)==='89504e470d0a1a0a'\\){ console.log\\('PNG', b.readUInt32BE\\(16\\)+'x'+b.readUInt32BE\\(20\\)\\); } else console.log\\('not PNG'\\);\")",
+      "Bash(cp \"sof-linkedin-ink-on-cloud.png\" logo-on-light.png)",
+      "Bash(node -e \"const fs=require\\('fs'\\); const b=fs.readFileSync\\('logo-on-light.png'\\); console.log\\('PNG', b.readUInt32BE\\(16\\)+'x'+b.readUInt32BE\\(20\\)\\);\")",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(git fetch *)",
+      "WebFetch(domain:www.scholarsoppfund.com)",
+      "Bash(gh api *)",
+      "WebFetch(domain:api.github.com)",
+      "WebFetch(domain:github.com)",
+      "Bash(git commit -m 'fix\\(counter\\): clamp negative easing overshoot and prerender target value *)"
+    ]
+  }
+}
