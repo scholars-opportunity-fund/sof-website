@@ -37,8 +37,9 @@ export default function ProgramPage() {
             </h1>
             <p className="mt-8 max-w-xl text-[17px] leading-[1.8] text-foreground-on-dark-muted">
               SOF places analysts inside a live event-driven investment
-              process. Real work product, real capital consequences, under a
-              CIO whose research has shaped the field.
+              process. Real work product under a CIO whose research has
+              shaped the field. Build the paper portfolio track record that
+              determines whether real capital follows.
             </p>
             <div className="mt-12 flex flex-wrap items-center gap-5">
               <Button href="/team" variant="outline">
@@ -253,41 +254,24 @@ export default function ProgramPage() {
         </Container>
       </section>
 
-      {/* Who We Recruit + Career Outcomes */}
+      {/* Who We Recruit */}
       <section className="bg-ink py-16 sm:py-24">
         <Container>
           <Reveal>
-            <div className="grid gap-24 lg:grid-cols-2">
-              <div>
-                <p className="text-xs font-medium tracking-[0.2em] text-copper uppercase">
-                  Who We Recruit
-                </p>
-                <h2 className="mt-6 text-4xl text-cloud sm:text-5xl">
-                  Depth over pedigree
-                </h2>
-                <p className="mt-8 text-[17px] leading-[1.8] text-foreground-on-dark-muted">
-                  SOF draws from the University of Utah and maintains a steady
-                  cohort of student analysts. New analysts are admitted each
-                  semester to backfill natural attrition, ensuring continuity
-                  of model ownership and institutional knowledge across cohort
-                  generations.
-                </p>
-              </div>
-              <div>
-                <p className="text-xs font-medium tracking-[0.2em] text-copper uppercase">
-                  Career Outcomes
-                </p>
-                <h2 className="mt-6 text-4xl text-cloud sm:text-5xl">
-                  Where analysts go
-                </h2>
-                <p className="mt-8 text-[17px] leading-[1.8] text-foreground-on-dark-muted">
-                  Analysts are prepared for and actively supported in pursuing
-                  careers with investment banks, management consulting firms,
-                  private equity funds, and hedge funds across top firms in
-                  the nation. Dr. Brogaard&apos;s network spans the
-                  institutional investment community.
-                </p>
-              </div>
+            <div className="max-w-3xl">
+              <p className="text-xs font-medium tracking-[0.2em] text-copper uppercase">
+                Who We Recruit
+              </p>
+              <h2 className="mt-6 text-4xl text-cloud sm:text-5xl">
+                Depth over pedigree
+              </h2>
+              <p className="mt-8 text-[17px] leading-[1.8] text-foreground-on-dark-muted">
+                SOF draws from the University of Utah and maintains a steady
+                cohort of student analysts. New analysts are admitted each
+                semester to backfill natural attrition, ensuring continuity
+                of process ownership and institutional knowledge across
+                cohort generations.
+              </p>
             </div>
             <div className="mt-16 flex flex-wrap items-center gap-5">
               <Button href="/team" variant="outline">
@@ -311,9 +295,9 @@ export default function ProgramPage() {
                   Headquartered in Salt Lake City
                 </h2>
                 <p className="mt-8 max-w-xl text-[17px] leading-[1.8] text-foreground-secondary">
-                  SOF is based at the David Eccles School of Business at the
-                  University of Utah. The analyst team meets in person each
-                  week for candidate review, memo defense, and CIO handoffs.
+                  Headquartered in Salt Lake City. The analyst team is drawn
+                  from the University of Utah, and meets in person each week
+                  for candidate review, memo defense, and CIO handoffs.
                 </p>
               </div>
               <div className="flex items-stretch justify-center">
@@ -324,11 +308,6 @@ export default function ProgramPage() {
                     </p>
                     <p className="mt-4 font-heading text-2xl">
                       Salt Lake City, UT
-                    </p>
-                    <p className="mt-2 text-[14px] text-foreground-on-dark-muted">
-                      David Eccles School of Business
-                      <br />
-                      University of Utah
                     </p>
                   </div>
                   <div className="mt-10 flex items-center gap-2 text-[12px] font-medium tracking-[0.15em] text-copper uppercase">

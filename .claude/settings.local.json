@@ -34,7 +34,8 @@
       "Bash(gh api *)",
       "WebFetch(domain:api.github.com)",
       "WebFetch(domain:github.com)",
-      "Bash(git commit -m 'fix\\(counter\\): clamp negative easing overshoot and prerender target value *)"
+      "Bash(git commit -m 'fix\\(counter\\): clamp negative easing overshoot and prerender target value *)",
+      "Bash(git commit -m 'edit\\(program\\): remove career outcomes overclaim, correct capital and affiliation copy *)"
     ]
   }
 }
