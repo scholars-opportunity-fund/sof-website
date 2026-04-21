@@ -19,7 +19,6 @@ export const NAV_ITEMS = [
   { label: "Overview", href: "/about" },
   { label: "Team", href: "/team" },
   { label: "Process", href: "/program" },
-  { label: "Insights", href: "/insights" },
   { label: "Contact", href: `mailto:${CONTACT_EMAIL}` },
 ] as const;
 
@@ -27,7 +26,6 @@ export const FOOTER_LINKS = {
   fund: [
     { label: "Overview", href: "/about" },
     { label: "Team", href: "/team" },
-    { label: "Insights", href: "/insights" },
   ],
   program: [{ label: "Process", href: "/program" }],
   contact: [

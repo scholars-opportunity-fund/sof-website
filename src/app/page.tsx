@@ -3,13 +3,9 @@ import Link from "next/link";
 import Container from "@/components/ui/Container";
 import Button from "@/components/ui/Button";
 import Reveal from "@/components/ui/Reveal";
-import { getAllInsights } from "@/lib/insights";
-import InsightCard from "@/components/insights/InsightCard";
 import { CIO } from "@/lib/team";
 
 export default function Home() {
-  const latestInsights = getAllInsights().slice(0, 3);
-
   return (
     <>
       {/* Hero */}
@@ -241,42 +237,6 @@ export default function Home() {
         </Container>
       </section>
 
-      {/* Insights */}
-      <section className="py-16 sm:py-24">
-        <Container>
-          <div className="flex items-end justify-between">
-            <div>
-              <p className="text-xs font-medium tracking-[0.2em] text-copper uppercase">
-                Research & Analysis
-              </p>
-              <h2 className="mt-6 text-4xl sm:text-5xl">Insights</h2>
-            </div>
-            {latestInsights.length > 0 && (
-              <Link
-                href="/insights"
-                className="text-[15px] text-foreground-secondary transition-colors hover:text-ink"
-              >
-                View all &rarr;
-              </Link>
-            )}
-          </div>
-          <div className="mt-16">
-            {latestInsights.length > 0 ? (
-              <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-                {latestInsights.map((insight) => (
-                  <InsightCard key={insight.slug} insight={insight} />
-                ))}
-              </div>
-            ) : (
-              <div className="border-t border-border/60 pt-12">
-                <p className="text-foreground-muted">
-                  Market research and post mortems coming soon.
-                </p>
-              </div>
-            )}
-          </div>
-        </Container>
-      </section>
     </>
   );
 }
