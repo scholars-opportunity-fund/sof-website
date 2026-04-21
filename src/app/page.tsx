@@ -53,9 +53,17 @@ export default function Home() {
             and catalyst-driven opportunities in the public equity universe.
           </p>
           <div className="mt-12 flex flex-wrap items-center gap-5">
-            <Button href="/about">View Overview</Button>
-            <Button href="/program" variant="outline">
-              <span className="text-cloud">Join the Fund</span>
+            <Button
+              href="/about"
+              className="!bg-cloud !text-ink hover:!bg-white"
+            >
+              Read the approach
+            </Button>
+            <Button
+              href="/team"
+              className="!border !border-cloud/40 !bg-transparent !text-cloud hover:!border-cloud hover:!bg-cloud/10"
+            >
+              Meet the cohort
             </Button>
           </div>
         </Container>

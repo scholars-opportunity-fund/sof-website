@@ -36,7 +36,8 @@
       "WebFetch(domain:github.com)",
       "Bash(git commit -m 'fix\\(counter\\): clamp negative easing overshoot and prerender target value *)",
       "Bash(git commit -m 'edit\\(program\\): remove career outcomes overclaim, correct capital and affiliation copy *)",
-      "Bash(git commit -m 'chore\\(nav\\): hide insights link until first piece ships *)"
+      "Bash(git commit -m 'chore\\(nav\\): hide insights link until first piece ships *)",
+      "Bash(git commit -m 'edit\\(hero\\): replace text-link CTAs with styled buttons and specific copy *)"
     ]
   }
 }
