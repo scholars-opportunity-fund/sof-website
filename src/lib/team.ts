@@ -35,7 +35,7 @@ export const CIO: TeamMember = {
   slug: "jonathan-brogaard",
   name: "Dr. Jonathan Brogaard",
   role: "Chief Investment Officer",
-  image: "/team/brogaard.jpg",
+  image: "/team/jonathan.png",
   headline:
     "Associate Dean of Research and Kendall D. Garff Chaired Professor at the University of Utah's David Eccles School of Business.",
   bio: "Dr. Brogaard is the Associate Dean of Research and Kendall D. Garff Chaired Professor of Finance at the University of Utah's David Eccles School of Business. His research on trading microstructure and empirical asset pricing has been published in the Journal of Finance, Journal of Financial Economics, and Review of Financial Studies, and cited in Bloomberg, The Economist, the Financial Times, the New York Times, and the Wall Street Journal. He has worked with the U.S. Commodity Futures Trading Commission, the U.K. Financial Services Authority, and the Canadian Investment Industry Regulatory Organization, and currently serves on FINRA's Market Regulation Committee. In 2023 he founded the University of Utah's Institute for Advanced Investment Management. He was named one of Poets & Quants' Best 40-Under-40 Business School Professors in 2021 and holds a J.D. and a Ph.D. in Finance from Northwestern University.",
