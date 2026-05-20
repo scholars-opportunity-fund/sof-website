@@ -138,17 +138,6 @@ export const ANALYSTS: TeamMember[] = [
     linkedin: "https://www.linkedin.com/in/tyler-teo/",
   },
   {
-    slug: "maretta-henriksen",
-    name: "Maretta Henriksen",
-    role: "Analyst",
-    image: "/team/maretta.jpg",
-    headline:
-      "Marketing & Data Analyst at Eccles Graduate Programs. Women in Business member.",
-    gradYear: "May 2029",
-    credentials: "B.S. QAMO",
-    linkedin: "https://www.linkedin.com/in/maretta-henriksen-b3409b353/",
-  },
-  {
     slug: "nicholas-kouzmanoff",
     name: "Nicholas Kouzmanoff",
     role: "Analyst",
