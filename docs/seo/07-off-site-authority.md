@@ -12,15 +12,15 @@ Authority from a link is roughly the linking site's own authority, divided by it
 
 Rank the sources by what they are worth here:
 
-**Tier 1 — institutional.** The University of Utah, the David Eccles School of Business, any department or faculty page that mentions the fund or Dr. Brogaard's role in it. One link from here is worth more than everything else on this list combined. It is also the hardest to get and the most worth asking for. This is a conversation Joel or Dr. Brogaard has with whoever owns those pages, not something the site can engineer.
+**Tier 1, institutional.** The University of Utah, the David Eccles School of Business, any department or faculty page that mentions the fund or Dr. Brogaard's role in it. One link from here is worth more than everything else on this list combined. It is also the hardest to get and the most worth asking for. This is a conversation Joel or Dr. Brogaard has with whoever owns those pages, not something the site can engineer.
 
-**Tier 2 — professional profiles.** LinkedIn: the company page and all twelve personal profiles. Each should list the fund by its exact name, link to the site, and use the same title the site uses. Twelve people with consistent, linked profiles is a real entity signal, and it is entirely within our control. It also feeds the `sameAs` graph in document 04 from the other direction.
+**Tier 2, professional profiles.** LinkedIn: the company page and all twelve personal profiles. Each should list the fund by its exact name, link to the site, and use the same title the site uses. Twelve people with consistent, linked profiles is a real entity signal, and it is entirely within our control. It also feeds the `sameAs` graph in document 04 from the other direction.
 
-**Tier 3 — press and events.** Any coverage of the fund, any conference or competition appearance, any guest talk. Ask for the link every time. Most organisers will add one if asked and none will if not.
+**Tier 3, press and events.** Any coverage of the fund, any conference or competition appearance, any guest talk. Ask for the link every time. Most organisers will add one if asked and none will if not.
 
-**Tier 4 — the professor's own footprint.** Dr. Brogaard has a faculty page, publications, a Google Scholar profile, likely a personal site. Wherever his affiliation with the fund is stated, it should link.
+**Tier 4, the professor's own footprint.** Dr. Brogaard has a faculty page, publications, a Google Scholar profile, likely a personal site. Wherever his affiliation with the fund is stated, it should link.
 
-**Tier 5 — directories.** Crunchbase, university club directories, student-organisation listings. Low weight individually, but they are where knowledge-graph systems go to confirm an entity exists. Worth claiming once and keeping accurate. Not worth chasing beyond that.
+**Tier 5, directories.** Crunchbase, university club directories, student-organisation listings. Low weight individually, but they are where knowledge-graph systems go to confirm an entity exists. Worth claiming once and keeping accurate. Not worth chasing beyond that.
 
 ## Consistency is the real work
 
