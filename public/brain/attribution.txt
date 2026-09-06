@@ -11,3 +11,5 @@ https://creativecommons.org/licenses/by-sa/4.0/
 
 SOF modifications: retained cortical, cerebellar, and brainstem geometry; grouped it into five website navigation regions; centered and uniformly scaled it; welded shared vertices, softened tessellation with four paired Taubin smoothing passes, and recomputed normals; replaced original materials with SOF visual styling. The connection network is a decorative navigation metaphor.
 The upstream source and license are retained in design/brain/source. This model license applies to the anatomical asset; it does not relicense the website's application code.
+
+Intro clips (intro-16x9.mp4, intro-9x16.mp4): generated with Higgsfield (Gemini Omni Flash 1.1 opening, Kling 3.0 Turbo tail reversed) from renders of this model, assembled with ffmpeg. See design/brain/video/README.md.

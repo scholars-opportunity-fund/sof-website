@@ -3,8 +3,15 @@
 .canvas { position:absolute; inset:0; width:100%; height:100%; display:block; cursor:grab; }
 .canvas:active { cursor:grabbing; }
 .canvas[data-ready=false] { visibility:hidden; }
-.intro { position:absolute; inset:0; width:100%; height:100%; display:block; z-index:1; }
-.intro[hidden] { display:none; }
+/* While the clip plays the model stays hidden beneath it; it is revealed the moment the swap begins. */
+.home[data-brain-phase=forming]:not([data-swap=true]):not([data-brain-pose]) .canvas { visibility:hidden; }
+/* The clip is always scaled to the stage height and centred (max-width:none lifts the Tailwind preflight cap that would letterbox it); feathered side edges hide the seam between encoded black and the stage colour. */
+.clip { position:absolute; top:0; left:50%; height:100%; width:auto; max-width:none; transform:translateX(-50%); z-index:1; pointer-events:auto; background:transparent; opacity:1; transition:opacity .25s ease;
+  -webkit-mask-image:linear-gradient(to right, transparent 0%, #000 8%, #000 92%, transparent 100%); mask-image:linear-gradient(to right, transparent 0%, #000 8%, #000 92%, transparent 100%); }
+.clip[data-fading=true] { opacity:0; pointer-events:none; }
+.clip[hidden] { display:none; }
+/* Everything the visitor reads or clicks sits above the clip layer. */
+.wordmark, .pins, .selection, .hint, .tools, .scrollCue, .introControls, .status { z-index:2; }
 .field { position:absolute; inset:0; opacity:var(--light); }
 .fallback { position:absolute; width:min(64%,800px); top:50%; left:50%; transform:translate(-50%,-50%); }
 .fallback[hidden] { display:none; }
@@ -79,5 +86,5 @@
 
 /* Keyframe capture (development only): bare stage, model at its formed pose, nothing else. */
 .home[data-brain-pose] { --stage-color:#0b1221 !important; }
-.home[data-brain-pose] .field, .home[data-brain-pose] .wordmark, .home[data-brain-pose] .scrollCue, .home[data-brain-pose] .introControls, .home[data-brain-pose] .intro, .home[data-brain-pose] .pins, .home[data-brain-pose] .tools, .home[data-brain-pose] .hint { display:none; }
+.home[data-brain-pose] .field, .home[data-brain-pose] .wordmark, .home[data-brain-pose] .scrollCue, .home[data-brain-pose] .introControls, .home[data-brain-pose] .clip, .home[data-brain-pose] .pins, .home[data-brain-pose] .tools, .home[data-brain-pose] .hint { display:none; }
 .home[data-brain-pose=empty] .canvas { visibility:hidden; }

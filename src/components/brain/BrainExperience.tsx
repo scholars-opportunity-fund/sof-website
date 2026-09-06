@@ -3,39 +3,42 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import Link from 'next/link';
 import type { BrainPhase } from '@/lib/brain/scene';
-import type { BrainIntro } from '@/lib/brain/intro';
 import { brainRegions } from '@/lib/brain/regions';
 import { useExplorer } from './BrainContext';
 import SignalField from '@/components/signal/SignalField';
 import styles from './BrainExperience.module.css';
 
 const smooth = (value: number) => { const p = Math.max(0, Math.min(1, value)); return p * p * (3 - 2 * p); };
-const SPEED = .85;
-// The 2D synapse intro carries the formation until the model has loaded, then dissolves into it.
-const HOLD_AT = 5;
+// The rendered clip carries the stage timeline up to the formed moment (9.4 of 12); the code carries the rest.
+const FORMED = 9.4;
+const START_BUDGET = 2500;
+const STALL_BUDGET = 1500;
+const SWAP_FADE = 250;
+const CLIPS = { landscape: { src: '/brain/intro-16x9.mp4', aspect: 16 / 9 }, portrait: { src: '/brain/intro-9x16.mp4', aspect: 9 / 16 } };
 
 export default function BrainExperience({ fallback }: { fallback: ReactNode }) {
   const { scene, setAvailable, active, setHovered, setFocused, setSelected, zoom, setZoom, setFollowScroll, reset } = useExplorer();
   const root = useRef<HTMLElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
-  const introCanvas = useRef<HTMLCanvasElement>(null);
-  const intro = useRef<BrainIntro | null>(null);
+  const video = useRef<HTMLVideoElement>(null);
   const word = useRef<HTMLParagraphElement>(null);
   const letters = useRef<HTMLSpanElement>(null);
   const navigation = useRef(0);
   const time = useRef(0);
-  const startedAt = useRef(0);
-  const held = useRef(0);
   const navWord = useRef<HTMLElement | null>(null);
   const skipRequested = useRef(false);
-  // Read by the intro clock so a frame already queued cannot repaint after Skip, scroll, or failure.
+  // Read by the clip loop so a frame already queued cannot repaint after Skip, scroll, or failure.
   const playing = useRef(false);
   const failedRef = useRef(false);
+  const attempts = useRef(0);
+  const swapStartedAt = useRef(0);
   const [phase, setPhase] = useState<BrainPhase>('loading');
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
   const [exploring, setExploring] = useState(false);
   const [lightVisible, setLightVisible] = useState(false);
+  const [clip, setClip] = useState<{ src: string; aspect: number } | null>(null);
+  const [swapping, setSwapping] = useState(false);
   // Development-only capture mode for the clip's keyframes: `?pose=formed` shows the model at its formed pose, `?pose=empty` the bare stage.
   const [pose, setPose] = useState<'formed' | 'empty' | null>(null);
   const activeRegion = brainRegions.find(region => region.id === active);
@@ -66,20 +69,36 @@ export default function BrainExperience({ fallback }: { fallback: ReactNode }) {
     }
   }, []);
 
-  const finish = useCallback(() => { skipRequested.current = true; playing.current = false; setPhase('still'); paint(12); intro.current?.clear(); }, [paint]);
+  const finish = useCallback(() => {
+    skipRequested.current = true; playing.current = false; swapStartedAt.current = 0;
+    const element = video.current;
+    if (element) { element.pause(); element.removeAttribute('src'); element.load(); }
+    setSwapping(false); setPhase('still'); paint(12);
+  }, [paint]);
   const fail = useCallback(() => { scene.current?.dispose(); scene.current = null; failedRef.current = true; setFailed(true); setReady(false); setAvailable(false); finish(); }, [scene, setAvailable, finish]);
 
-  // Decide on mount whether the intro plays, and start it right away while the model loads.
+  // Start the clip as soon as the page mounts, while the model loads in the background. A second failure stops retrying.
+  const start = useCallback(() => {
+    const preference = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const saveData = Boolean((navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData);
+    if (preference || saveData || attempts.current >= 2) { finish(); return; }
+    attempts.current += 1;
+    playing.current = true;
+    setSwapping(false);
+    setClip(innerWidth < innerHeight ? CLIPS.portrait : CLIPS.landscape);
+    setPhase('forming');
+    paint(0);
+  }, [finish, paint]);
+
   useEffect(() => {
     navWord.current = document.querySelector<HTMLElement>('[data-nav-word]');
     if (process.env.NODE_ENV === 'development') {
       const requested = new URLSearchParams(window.location.search).get('pose');
       if (requested === 'formed' || requested === 'empty') { setPose(requested); setPhase('forming'); return; }
     }
-    if (skipRequested.current || navigation.current > .02 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) { finish(); return; }
-    startedAt.current = performance.now(); held.current = 0; playing.current = true;
-    setPhase('forming');
-  }, [finish]);
+    if (skipRequested.current || navigation.current > .02) { finish(); return; }
+    start();
+  }, [finish, start]);
 
   useEffect(() => {
     const element = canvas.current;
@@ -101,34 +120,48 @@ export default function BrainExperience({ fallback }: { fallback: ReactNode }) {
   }, [scene, setAvailable, setHovered, setSelected, setFollowScroll, setZoom, fail]);
   useEffect(() => { scene.current?.setRegion(active); }, [active, ready, scene]);
   useEffect(() => { scene.current?.setZoom(zoom); }, [zoom, ready, scene]);
-  useEffect(() => { scene.current?.setPhase(phase); if (phase === 'forming') scene.current?.setTime(pose ? 9.4 : time.current); }, [phase, ready, scene, pose]);
-  useEffect(() => { scene.current?.setClipAspect(innerWidth < innerHeight ? 9 / 16 : 16 / 9); }, [ready, scene]);
+  useEffect(() => { scene.current?.setPhase(phase); if (phase === 'forming') scene.current?.setTime(pose ? FORMED : time.current); }, [phase, ready, scene, pose]);
+  useEffect(() => { scene.current?.setClipAspect(pose ? (innerWidth < innerHeight ? 9 / 16 : 16 / 9) : clip?.aspect ?? null); }, [ready, scene, clip, pose]);
 
-  // The intro clock: draws the synapse overlay, updates the stage, and feeds the model the same time.
+  // The clip drives the timeline until it ends; then the model takes over and the code clock runs 9.4 to 12.
   useEffect(() => {
-    if (phase !== 'forming' || pose) return;
-    const element = introCanvas.current;
+    if (phase !== 'forming' || pose || !clip) return;
+    const element = video.current;
     if (!element) return;
-    let cancelled = false, frame = 0;
-    let engine = intro.current;
-    if (!engine) import('@/lib/brain/intro').then(module => { if (!cancelled) engine = intro.current = module.createBrainIntro(element); }).catch(() => finish());
-    const preference = window.matchMedia('(prefers-reduced-motion: reduce)');
-    function tick(now: number) {
+    let cancelled = false, frame = 0, startTimer = 0, startedAt = 0;
+    const bail = () => { if (!cancelled && playing.current && !swapStartedAt.current) finish(); };
+    element.src = clip.src;
+    element.currentTime = 0;
+    startTimer = window.setTimeout(() => { if (element.paused || element.currentTime === 0) bail(); }, START_BUDGET);
+    const onPlaying = () => { clearTimeout(startTimer); if (!startedAt) startedAt = performance.now(); };
+    element.addEventListener('playing', onPlaying);
+    element.addEventListener('error', bail);
+    element.play().catch(bail);
+    function tick() {
       frame = 0;
-      if (cancelled || !playing.current) return;
-      if (preference.matches) { finish(); return; }
-      const clock = (now - startedAt.current) / 1000;
-      let seconds = clock * SPEED - held.current;
-      if (!scene.current && seconds > HOLD_AT) { held.current += seconds - HOLD_AT; seconds = HOLD_AT; }
-      paint(seconds);
-      engine?.draw(seconds, clock, 1 - smooth((seconds - 8.2) / 1.4));
-      scene.current?.setTime(seconds);
-      if (seconds >= 12) { playing.current = false; setPhase('still'); engine?.clear(); return; }
+      if (cancelled || !playing.current || !element) return;
+      if (swapStartedAt.current) {
+        // The clock holds at the formed moment while the clip fades, so the model does not start moving under the crossfade.
+        const seconds = Math.min(12, FORMED + Math.max(0, performance.now() - swapStartedAt.current - SWAP_FADE) / 1000);
+        paint(seconds); scene.current?.setTime(seconds);
+        if (seconds >= 12) { playing.current = false; swapStartedAt.current = 0; setPhase('still'); return; }
+      } else if (element.ended) {
+        // Hold on the last frame until the model is ready (R10), then reveal it under the clip and fade the clip away.
+        if (scene.current) { swapStartedAt.current = performance.now(); setSwapping(true); paint(FORMED); scene.current.setTime(FORMED); }
+      } else if (element.duration) {
+        // Stall watchdog: once the clip has fallen a budget's worth behind the wall clock, whether in one buffering pause or many stutters, it is cut for the still.
+        if (startedAt && performance.now() - startedAt - element.currentTime * 1000 > STALL_BUDGET) { bail(); return; }
+        const seconds = FORMED * Math.min(1, element.currentTime / element.duration);
+        paint(seconds); scene.current?.setTime(seconds);
+      }
       frame = requestAnimationFrame(tick);
     }
     frame = requestAnimationFrame(tick);
-    return () => { cancelled = true; cancelAnimationFrame(frame); };
-  }, [phase, scene, paint, finish, pose]);
+    return () => {
+      cancelled = true; cancelAnimationFrame(frame); clearTimeout(startTimer);
+      element.removeEventListener('playing', onPlaying); element.removeEventListener('error', bail);
+    };
+  }, [phase, clip, pose, scene, paint, finish]);
 
   useEffect(() => {
     let frame = 0;
@@ -154,23 +187,24 @@ export default function BrainExperience({ fallback }: { fallback: ReactNode }) {
   }, [scene, paint, finish, pose]);
 
   function replay() {
-    reset(); skipRequested.current = false;
+    reset(); skipRequested.current = false; swapStartedAt.current = 0;
     window.scrollTo({ top: root.current ? window.scrollY + root.current.getBoundingClientRect().top - 72 : 0, behavior: 'instant' });
     navigation.current = 0; scene.current?.setNavigation(0); setExploring(false);
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { finish(); return; }
-    startedAt.current = performance.now(); held.current = 0; playing.current = true;
-    paint(0); scene.current?.setTime(0); setPhase('forming');
+    setPhase('loading');
+    scene.current?.setTime(0);
+    start();
   }
   const controlsVisible = exploring || failed;
   const forming = phase === 'forming';
-  return <section ref={root} className={styles.home} aria-label="Scholars Opportunity Fund — connected intelligence" data-brain data-brain-home data-brain-phase={phase} data-brain-ready={ready} data-brain-failed={failed} data-exploring={exploring} data-brain-pose={pose ?? undefined}>
+  return <section ref={root} className={styles.home} aria-label="Scholars Opportunity Fund — connected intelligence" data-brain data-brain-home data-brain-phase={phase} data-brain-ready={ready} data-brain-failed={failed} data-exploring={exploring} data-swap={swapping} data-brain-pose={pose ?? undefined}>
     <div className={styles.stage} data-startup-stage>
       <div className={styles.field}><SignalField active={lightVisible} /></div>
       <div className={styles.fallback} data-brain-fallback hidden={!failed}>{fallback}</div>
       <canvas ref={canvas} className={styles.canvas} data-brain-canvas data-ready={ready} tabIndex={ready && phase === 'still' ? 0 : -1}
         aria-label="3D brain. Drag to rotate. Pinch or Shift and scroll to zoom. Arrow keys rotate; plus and minus zoom. Select a region to explore it." />
-      <canvas ref={introCanvas} className={styles.intro} data-brain-intro hidden={!forming} aria-hidden="true" onPointerUp={event => { if (event.pointerType === 'mouse' && event.button === 0) finish(); }} />
-      <div className={styles.wordmark} aria-hidden="true"><div className={styles.wordInner}>
+      <video ref={video} className={styles.clip} data-brain-clip data-fading={swapping} hidden={!forming || Boolean(pose) || !clip} muted playsInline preload="auto" aria-hidden="true"
+        onPointerUp={event => { if (event.pointerType === 'mouse' && event.button === 0 && !swapping) finish(); }} />
+      <div className={styles.wordmark} data-brain-word aria-hidden="true"><div className={styles.wordInner}>
         <p ref={word} className={styles.word}><span ref={letters} /><span className={styles.cursor} /></p>
         <p className={styles.subtitle}>Scholars Opportunity Fund · Salt Lake City</p>
       </div></div>
@@ -192,12 +226,12 @@ export default function BrainExperience({ fallback }: { fallback: ReactNode }) {
       </div>
       <a href="#sof-overview" className={styles.scrollCue} tabIndex={exploring ? -1 : 0}><span><i /></span>Scroll</a>
       <div className={styles.introControls}>
-        {!exploring && forming && <button type="button" onClick={finish}>Skip intro</button>}
+        {!exploring && forming && !swapping && <button type="button" onClick={finish}>Skip intro</button>}
         <button type="button" disabled={failed} onClick={replay}>Replay</button>
         {controlsVisible && <a href="/brain/attribution.txt">Model credits</a>}
       </div>
       {failed && <p className={styles.status}>3D view unavailable. Explore the fund through the section links.</p>}
-      <noscript><style>{`[data-brain-home]{height:auto!important;--stage-color:#F3F5F8}[data-brain-navigation]{visibility:visible!important;opacity:1!important}[data-brain-canvas],[data-brain-intro]{display:none!important}[data-brain-fallback]{display:block!important}`}</style></noscript>
+      <noscript><style>{`[data-brain-home]{height:auto!important;--stage-color:#F3F5F8}[data-brain-navigation]{visibility:visible!important;opacity:1!important}[data-brain-canvas],[data-brain-clip]{display:none!important}[data-brain-fallback]{display:block!important}`}</style></noscript>
     </div>
   </section>;
 }
