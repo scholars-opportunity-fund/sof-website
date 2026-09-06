@@ -1,0 +1,62 @@
+.visual { position: relative; width: 100%; aspect-ratio: 3 / 2; isolation: isolate; background: var(--ink); }
+.material { display: block; width: 100%; height: auto; mix-blend-mode: lighten; }
+:global([data-intro-phase='docking']) .visual { clip-path: var(--brain-outline); }
+.fibers, .regions, .synapses { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.synapses { opacity: 0; overflow: hidden; }
+.network { transform-origin: 35% 45%; }
+.connection { stroke-width: 1.2; }
+.signal { stroke-width: 3; stroke-linecap: round; stroke-dasharray: .045 .955; }
+.fibers { opacity: 0; }
+.regions { mix-blend-mode: screen; }
+.fibers > path { transform-box: view-box; transform-origin: center; }
+
+:global([data-intro-phase='waiting']) .material { opacity: .2; animation: waitingFallback 0s 4s forwards; }
+:global([data-intro-phase='waiting']) .fibers { opacity: .16; }
+:global([data-intro-phase='forming']) .material { animation: materialize 12s ease both; }
+:global([data-intro-phase='forming']) .fibers { animation: settle 12s ease both; }
+:global([data-intro-phase='forming']) .fibers > path {
+  animation: converge 3.6s cubic-bezier(.16, .7, .25, 1) both;
+  animation-delay: calc(6s + var(--arrival));
+}
+:global([data-intro-phase='forming']) .synapses { animation: networkLife 12s linear both; }
+:global([data-intro-phase='forming']) .network { animation: pullBack 12s cubic-bezier(.3, 0, .2, 1) both; }
+:global([data-intro-phase='forming']) .connection { animation: connect .7s ease-out var(--birth) both; }
+:global([data-intro-phase='forming']) .signal { animation: transmit 1.7s linear var(--signal-birth) infinite both; }
+:global([data-intro-phase='forming']) .junction { animation: ignite .85s ease-out var(--birth) both; }
+:global([data-material-failed='true']) .material { opacity: 0; }
+:global([data-material-failed='true']) .fibers { opacity: .8; }
+
+@keyframes converge {
+  0% { transform: translate(var(--drift-x), var(--drift-y)) rotate(var(--turn)); stroke-dasharray: 1; stroke-dashoffset: 1; opacity: 0; }
+  18% { opacity: .75; }
+  68% { stroke-dashoffset: 0; }
+  100% { transform: translate(0, 0) rotate(0deg); stroke-dasharray: 1; stroke-dashoffset: 0; opacity: 1; }
+}
+@keyframes waitingFallback { to { opacity: 1; } }
+@keyframes materialize {
+  0%, 58% { opacity: 0; }
+  72% { opacity: .18; }
+  90%, 100% { opacity: 1; }
+}
+@keyframes settle {
+  0%, 49% { opacity: 0; }
+  70%, 80% { opacity: .8; }
+  100% { opacity: 0; }
+}
+@keyframes networkLife { 0% { opacity: 0; } 5%, 72% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes pullBack {
+  0%, 12% { transform: scale(2.8) rotate(-7deg); }
+  40% { transform: scale(2.3) rotate(-3deg); }
+  74%, 100% { transform: scale(1) rotate(0); }
+}
+@keyframes connect { from { stroke-dasharray: 1; stroke-dashoffset: 1; opacity: 0; } to { stroke-dasharray: 1; stroke-dashoffset: 0; opacity: .55; } }
+@keyframes transmit { 0% { stroke-dashoffset: 1; opacity: 0; } 12%, 80% { opacity: .95; } 100% { stroke-dashoffset: 0; opacity: 0; } }
+@keyframes ignite { 0% { opacity: 0; } 35% { opacity: 1; } 100% { opacity: .65; } }
+@media (prefers-reduced-motion: reduce), (scripting: none) {
+  .material, .fibers, .fibers path, .synapses, .synapses * { animation: none !important; }
+  :global([data-intro-phase]) .synapses { opacity: 0; }
+  :global([data-intro-phase]) .material { opacity: 1; }
+  :global([data-intro-phase]) .fibers { opacity: 0; }
+  :global([data-material-failed='true']) .material { opacity: 0; }
+  :global([data-material-failed='true']) .fibers { opacity: .8; }
+}

@@ -1,0 +1,83 @@
+﻿.home { position:relative; height:calc(230vh - 72px); background:var(--cloud); --stage-color:#0b1221; --light:0; --word-opacity:0; --subtitle-opacity:0; --cue-opacity:0; }
+.stage { position:sticky; top:72px; height:calc(100svh - 72px); min-height:460px; background:var(--stage-color); overflow:clip; }
+.canvas { position:absolute; inset:0; width:100%; height:100%; display:block; cursor:grab; }
+.canvas:active { cursor:grabbing; }
+.canvas[data-ready=false] { visibility:hidden; }
+.intro { position:absolute; inset:0; width:100%; height:100%; display:block; z-index:1; }
+.intro[hidden] { display:none; }
+.field { position:absolute; inset:0; opacity:var(--light); }
+.fallback { position:absolute; width:min(64%,800px); top:50%; left:50%; transform:translate(-50%,-50%); }
+.fallback[hidden] { display:none; }
+.wordmark { position:absolute; inset:0; display:flex; align-items:center; pointer-events:none; opacity:var(--word-opacity); }
+.wordInner { width:100%; max-width:1280px; margin:auto; padding:0 48px; }
+.word { display:inline-flex; align-items:center; font-family:var(--font-heading); font-size:min(240px,20vw); line-height:1; letter-spacing:-.03em; color:var(--word-color); transform-origin:0 0; }
+.cursor { width:.06em; height:.82em; margin-left:.06em; background:var(--copper); animation:blink 1s steps(1) infinite; }
+.subtitle { margin-top:20px; font-size:12px; font-weight:500; letter-spacing:.22em; text-transform:uppercase; color:var(--copper); opacity:var(--subtitle-opacity); }
+.pins { position:absolute; inset:0; pointer-events:none; visibility:hidden; opacity:0; transition:opacity .4s; }
+.pins[data-visible=true], .pins:focus-within { visibility:visible; opacity:1; }
+.pin { position:absolute; padding:10px 14px; border:1px solid #e2e5eae6; background:#ffffffb8; backdrop-filter:blur(6px); color:var(--ink); pointer-events:auto; max-width:260px; transition:background .3s,border-color .3s; }
+.pin:nth-child(1) { left:12%; top:24%; }
+.pin:nth-child(2) { right:12%; top:18%; }
+.pin:nth-child(3) { left:10%; top:56%; }
+.pin:nth-child(4) { right:9%; top:58%; }
+.pin:nth-child(5) { left:45%; bottom:16%; }
+.pinTitle { display:flex; align-items:center; gap:10px; font:15px var(--font-heading); }
+.pinTitle i { width:7px; height:7px; border-radius:50%; background:var(--region-color); flex-shrink:0; }
+.pinTitle small { font:500 10px var(--font-sans); letter-spacing:.22em; color:var(--slate); }
+.plate { display:none; margin-top:10px; font-size:12px; line-height:1.5; }
+.plate strong { display:block; margin-top:10px; font-size:11px; font-weight:500; letter-spacing:.12em; text-transform:uppercase; color:var(--copper); }
+.pin[data-active=true] { border-color:var(--region-color); background:#fffffff5; z-index:2; }
+.pin[data-active=true] .plate { display:block; }
+.hint { position:absolute; left:48px; bottom:28px; display:flex; gap:24px; color:var(--slate); font-size:10px; font-weight:500; letter-spacing:.16em; text-transform:uppercase; pointer-events:none; }
+.tools { position:absolute; right:48px; bottom:24px; display:flex; border:1px solid var(--border); background:#ffffffb3; }
+.tools button { height:36px; min-width:36px; padding:0 10px; color:var(--ink); font-size:14px; border-left:1px solid var(--border); cursor:pointer; }
+.tools button:first-child { border-left:0; }
+.tools button:hover { background:var(--border); }
+.tools button:disabled { opacity:.35; cursor:default; }
+.tools[hidden],.hint[hidden] { display:none; }
+.scrollCue { position:absolute; left:50%; bottom:28px; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:12px; color:var(--slate); font-size:10px; letter-spacing:.24em; text-transform:uppercase; opacity:var(--cue-opacity); }
+.home[data-exploring=true] .scrollCue { visibility:hidden; }
+.scrollCue > span { display:block; position:relative; width:1px; height:56px; background:#8892a059; overflow:hidden; }
+.scrollCue i { position:absolute; left:-1px; width:3px; height:14px; background:var(--copper); animation:scrollDot 1.8s cubic-bezier(.4,0,.2,1) infinite; }
+.introControls { position:absolute; right:48px; bottom:28px; display:flex; gap:20px; font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--slate); }
+.introControls button { cursor:pointer; text-transform:inherit; letter-spacing:inherit; }
+.introControls button:hover,.introControls a:hover { color:var(--copper); }
+.introControls button:disabled { opacity:.4; cursor:default; }
+.home[data-exploring=true] .introControls,.home[data-brain-failed=true] .introControls { bottom:76px; font-size:9px; }
+.selection { position:absolute; left:48px; bottom:76px; display:flex; gap:16px; align-items:center; font-size:12px; color:var(--ink); }
+.selection a { color:var(--copper); }
+.selection button { cursor:pointer; font-size:18px; }
+.status { position:absolute; top:12px; left:24px; font-size:12px; color:var(--cloud); }
+/* Without the model, the still image carries the hero on the dark stage and the wordmark stays in the header. */
+.home[data-brain-failed=true] { --stage-color:#0b1221 !important; }
+.home[data-brain-failed=true] .field, .home[data-brain-failed=true] .wordmark, .home[data-brain-failed=true] .scrollCue { display:none; }
+@keyframes blink { 50% { opacity:0; } }
+@keyframes scrollDot { 0% { transform:translateY(-16px); opacity:0; } 30% { opacity:1; } 100% { transform:translateY(60px); opacity:0; } }
+@media(max-width:767px) {
+ .wordmark { align-items:flex-start; padding-top:52px; }
+ .wordInner { padding:0 24px; margin:0 auto; }
+ .word { font-size:27vw; }
+ .subtitle { font-size:9px; max-width:240px; }
+ .pin { padding:9px; max-width:46%; }
+ .pinTitle { font-size:11px; gap:6px; }
+ .pin:nth-child(1) { left:4%; top:12%; }
+ .pin:nth-child(2) { right:4%; top:12%; }
+ .pin:nth-child(3) { left:4%; top:57%; }
+ .pin:nth-child(4) { right:4%; top:57%; }
+ .pin:nth-child(5) { left:4%; bottom:20%; }
+ .plate { font-size:11px; }
+ .hint { left:16px; bottom:30px; font-size:9px; }
+ .hint span { display:none; }
+ .tools { right:16px; }
+ .introControls { right:20px; gap:12px; font-size:9px; }
+ .selection { left:16px; bottom:118px; font-size:11px; }
+}
+@media(prefers-reduced-motion:reduce) { .cursor,.scrollCue i { animation:none; } .pins { transition:none; } }
+
+.hint a { pointer-events:auto; color:var(--copper); }
+@media(max-width:767px) { .hint { gap:12px; flex-direction:column; bottom:22px; } }
+
+/* Keyframe capture (development only): bare stage, model at its formed pose, nothing else. */
+.home[data-brain-pose] { --stage-color:#0b1221 !important; }
+.home[data-brain-pose] .field, .home[data-brain-pose] .wordmark, .home[data-brain-pose] .scrollCue, .home[data-brain-pose] .introControls, .home[data-brain-pose] .intro, .home[data-brain-pose] .pins, .home[data-brain-pose] .tools, .home[data-brain-pose] .hint { display:none; }
+.home[data-brain-pose=empty] .canvas { visibility:hidden; }

@@ -9,7 +9,7 @@ import { generatePageMetadata } from "@/lib/seo";
 import { CIO } from "@/lib/team";
 
 export const metadata = generatePageMetadata({
-  title: "Process",
+  title: "Analyst Program",
   description:
     "How Scholars Opportunity Fund sources, researches, and underwrites event-driven opportunities in public equities.",
   path: "/program",
@@ -19,7 +19,7 @@ export default function ProgramPage() {
   return (
     <>
       {/* Hero */}
-      <section className="relative overflow-hidden bg-ink py-24 sm:py-32">
+      <section id="analyst-program" className="scroll-mt-24 relative overflow-hidden bg-ink py-24 sm:py-32">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0"
@@ -67,7 +67,7 @@ export default function ProgramPage() {
       </section>
 
       {/* What Students Do */}
-      <section className="py-16 sm:py-24">
+      <section id="work" className="py-16 sm:py-24">
         <Container>
           <Reveal>
             <div className="grid gap-16 lg:grid-cols-[1fr_1.5fr] lg:gap-24">
@@ -122,7 +122,7 @@ export default function ProgramPage() {
       </section>
 
       {/* A week in the life: interactive tabs */}
-      <section className="border-t border-border/60 bg-cloud py-16 sm:py-24">
+      <section id="week" className="border-t border-border/60 bg-cloud py-16 sm:py-24">
         <Container>
           <Reveal>
             <div className="grid gap-10 lg:grid-cols-[1fr_1.5fr] lg:items-start lg:gap-20">
@@ -145,7 +145,7 @@ export default function ProgramPage() {
       </section>
 
       {/* How responsibility grows */}
-      <section className="py-16 sm:py-24">
+      <section id="growth" className="py-16 sm:py-24">
         <Container>
           <Reveal>
             <div className="grid gap-16 lg:grid-cols-[1fr_1.5fr] lg:gap-24">
@@ -255,7 +255,7 @@ export default function ProgramPage() {
       </section>
 
       {/* Who We Recruit */}
-      <section className="bg-ink py-16 sm:py-24">
+      <section id="apply" className="bg-ink py-16 sm:py-24">
         <Container>
           <Reveal>
             <div className="max-w-3xl">

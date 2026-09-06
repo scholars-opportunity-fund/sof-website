@@ -1,3 +1,5 @@
+import { SITE_SECTIONS } from './site-map';
+
 export const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || "https://scholarsoppfund.com";
 
@@ -16,18 +18,20 @@ export const FUND = {
 } as const;
 
 export const NAV_ITEMS = [
-  { label: "Overview", href: "/about" },
-  { label: "Team", href: "/team" },
-  { label: "Process", href: "/program" },
+  { label: SITE_SECTIONS.approach.name, href: SITE_SECTIONS.approach.href },
+  { label: SITE_SECTIONS.team.name, href: SITE_SECTIONS.team.href },
+  { label: SITE_SECTIONS.program.name, href: SITE_SECTIONS.program.href },
   { label: "Contact", href: `mailto:${CONTACT_EMAIL}` },
 ] as const;
 
 export const FOOTER_LINKS = {
   fund: [
-    { label: "Overview", href: "/about" },
-    { label: "Team", href: "/team" },
+    { label: SITE_SECTIONS.process.name, href: SITE_SECTIONS.process.href },
+    { label: SITE_SECTIONS.structure.name, href: SITE_SECTIONS.structure.href },
+    { label: SITE_SECTIONS.approach.name, href: SITE_SECTIONS.approach.href },
+    { label: SITE_SECTIONS.team.name, href: SITE_SECTIONS.team.href },
   ],
-  program: [{ label: "Process", href: "/program" }],
+  program: [{ label: SITE_SECTIONS.program.name, href: SITE_SECTIONS.program.href }],
   contact: [
     {
       label: CONTACT_EMAIL,

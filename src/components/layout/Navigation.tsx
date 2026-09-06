@@ -11,11 +11,12 @@ export default function Navigation({ onNavigate }: { onNavigate?: () => void }) 
     <nav aria-label="Main navigation">
       <ul className="flex flex-col lg:flex-row lg:items-center lg:gap-10 gap-1">
         {NAV_ITEMS.map((item) => {
-          const isActive = pathname === item.href;
+          const isActive = pathname === item.href.split("#")[0];
           return (
             <li key={item.href}>
               <Link
                 href={item.href}
+                aria-current={isActive ? "page" : undefined}
                 onClick={onNavigate}
                 className={`block py-2 text-[15px] transition-colors duration-200 ${
                   isActive
