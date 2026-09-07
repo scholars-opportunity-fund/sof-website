@@ -18,10 +18,18 @@ const HOLD_AT = 5;
 const REVEAL_AT = 8.2;
 // The cinematic intro. The clip is handed over while its brain is still a glowing lattice, so the live
 // model performs the last beat itself: the metal skins over on screen and always matches exactly.
-// 0.916 is where the clip's own brain has fully resolved into a glowing glass shell, which is the state
-// the live model arrives in. Handing over there swaps like for like instead of cutting out of the storm.
-const CLIP = { src: '/brain/intro-market-16x9.mp4', handoff: .916 };
-const HANDOFF_AT = 8;
+// 0.80 is where the clip's market storm has begun to collapse inward. The drawn trace takes it from there
+// and builds the brain itself, so the network that flew past you is the thing that forms.
+const CLIP = { src: '/brain/intro-market-16x9.mp4', handoff: .8 };
+// Page seconds at the moment the clip gives way to the trace, and at the moment the trace gives way to the model.
+const TRACE_AT = 6.4;
+// The trace is densest just before 8 s of its own build, so the model takes over there rather than later,
+// when the drawn network has begun to thin out again.
+const HANDOFF_AT = 7.9;
+// Act two runs the trace clock slower than real time, to dwell on the formation.
+const TRACE_SPEED = .6;
+// How long the clip and the trace overlap while one fades into the other.
+const TRACE_FADE = 1.1;
 const SETTLE = 1.8;
 const START_BUDGET = 2500;
 const STALL_BUDGET = 1500;
@@ -49,6 +57,8 @@ export default function BrainExperience({ fallback }: { fallback: ReactNode }) {
   const [revealed, setRevealed] = useState(false);
   // null until the mount effect decides; true runs the clip, false runs the 2D synapse trace.
   const [clipMode, setClipMode] = useState<boolean | null>(null);
+  // True once the trace has taken over from the clip, which fades the video out from under it.
+  const [clipOut, setClipOut] = useState(false);
   // Development-only finish switch, so the live brain can be compared against the intro clip's ending.
   const [look, setLook] = useState<BrainLookName | null>(null);
   const [ready, setReady] = useState(false);
@@ -69,10 +79,10 @@ export default function BrainExperience({ fallback }: { fallback: ReactNode }) {
     element.style.setProperty('--light', String(light));
     element.style.setProperty('--stage-color', `rgb(${11 + 232 * light},${18 + 227 * light},${33 + 215 * light})`);
     element.style.setProperty('--word-color', `rgb(${243 - 232 * light},${245 - 227 * light},${248 - 215 * light})`);
-    element.style.setProperty('--word-opacity', String(seconds < 8 ? 0 : 1 - smooth((nav - .78) / .2)));
-    element.style.setProperty('--subtitle-opacity', seconds > 9.9 && nav < .05 ? '1' : '0');
-    element.style.setProperty('--cue-opacity', seconds > 10.4 && nav < .05 ? '1' : '0');
-    if (letters.current) letters.current.textContent = 'SOF'.slice(0, Math.min(3, Math.floor(Math.max(0, (seconds - 8.1) / 1.1) * 3.999)));
+    element.style.setProperty('--word-opacity', String(seconds < 9.5 ? 0 : 1 - smooth((nav - .78) / .2)));
+    element.style.setProperty('--subtitle-opacity', seconds > 11 && nav < .05 ? '1' : '0');
+    element.style.setProperty('--cue-opacity', seconds > 11.3 && nav < .05 ? '1' : '0');
+    if (letters.current) letters.current.textContent = 'SOF'.slice(0, Math.min(3, Math.floor(Math.max(0, (seconds - 9.6) / 1.1) * 3.999)));
     const destination = navWord.current;
     if (word.current && destination) {
       word.current.style.transform = 'none';
@@ -108,7 +118,7 @@ export default function BrainExperience({ fallback }: { fallback: ReactNode }) {
     const saveData = Boolean((navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData);
     // The clip is landscape only and heavy, so portrait stages and metered connections take the drawn trace.
     setClipMode(previous => previous ?? (!saveData && innerWidth >= innerHeight && innerWidth >= 900));
-    startedAt.current = performance.now(); held.current = 0; playing.current = true; setRevealed(false);
+    startedAt.current = performance.now(); held.current = 0; playing.current = true; setRevealed(false); setClipOut(false);
     setPhase('forming');
   }, [finish]);
 
@@ -140,9 +150,13 @@ export default function BrainExperience({ fallback }: { fallback: ReactNode }) {
   // while the model settles out of its arrival glow. Any failure drops to the drawn trace, never a blank stage.
   useEffect(() => {
     if (phase !== 'forming' || pose || clipMode !== true) return;
-    const element = video.current;
-    if (!element) return;
-    let cancelled = false, frame = 0, startTimer = 0, startedPlaying = 0;
+    const element = video.current, canvasElement = introCanvas.current;
+    if (!element || !canvasElement) return;
+    let cancelled = false, frame = 0, startTimer = 0, startedPlaying = 0, traceAt = 0;
+    let engine = intro.current;
+    // The trace runs from the first frame, hidden under the clip, so by the time the storm collapses it is
+    // already mid-formation and can carry the brain the rest of the way.
+    if (!engine) import('@/lib/brain/intro').then(module => { if (!cancelled) engine = intro.current = module.createBrainIntro(canvasElement); }).catch(() => {});
     const toTrace = () => {
       if (cancelled || !playing.current || handedOverAt.current) return;
       element.pause(); element.removeAttribute('src'); element.load();
@@ -160,28 +174,34 @@ export default function BrainExperience({ fallback }: { fallback: ReactNode }) {
       frame = 0;
       if (cancelled || !playing.current || !element) return;
       if (handedOverAt.current) {
+        // Act three: the live model, arriving lit and skinning over to its finish.
         const elapsed = (performance.now() - handedOverAt.current) / 1000;
         const seconds = Math.min(12, HANDOFF_AT + elapsed);
         scene.current?.setArrival(Math.max(0, 1 - elapsed / SETTLE));
         paint(seconds); scene.current?.setTime(seconds);
-        if (seconds >= 12) { playing.current = false; handedOverAt.current = 0; scene.current?.setArrival(0); setPhase('still'); return; }
+        engine?.draw(seconds, seconds, Math.max(0, 1 - elapsed / .5));
+        if (seconds >= 12) { playing.current = false; handedOverAt.current = 0; scene.current?.setArrival(0); engine?.clear(); setPhase('still'); return; }
+      } else if (traceAt) {
+        // Act two: the trace owns the stage and draws the brain out of the network.
+        const seconds = Math.min(HANDOFF_AT, TRACE_AT + (performance.now() - traceAt) / 1000 * TRACE_SPEED);
+        paint(seconds); scene.current?.setTime(seconds);
+        engine?.draw(seconds, seconds, 1);
+        if (seconds >= HANDOFF_AT && scene.current) {
+          handedOverAt.current = performance.now();
+          scene.current.setArrival(1); scene.current.setTime(HANDOFF_AT);
+          setRevealed(true);
+        }
       } else if (element.duration) {
+        // Act one: the clip, from the first signal through the market storm.
         const handoff = element.duration * CLIP.handoff;
         const progress = Math.min(1, element.currentTime / handoff);
         // Cut it for the trace if the clip falls a budget's worth behind the wall clock, however it stutters.
         if (startedPlaying && !element.ended && performance.now() - startedPlaying - element.currentTime * 1000 > STALL_BUDGET) { toTrace(); return; }
-        if (progress >= 1 || element.ended) {
-          // Hold the frame until the model exists, then reveal it under the clip and let the metal close over.
-          if (scene.current) {
-            element.pause();
-            handedOverAt.current = performance.now();
-            scene.current.setArrival(1); scene.current.setTime(HANDOFF_AT);
-            setRevealed(true); paint(HANDOFF_AT);
-          }
-        } else {
-          const seconds = HANDOFF_AT * progress;
-          paint(seconds); scene.current?.setTime(seconds);
-        }
+        const seconds = TRACE_AT * progress;
+        paint(seconds); scene.current?.setTime(seconds);
+        // The trace fades up under the clip's last second so the two overlap rather than cut.
+        engine?.draw(seconds, seconds, smooth((seconds - (TRACE_AT - TRACE_FADE)) / TRACE_FADE));
+        if (progress >= 1 || element.ended) { traceAt = performance.now(); setClipOut(true); element.pause(); }
       }
       frame = requestAnimationFrame(tick);
     }
@@ -248,7 +268,7 @@ export default function BrainExperience({ fallback }: { fallback: ReactNode }) {
     navigation.current = 0; scene.current?.setNavigation(0); setExploring(false);
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { finish(); return; }
     startedAt.current = performance.now(); held.current = 0; playing.current = true; setRevealed(false);
-    paint(0); scene.current?.setTime(0); setPhase('forming');
+    paint(0); setClipOut(false); scene.current?.setTime(0); setPhase('forming');
   }
   const controlsVisible = exploring || failed;
   const forming = phase === 'forming';
@@ -258,9 +278,9 @@ export default function BrainExperience({ fallback }: { fallback: ReactNode }) {
       <div className={styles.fallback} data-brain-fallback hidden={!failed}>{fallback}</div>
       <canvas ref={canvas} className={styles.canvas} data-brain-canvas data-ready={ready} tabIndex={ready && phase === 'still' ? 0 : -1}
         aria-label="3D brain. Drag to rotate. Pinch or Shift and scroll to zoom. Arrow keys rotate; plus and minus zoom. Select a region to explore it." />
-      <video ref={video} className={styles.clip} data-brain-clip data-fading={revealed} hidden={!forming || clipMode !== true || Boolean(pose)} muted playsInline preload="auto" aria-hidden="true"
+      <video ref={video} className={styles.clip} data-brain-clip data-fading={clipOut || revealed} hidden={!forming || clipMode !== true || Boolean(pose)} muted playsInline preload="auto" aria-hidden="true"
         onPointerUp={event => { if (event.pointerType === 'mouse' && event.button === 0) finish(); }} />
-      <canvas ref={introCanvas} className={styles.intro} data-brain-intro hidden={!forming || clipMode !== false} aria-hidden="true" onPointerUp={event => { if (event.pointerType === 'mouse' && event.button === 0) finish(); }} />
+      <canvas ref={introCanvas} className={styles.intro} data-brain-intro hidden={!forming} aria-hidden="true" onPointerUp={event => { if (event.pointerType === 'mouse' && event.button === 0) finish(); }} />
       <div className={styles.wordmark} aria-hidden="true"><div className={styles.wordInner}>
         <p ref={word} className={styles.word}><span ref={letters} /><span className={styles.cursor} /></p>
         <p className={styles.subtitle}>Scholars Opportunity Fund · Salt Lake City</p>

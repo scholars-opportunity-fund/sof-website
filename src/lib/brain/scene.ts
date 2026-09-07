@@ -148,6 +148,8 @@ export async function createBrainScene(canvas: HTMLCanvasElement, callbacks: Cal
   let navigation = 0, clipAspect: number | null = null, look: BrainLookName = DEFAULT_LOOK;
   // 1 the instant the clip hands over, decaying to 0 as the metal skins over and the traffic calms.
   let arrival = 0;
+  // Keeps the resting brain alive: a slow clock so pulses keep travelling the connections once it settles.
+  let idle = 0, lastFrame = 0;
   const viewport = new THREE.Vector2();
   const preference = window.matchMedia('(prefers-reduced-motion: reduce)');
   controls.enableDamping = !preference.matches;
@@ -155,12 +157,21 @@ export async function createBrainScene(canvas: HTMLCanvasElement, callbacks: Cal
   function render() {
     frame = 0;
     const time = phase === 'forming' ? Math.min(12, introTime) : 12;
+    const now = performance.now();
+    const delta = lastFrame ? Math.min(.05, (now - lastFrame) / 1000) : 0;
+    lastFrame = now;
+    // At rest the clock keeps running at a fraction of formation speed, so the network reads as alive
+    // rather than frozen. Reduced motion holds it still.
+    const breathing = phase === 'still' && !preference.matches;
+    if (breathing) idle += delta * .22;
     // The rendered clip carries the formation; the model is fully formed and static beneath it and keeps a faint network after the swap.
-    networkMaterial.uniforms.time.value = 12;
+    networkMaterial.uniforms.time.value = 12 + idle;
     const preset = BRAIN_LOOKS[look], hot = arrival;
     // On arrival the brain is still the clip's glowing lattice: traffic at full tilt, shell thin and lit.
     // As `hot` decays the shell closes to its finish and the network drops back to its resting hum.
-    networkMaterial.uniforms.strength.value = THREE.MathUtils.smoothstep(time, 9.4, 10.6) * .26 * preset.network.strength + hot * .95;
+    const settled = THREE.MathUtils.smoothstep(time, 9.4, 10.6);
+    const breath = breathing ? .82 + Math.sin(idle * 1.7) * .18 : 1;
+    networkMaterial.uniforms.strength.value = settled * .26 * preset.network.strength * breath + hot * .95;
     networkMaterial.uniforms.pointStrength.value = preset.junction.strength * (1 + hot * 2.4);
     for (const surface of surfaces) {
       surface.material.opacity = preset.surface.opacity * (1 - hot * .5) * (surface.name === active ? 1.04 : 1);
@@ -168,12 +179,12 @@ export async function createBrainScene(canvas: HTMLCanvasElement, callbacks: Cal
     }
     for (const wire of wires) wire.material.opacity = preset.wireOpacity + hot * .1;
     brain.scale.setScalar(1); brain.rotation.set(0, 0, 0); brain.position.set(0, 0, 0);
-    const shift = THREE.MathUtils.smoothstep(time, 9.4, 10.6) * (1 - navigation);
+    const shift = settled * (1 - navigation);
     renderer.getSize(viewport);
     const mobile = viewport.x < 768;
     // While a clip is matched the aspect factor follows the clip, so the model matches the height-fitted video; it settles to the stage's own factor across the shift.
     const stageFactor = Math.min(1, viewport.x / viewport.y * 1.05);
-    const factor = clipAspect ? THREE.MathUtils.lerp(Math.min(1, clipAspect * 1.05), stageFactor, THREE.MathUtils.smoothstep(time, 9.4, 10.6)) : stageFactor;
+    const factor = clipAspect ? THREE.MathUtils.lerp(Math.min(1, clipAspect * 1.05), stageFactor, settled) : stageFactor;
     brain.scale.multiplyScalar(factor * THREE.MathUtils.lerp(1, mobile ? .72 : .66, shift));
     camera.setViewOffset(viewport.x, viewport.y, mobile ? 0 : -viewport.x * .25 * shift, mobile ? viewport.y * .14 * shift : 0, viewport.x, viewport.y);
     controls.update();
@@ -181,6 +192,8 @@ export async function createBrainScene(canvas: HTMLCanvasElement, callbacks: Cal
     canvas.dataset.orientation = camera.position.toArray().map(value => value.toFixed(3)).join(',');
     canvas.dataset.formation = time.toFixed(2);
     canvas.dataset.region = active ?? 'none';
+    // Only the resting brain drives itself; every other state renders on demand.
+    if (breathing) invalidate();
   }
   function resize() {
     const { width, height } = canvas.getBoundingClientRect();
@@ -190,8 +203,9 @@ export async function createBrainScene(canvas: HTMLCanvasElement, callbacks: Cal
     renderer.setSize(width, height, false); camera.aspect = width / height; camera.updateProjectionMatrix(); invalidate();
   }
   const resizeObserver = new ResizeObserver(resize); resizeObserver.observe(canvas);
-  const intersection = new IntersectionObserver(entries => { visible = entries[0].isIntersecting; if (visible) invalidate(); }); intersection.observe(canvas);
-  document.addEventListener('visibilitychange', invalidate);
+  const intersection = new IntersectionObserver(entries => { visible = entries[0].isIntersecting; lastFrame = 0; if (visible) invalidate(); }); intersection.observe(canvas);
+  const visibilityChanged = () => { lastFrame = 0; invalidate(); };
+  document.addEventListener('visibilitychange', visibilityChanged);
   window.addEventListener('resize', resize);
   controls.addEventListener('change', invalidate);
   controls.addEventListener('start', callbacks.move);
@@ -265,7 +279,7 @@ export async function createBrainScene(canvas: HTMLCanvasElement, callbacks: Cal
     setArrival(value: number) { arrival = THREE.MathUtils.clamp(value, 0, 1); invalidate(); },
     dispose() {
       disposed = true; cancelAnimationFrame(frame); cancelAnimationFrame(hoverFrame); controls.dispose(); resizeObserver.disconnect(); intersection.disconnect();
-      document.removeEventListener('visibilitychange', invalidate); window.removeEventListener('resize', resize); preference.removeEventListener('change', motionChanged);
+      document.removeEventListener('visibilitychange', visibilityChanged); window.removeEventListener('resize', resize); preference.removeEventListener('change', motionChanged);
       canvas.removeEventListener('wheel', wheel, true); canvas.removeEventListener('pointerdown', pointerDown); canvas.removeEventListener('pointermove', pointerMove); canvas.removeEventListener('pointerup', pointerUp); canvas.removeEventListener('pointercancel', pointerCancel); canvas.removeEventListener('pointerleave', pointerLeave); canvas.removeEventListener('keydown', keyDown); canvas.removeEventListener('webglcontextlost', contextLost);
       disposeModel(); outlines.forEach(outline => { outline.geometry.dispose(); (outline.material as THREE.Material).dispose(); }); wires.forEach(wire => wire.material.dispose()); connections.dispose(); networkMaterial.dispose(); junctionGeometry.dispose(); junctionMaterial.dispose(); environmentMap.dispose(); renderer.dispose(); renderer.forceContextLoss();
     },
