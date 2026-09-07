@@ -38,7 +38,7 @@
 .rail::after { height:var(--fill,0%); background:var(--copper); }
 .rail ol { display:flex; flex-direction:column; gap:72px; }
 .rail li { position:relative; }
-.rail li > p:not(.kicker) { margin-top:14px; font-size:17px; line-height:1.7; }
+.rail li > p:not(.kicker) { margin-top:14px; max-width:560px; font-size:17px; line-height:1.7; }
 .rail li > p.meta { font-size:13px; color:var(--slate); letter-spacing:.04em; }
 .cubeWrap { position:absolute; left:-72px; top:0; width:48px; height:48px; perspective:500px; display:flex; align-items:center; justify-content:center; z-index:1; }
 .cube { position:relative; width:32px; height:32px; transform-style:preserve-3d; transform:rotateX(-28deg) rotateY(45deg); transition:transform 1.4s cubic-bezier(.22,.8,.2,1); }

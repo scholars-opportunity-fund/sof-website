@@ -5,9 +5,9 @@ import { FUND, FOOTER_LINKS } from "@/lib/constants";
 export default function Footer() {
   return (
     <footer className="border-t border-border-dark/60 bg-ink text-foreground-on-dark">
-      <div className="mx-auto max-w-7xl px-8 py-14 lg:px-12">
-        <div className="grid grid-cols-1 gap-16 sm:grid-cols-5">
-          <div className="sm:col-span-2">
+      <div className="mx-auto max-w-[86rem] px-8 py-14 lg:px-12">
+        <div className="grid grid-cols-1 gap-16 sm:grid-cols-[2fr_1fr_1fr_1fr]">
+          <div>
             <Link
               href="/"
               className="inline-flex items-center gap-3 font-heading text-lg text-cloud hover:text-copper transition-colors"
