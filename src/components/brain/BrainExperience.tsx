@@ -30,9 +30,9 @@ const HANDOFF_AT = 7.9;
 const TRACE_SPEED = .6;
 // How long the clip and the trace overlap while one fades into the other.
 const TRACE_FADE = 1.1;
-const SETTLE = 2.6;
+const SETTLE = 3.2;
 // The trace lingers over the arriving model and dissolves across this long, so neither one pops.
-const TRACE_OUT = 1.1;
+const TRACE_OUT = 2;
 const START_BUDGET = 2500;
 const STALL_BUDGET = 1500;
 

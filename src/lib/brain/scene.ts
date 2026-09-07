@@ -69,7 +69,7 @@ export async function createBrainScene(canvas: HTMLCanvasElement, callbacks: Cal
   // The metal shell grows out of the same seed the network grows from: fragments nearer the seed skin over
   // first, with a lit frontier where the metal is still creeping. `grown` at 1 is the finished brain.
   const growthSeed = new THREE.Vector3(.8, .1, 1);
-  const growth = { grown: { value: 1 }, seed: { value: growthSeed }, reach: { value: 1 }, rim: { value: .14 }, rimColor: { value: new THREE.Color('#bfe2f5') } };
+  const growth = { grown: { value: 1 }, seed: { value: growthSeed }, reach: { value: 1 }, rim: { value: .2 }, rimColor: { value: new THREE.Color('#8fd4f5') } };
   const surfaces: THREE.Mesh<THREE.BufferGeometry, THREE.MeshPhysicalMaterial>[] = [];
   const outlines: THREE.LineSegments[] = [];
   const wires: THREE.Mesh<THREE.BufferGeometry, THREE.MeshBasicMaterial>[] = [];
@@ -98,7 +98,7 @@ export async function createBrainScene(canvas: HTMLCanvasElement, callbacks: Cal
           if (uGrown < 0.999) {
             float reached = distance(vGrowthPos, uSeed) / uReach;
             if (reached > uGrown) discard;
-            gl_FragColor.rgb += uRimColor * smoothstep(uGrown - uRim, uGrown, reached) * 1.8;
+            gl_FragColor.rgb += uRimColor * smoothstep(uGrown - uRim, uGrown, reached) * .75;
           }`);
     };
     object.material.customProgramCacheKey = () => 'brain-growth';
@@ -106,7 +106,34 @@ export async function createBrainScene(canvas: HTMLCanvasElement, callbacks: Cal
     surfaces.push(object as THREE.Mesh<THREE.BufferGeometry, THREE.MeshPhysicalMaterial>);
     const outline = new THREE.LineSegments(new THREE.EdgesGeometry(object.geometry, 32), new THREE.LineBasicMaterial({ color: '#7BB8D6', transparent: true, opacity: 0, depthWrite: false }));
     outline.visible = false; outline.name = object.name; outline.renderOrder = 3; outlines.push(outline); brain.add(outline);
-    const wire = new THREE.Mesh(object.geometry, new THREE.MeshBasicMaterial({ color: '#9ccde4', wireframe: true, transparent: true, opacity: .025, depthWrite: false }));
+    const wireMaterial = new THREE.MeshBasicMaterial({ color: '#9ccde4', wireframe: true, transparent: true, opacity: .025, depthWrite: false });
+    // The scaffold grows with the shell. Without this it arrives complete and the handoff reads as a jump
+    // from the trace's sparse dots to a dense mesh.
+    wireMaterial.onBeforeCompile = (shader: { uniforms: Record<string, { value: unknown }>; vertexShader: string; fragmentShader: string }) => {
+      Object.assign(shader.uniforms, { uGrown: growth.grown, uSeed: growth.seed, uReach: growth.reach, uRim: growth.rim, uRimColor: growth.rimColor });
+      shader.vertexShader = shader.vertexShader
+        .replace('#include <common>', `#include <common>
+          varying vec3 vGrowthPos;`)
+        .replace('#include <begin_vertex>', `#include <begin_vertex>
+          vGrowthPos = position;`);
+      shader.fragmentShader = shader.fragmentShader
+        .replace('#include <common>', `#include <common>
+          varying vec3 vGrowthPos;
+          uniform float uGrown;
+          uniform vec3 uSeed;
+          uniform float uReach;
+          uniform float uRim;
+          uniform vec3 uRimColor;`)
+        .replace('#include <dithering_fragment>', `#include <dithering_fragment>
+          if (uGrown < 0.999) {
+            float reached = distance(vGrowthPos, uSeed) / uReach;
+            // The mesh fades in just ahead of the metal instead of stopping dead at the frontier.
+            if (reached > uGrown + uRim) discard;
+            gl_FragColor.a *= 1.0 - smoothstep(uGrown, uGrown + uRim, reached);
+          }`);
+    };
+    wireMaterial.customProgramCacheKey = () => 'brain-growth-wire';
+    const wire = new THREE.Mesh(object.geometry, wireMaterial);
     wire.renderOrder = 2; wires.push(wire); brain.add(wire);
     const positions = object.geometry.getAttribute('position');
     for (let i = 0; i < positions.count; i += Math.max(1, Math.floor(positions.count / 700))) {
@@ -207,7 +234,7 @@ export async function createBrainScene(canvas: HTMLCanvasElement, callbacks: Cal
       surface.material.opacity = preset.surface.opacity * (surface.name === active ? 1.04 : 1);
       surface.material.emissiveIntensity = preset.surface.emissiveIntensity + hot * .7;
     }
-    for (const wire of wires) wire.material.opacity = preset.wireOpacity + hot * .16;
+    for (const wire of wires) wire.material.opacity = preset.wireOpacity * (1 + hot * .8);
     brain.scale.setScalar(1); brain.rotation.set(0, 0, 0); brain.position.set(0, 0, 0);
     const shift = settled * (1 - navigation);
     renderer.getSize(viewport);
