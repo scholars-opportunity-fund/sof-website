@@ -7,7 +7,8 @@ import { brainRegions, type BrainRegion } from './regions';
 
 export type BrainPhase = 'loading' | 'forming' | 'still';
 export type BrainScene = Awaited<ReturnType<typeof createBrainScene>>;
-type Callbacks = { hover: (region: BrainRegion | null) => void; select: (region: BrainRegion | null) => void; move: () => void; zoom: (zoom: number) => void; failed: () => void };
+export type RegionAnchor = { id: BrainRegion; x: number; y: number; facing: number };
+type Callbacks = { hover: (region: BrainRegion | null) => void; select: (region: BrainRegion | null) => void; move: () => void; zoom: (zoom: number) => void; failed: () => void; anchors?: (anchors: RegionAnchor[]) => void };
 const HOME = new THREE.Vector3(4.6, .6, 2.65);
 const BASE_DISTANCE = HOME.length();
 
@@ -181,6 +182,40 @@ export async function createBrainScene(canvas: HTMLCanvasElement, callbacks: Cal
   });
   const junctions = new THREE.Points(junctionGeometry, junctionMaterial); junctions.renderOrder = 5; brain.add(junctions);
 
+  // A region's marker rides on its surface rather than at its centre: lobe centres sit near the midline,
+  // so they carry no sense of which side of the head is facing you. Sample points across each region and
+  // each frame take whichever one currently faces the camera most squarely.
+  const regionSamples = new Map<BrainRegion, THREE.Vector3[]>();
+  for (const surface of surfaces) {
+    if (!surface.name) continue;
+    const positions = surface.geometry.getAttribute('position');
+    const step = Math.max(1, Math.floor(positions.count / 64));
+    const samples: THREE.Vector3[] = [];
+    for (let i = 0; i < positions.count; i += step) samples.push(new THREE.Vector3().fromBufferAttribute(positions, i).multiplyScalar(1.04));
+    if (samples.length) regionSamples.set(surface.name as BrainRegion, samples);
+  }
+  const projected = new THREE.Vector3();
+  const toCamera = new THREE.Vector3();
+  const outward = new THREE.Vector3();
+  const best = new THREE.Vector3();
+  function reportAnchors() {
+    if (!callbacks.anchors) return;
+    const list: RegionAnchor[] = [];
+    for (const [id, samples] of regionSamples) {
+      let facing = -Infinity;
+      for (const sample of samples) {
+        projected.copy(sample).applyMatrix4(brain.matrixWorld);
+        toCamera.copy(camera.position).sub(projected).normalize();
+        outward.copy(projected).sub(brain.position).normalize();
+        const score = toCamera.dot(outward);
+        if (score > facing) { facing = score; best.copy(projected); }
+      }
+      best.project(camera);
+      list.push({ id, x: (best.x + 1) / 2, y: (1 - best.y) / 2, facing });
+    }
+    callbacks.anchors(list);
+  }
+
   function applyLook() {
     const preset = BRAIN_LOOKS[look], face = preset.surface;
     for (const surface of surfaces) {
@@ -247,6 +282,7 @@ export async function createBrainScene(canvas: HTMLCanvasElement, callbacks: Cal
     controls.update();
     renderer.render(scene, camera);
     canvas.dataset.orientation = camera.position.toArray().map(value => value.toFixed(3)).join(',');
+    reportAnchors();
     canvas.dataset.formation = time.toFixed(2);
     canvas.dataset.region = active ?? 'none';
     // Only the resting brain drives itself; every other state renders on demand.
@@ -334,6 +370,27 @@ export async function createBrainScene(canvas: HTMLCanvasElement, callbacks: Cal
     setClipAspect(value: number | null) { clipAspect = value; invalidate(); },
     setLook(value: BrainLookName) { look = value; applyLook(); invalidate(); },
     setArrival(value: number) { arrival = THREE.MathUtils.clamp(value, 0, 1); invalidate(); },
+    // Travel towards a region over `duration`, so following a marker reads as going into the brain.
+    focusRegion(id: BrainRegion, duration = 900) {
+      const samples = regionSamples.get(id);
+      if (!samples || !samples.length) return;
+      const centre = samples.reduce((sum, sample) => sum.add(sample), new THREE.Vector3()).multiplyScalar(1 / samples.length);
+      const target = centre.applyMatrix4(brain.matrixWorld);
+      const from = camera.position.clone();
+      const to = from.clone().lerp(target, .55);
+      const startedAt = performance.now();
+      controls.enabled = false;
+      const step = () => {
+        if (disposed) return;
+        const progress = Math.min(1, (performance.now() - startedAt) / duration);
+        const eased = progress * progress * (3 - 2 * progress);
+        camera.position.copy(from).lerp(to, eased);
+        camera.lookAt(brain.position);
+        invalidate();
+        if (progress < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    },
     dispose() {
       disposed = true; cancelAnimationFrame(frame); cancelAnimationFrame(hoverFrame); controls.dispose(); resizeObserver.disconnect(); intersection.disconnect();
       document.removeEventListener('visibilitychange', visibilityChanged); window.removeEventListener('resize', resize); preference.removeEventListener('change', motionChanged);

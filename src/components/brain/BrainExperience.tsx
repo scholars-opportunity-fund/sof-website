@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import Link from 'next/link';
-import type { BrainPhase } from '@/lib/brain/scene';
+import { useRouter } from 'next/navigation';
+import type { BrainPhase, RegionAnchor } from '@/lib/brain/scene';
 import type { BrainIntro } from '@/lib/brain/intro';
 import { isBrainLook, type BrainLookName } from '@/lib/brain/looks';
 import { brainRegions } from '@/lib/brain/regions';
@@ -61,6 +62,11 @@ export default function BrainExperience({ fallback }: { fallback: ReactNode }) {
   const [clipMode, setClipMode] = useState<boolean | null>(null);
   // True once the trace has taken over from the clip, which fades the video out from under it.
   const [clipOut, setClipOut] = useState(false);
+  // Screen positions of the region markers, reported by the scene each frame.
+  const [anchors, setAnchors] = useState<RegionAnchor[]>([]);
+  // The region being travelled into, which grows its marker while the camera moves.
+  const [entering, setEntering] = useState<string | null>(null);
+  const router = useRouter();
   // Development-only finish switch, so the live brain can be compared against the intro clip's ending.
   const [look, setLook] = useState<BrainLookName | null>(null);
   const [ready, setReady] = useState(false);
@@ -130,7 +136,7 @@ export default function BrainExperience({ fallback }: { fallback: ReactNode }) {
     const abort = new AbortController();
     setFollowScroll(false);
     import('@/lib/brain/scene').then(module => module.createBrainScene(element, {
-      hover: setHovered, select: setSelected, move: () => setHovered(null), zoom: setZoom, failed: fail,
+      hover: setHovered, select: setSelected, move: () => setHovered(null), zoom: setZoom, failed: fail, anchors: setAnchors,
     }, abort.signal)).then(engine => {
       if (abort.signal.aborted) { engine.dispose(); return; }
       scene.current = engine; engine.setNavigation(navigation.current);
@@ -287,14 +293,28 @@ export default function BrainExperience({ fallback }: { fallback: ReactNode }) {
         <p ref={word} className={styles.word}><span ref={letters} /><span className={styles.cursor} /></p>
         <p className={styles.subtitle}>Scholars Opportunity Fund · Salt Lake City</p>
       </div></div>
-      <nav className={styles.pins} aria-label="Explore the five areas of SOF" data-brain-navigation data-visible={controlsVisible}>
-        {brainRegions.map((region, index) => <Link key={region.id} href={region.href} className={styles.pin} data-pin={region.id} data-active={active === region.id}
-          style={{ '--region-color': region.color } as CSSProperties}
-          onPointerEnter={event => { if (event.pointerType === 'mouse') setHovered(region.id); }} onPointerLeave={() => setHovered(null)}
-          onFocus={() => setFocused(region.id)} onBlur={() => setFocused(null)}>
-          <span className={styles.pinTitle}><i /><small>0{index + 1}</small>{region.anatomy}</span>
-          <span className={styles.plate}><span>{region.description}</span><strong>{region.name} →</strong></span>
-        </Link>)}
+      <nav className={styles.pins} aria-label="Explore the five areas of SOF" data-brain-navigation data-visible={ready && (phase === 'still' || exploring)}>
+        {brainRegions.map(region => {
+          const anchor = anchors.find(item => item.id === region.id);
+          // Markers around the far side fade out rather than floating over the front of the model.
+          const behind = !anchor || anchor.facing < -.1;
+          return <Link key={region.id} href={region.href} className={styles.marker} data-pin={region.id}
+            data-active={active === region.id} data-behind={behind} data-entering={entering === region.id}
+            style={{ '--region-color': region.color, left: `${(anchor?.x ?? .5) * 100}%`, top: `${(anchor?.y ?? .5) * 100}%` } as CSSProperties}
+            onPointerEnter={event => { if (event.pointerType === 'mouse') setHovered(region.id); }} onPointerLeave={() => setHovered(null)}
+            onFocus={() => setFocused(region.id)} onBlur={() => setFocused(null)}
+            onClick={event => {
+              // Travel into the region first; the page follows once the camera has arrived.
+              if (event.metaKey || event.ctrlKey || event.shiftKey || entering) return;
+              event.preventDefault();
+              setEntering(region.id); setSelected(region.id);
+              scene.current?.focusRegion(region.id, 900);
+              window.setTimeout(() => router.push(region.href), 820);
+            }}>
+            <span className={styles.dot} aria-hidden="true" />
+            <span className={styles.markerLabel}><small>{region.anatomy}</small>{region.name}</span>
+          </Link>;
+        })}
       </nav>
       {activeRegion && controlsVisible && <div className={styles.selection} data-brain-detail><span>{activeRegion.name}</span><Link href={activeRegion.href}>Explore →</Link><button type="button" aria-label="Clear selected region" onClick={() => { setSelected(null); setHovered(null); }}>×</button></div>}
       <div className={styles.hint} hidden={!controlsVisible}>Drag to orbit <span>Pinch or Shift + scroll to zoom</span><a href="#sof-overview">Explore the fund &darr;</a></div>
