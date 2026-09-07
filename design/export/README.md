@@ -4,14 +4,13 @@
 the real markup and copy, every stylesheet inlined, images embedded as JPEG data URIs, and no
 scripts. It is kept under 300 KB so it can be handed to a design tool as an upload.
 
-The hero animates. `src/lib/brain/intro.ts` is bundled into the file with esbuild and runs for real:
-the synapse trace draws the brain, the formed brain lands, then the page settles into its resting
-composition. Clicking the REPLAY label in the corner runs it again.
+The hero runs the real intro. The Higgsfield clip is embedded as a compressed 573 KB copy (800x450,
+the first 8.2 seconds, which is the part the live page uses), `src/lib/brain/intro.ts` is bundled in
+with esbuild and draws the synapse trace over it, and the brain then forms and settles. Clicking the
+REPLAY label in the corner runs the whole thing again.
 
-Two parts of the live hero cannot travel in a single file, so they are stills instead of live layers:
-the rendered market clip that opens the real intro, and the WebGL model whose metal shell grows over
-the network. The file uses a captured frame of the formed brain and a captured frame of the resting
-hero for those beats.
+Only the WebGL model cannot travel: the metal shell growing over the network needs three.js and a
+5 MB model, so the file uses captured frames of the formed brain and the resting hero for that beat.
 
 Regenerate it against a running dev server with `design/brain/qa/../..` — the script lives in the
 session scratch, so if it is gone: open the page in the debug browser, skip the intro, capture the
