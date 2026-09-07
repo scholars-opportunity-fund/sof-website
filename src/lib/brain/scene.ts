@@ -66,6 +66,10 @@ export async function createBrainScene(canvas: HTMLCanvasElement, callbacks: Cal
   controls.saveState();
   const brain = new THREE.Group();
   brain.add(model.scene); scene.add(brain);
+  // The metal shell grows out of the same seed the network grows from: fragments nearer the seed skin over
+  // first, with a lit frontier where the metal is still creeping. `grown` at 1 is the finished brain.
+  const growthSeed = new THREE.Vector3(.8, .1, 1);
+  const growth = { grown: { value: 1 }, seed: { value: growthSeed }, reach: { value: 1 }, rim: { value: .14 }, rimColor: { value: new THREE.Color('#bfe2f5') } };
   const surfaces: THREE.Mesh<THREE.BufferGeometry, THREE.MeshPhysicalMaterial>[] = [];
   const outlines: THREE.LineSegments[] = [];
   const wires: THREE.Mesh<THREE.BufferGeometry, THREE.MeshBasicMaterial>[] = [];
@@ -75,6 +79,29 @@ export async function createBrainScene(canvas: HTMLCanvasElement, callbacks: Cal
     const oldMaterials = Array.isArray(object.material) ? object.material : [object.material];
     oldMaterials.forEach(material => material.dispose());
     object.material = new THREE.MeshPhysicalMaterial({ color: '#18364d', metalness: .7, roughness: .28, clearcoat: 1, clearcoatRoughness: .2, envMapIntensity: .65, transparent: true, opacity: .94, depthWrite: true, emissive: '#183044', emissiveIntensity: .16 });
+    object.material.onBeforeCompile = (shader: { uniforms: Record<string, { value: unknown }>; vertexShader: string; fragmentShader: string }) => {
+      Object.assign(shader.uniforms, { uGrown: growth.grown, uSeed: growth.seed, uReach: growth.reach, uRim: growth.rim, uRimColor: growth.rimColor });
+      shader.vertexShader = shader.vertexShader
+        .replace('#include <common>', `#include <common>
+          varying vec3 vGrowthPos;`)
+        .replace('#include <begin_vertex>', `#include <begin_vertex>
+          vGrowthPos = position;`);
+      shader.fragmentShader = shader.fragmentShader
+        .replace('#include <common>', `#include <common>
+          varying vec3 vGrowthPos;
+          uniform float uGrown;
+          uniform vec3 uSeed;
+          uniform float uReach;
+          uniform float uRim;
+          uniform vec3 uRimColor;`)
+        .replace('#include <dithering_fragment>', `#include <dithering_fragment>
+          if (uGrown < 0.999) {
+            float reached = distance(vGrowthPos, uSeed) / uReach;
+            if (reached > uGrown) discard;
+            gl_FragColor.rgb += uRimColor * smoothstep(uGrown - uRim, uGrown, reached) * 1.8;
+          }`);
+    };
+    object.material.customProgramCacheKey = () => 'brain-growth';
     object.renderOrder = 1;
     surfaces.push(object as THREE.Mesh<THREE.BufferGeometry, THREE.MeshPhysicalMaterial>);
     const outline = new THREE.LineSegments(new THREE.EdgesGeometry(object.geometry, 32), new THREE.LineBasicMaterial({ color: '#7BB8D6', transparent: true, opacity: 0, depthWrite: false }));
@@ -89,7 +116,8 @@ export async function createBrainScene(canvas: HTMLCanvasElement, callbacks: Cal
   });
 
   // Connections are anchored to actual 3D anatomy, so the formation and final view agree.
-  const seed = new THREE.Vector3(.8, .1, 1);
+  const seed = growthSeed;
+  growth.reach.value = Math.max(.001, Math.sqrt(candidates.reduce((far, point) => Math.max(far, point.distanceToSquared(seed)), 0)));
   candidates.sort((a, b) => a.distanceToSquared(seed) - b.distanceToSquared(seed));
   const nodes = candidates.slice(0, 360);
   const birth = (index: number) => .25 + 7.15 * Math.log(1 + index / nodes.length * (Math.exp(4) - 1)) / 4;
@@ -173,8 +201,10 @@ export async function createBrainScene(canvas: HTMLCanvasElement, callbacks: Cal
     const breath = breathing ? .82 + Math.sin(idle * 1.7) * .18 : 1;
     networkMaterial.uniforms.strength.value = settled * .26 * preset.network.strength * breath + hot * .95;
     networkMaterial.uniforms.pointStrength.value = preset.junction.strength * (1 + hot * 2.4);
+    // Ease the frontier so it starts quickly at the seed and slows as it closes over the far lobes.
+    growth.grown.value = hot > 0 ? Math.pow(1 - hot, .7) : 1;
     for (const surface of surfaces) {
-      surface.material.opacity = preset.surface.opacity * (1 - hot * .94) * (surface.name === active ? 1.04 : 1);
+      surface.material.opacity = preset.surface.opacity * (surface.name === active ? 1.04 : 1);
       surface.material.emissiveIntensity = preset.surface.emissiveIntensity + hot * .7;
     }
     for (const wire of wires) wire.material.opacity = preset.wireOpacity + hot * .16;
