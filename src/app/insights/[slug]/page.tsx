@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Container from "@/components/ui/Container";
 import JsonLd from "@/components/seo/JsonLd";
 import { getAllInsightSlugs, getInsightBySlug } from "@/lib/insights";
-import { generatePageMetadata, articleSchema } from "@/lib/seo";
+import { generatePageMetadata, articleSchema, breadcrumbSchema } from "@/lib/seo";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import Link from "next/link";
 
@@ -45,8 +45,16 @@ export default async function InsightPage({ params }: PageProps) {
           description: insight.meta.description,
           url: `/insights/${slug}`,
           datePublished: insight.meta.date,
+          dateModified: insight.meta.dateModified,
           author: insight.meta.author,
         })}
+      />
+      <JsonLd
+        data={breadcrumbSchema([
+          { name: "Home", href: "" },
+          { name: "Insights", href: "/insights" },
+          { name: insight.meta.title, href: `/insights/${slug}` },
+        ])}
       />
 
       <section className="bg-ink py-24 sm:py-32">
