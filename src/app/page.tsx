@@ -4,6 +4,14 @@ import Container from "@/components/ui/Container";
 import Button from "@/components/ui/Button";
 import Reveal from "@/components/ui/Reveal";
 import { CIO } from "@/lib/team";
+import { FUND } from "@/lib/constants";
+import { generatePageMetadata } from "@/lib/seo";
+
+export const metadata = generatePageMetadata({
+  title: `${FUND.name} | Event-Driven Public Equities`,
+  description: FUND.description,
+  path: "",
+});
 
 export default function Home() {
   return (

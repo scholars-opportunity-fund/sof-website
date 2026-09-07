@@ -30,7 +30,9 @@ export function generatePageMetadata({
   const twitterImage = ogImage || `${SITE_URL}/twitter-image`;
 
   return {
-    title,
+    // The homepage carries the site's full default title; the layout template
+    // ("%s | Fund Name") must not be applied on top of it.
+    title: path === "" ? { absolute: title } : title,
     description,
     alternates: {
       canonical: url,
