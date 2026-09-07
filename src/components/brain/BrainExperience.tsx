@@ -38,7 +38,7 @@ const START_BUDGET = 2500;
 const STALL_BUDGET = 1500;
 
 export default function BrainExperience({ fallback }: { fallback: ReactNode }) {
-  const { scene, setAvailable, active, setHovered, setFocused, setSelected, zoom, setZoom, setFollowScroll, reset } = useExplorer();
+  const { scene, setAvailable, active, selected, setHovered, setFocused, setSelected, zoom, setZoom, setFollowScroll, reset } = useExplorer();
   const root = useRef<HTMLElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const introCanvas = useRef<HTMLCanvasElement>(null);
@@ -301,13 +301,14 @@ export default function BrainExperience({ fallback }: { fallback: ReactNode }) {
           return <Link key={region.id} href={region.href} className={styles.marker} data-pin={region.id}
             data-active={active === region.id} data-behind={behind} data-entering={entering === region.id}
             style={{ '--region-color': region.color, left: `${(anchor?.x ?? .5) * 100}%`, top: `${(anchor?.y ?? .5) * 100}%` } as CSSProperties}
-            onPointerEnter={event => { if (event.pointerType === 'mouse') setHovered(region.id); }} onPointerLeave={() => setHovered(null)}
             onFocus={() => setFocused(region.id)} onBlur={() => setFocused(null)}
             onClick={event => {
-              // Travel into the region first; the page follows once the camera has arrived.
+              // Click to name the region, click again to travel into it. Hovering does nothing, so
+              // markers cannot fire as the model turns under the pointer.
               if (event.metaKey || event.ctrlKey || event.shiftKey || entering) return;
               event.preventDefault();
-              setEntering(region.id); setSelected(region.id);
+              if (selected !== region.id) { setSelected(region.id); return; }
+              setEntering(region.id);
               scene.current?.focusRegion(region.id, 900);
               window.setTimeout(() => router.push(region.href), 820);
             }}>
