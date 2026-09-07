@@ -1,5 +1,12 @@
 # Snapshots for design tools
 
+Two files, same page:
+
+- `SOF Home Live (full).html` (8 MB) is the one that matches localhost. The original 1600x900
+  Higgsfield clip, the hero captured at full resolution, photographs at 1400px.
+- `SOF Home Live.html` (1.1 MB) is the same thing shrunk for tools that limit upload size: the clip
+  re-encoded to 800x450 and trimmed to 8.2 s, the stills compressed harder.
+
 `SOF Home Live.html` is the homepage as it currently renders, frozen into one self-contained file:
 the real markup and copy, every stylesheet inlined, images embedded as JPEG data URIs, and no
 scripts. It is kept under 300 KB so it can be handed to a design tool as an upload.
