@@ -6,6 +6,12 @@
 /* The model waits under the synapse trace and is revealed as the trace dissolves, so the drawn brain is what forms. */
 .home[data-brain-phase=forming][data-brain-reveal=false]:not([data-brain-pose]) .canvas { visibility:hidden; }
 .intro { position:absolute; inset:0; width:100%; height:100%; display:block; z-index:1; }
+/* The clip is scaled to the stage height and centred; feathered side edges hide the seam between
+   its encoded black and the stage colour. max-width:none lifts the Tailwind preflight cap. */
+.clip { position:absolute; top:0; left:50%; height:100%; width:auto; max-width:none; transform:translateX(-50%); z-index:1; opacity:1; transition:opacity .45s ease;
+  -webkit-mask-image:linear-gradient(to right, transparent 0%, #000 7%, #000 93%, transparent 100%); mask-image:linear-gradient(to right, transparent 0%, #000 7%, #000 93%, transparent 100%); }
+.clip[data-fading=true] { opacity:0; pointer-events:none; }
+.clip[hidden] { display:none; }
 .intro[hidden] { display:none; }
 .field { position:absolute; inset:0; opacity:var(--light); }
 .fallback { position:absolute; width:min(64%,800px); top:50%; left:50%; transform:translate(-50%,-50%); }
@@ -81,5 +87,5 @@
 
 /* Keyframe capture (development only): bare stage, model at its formed pose, nothing else. */
 .home[data-brain-pose] { --stage-color:#0b1221 !important; }
-.home[data-brain-pose] .field, .home[data-brain-pose] .wordmark, .home[data-brain-pose] .scrollCue, .home[data-brain-pose] .introControls, .home[data-brain-pose] .intro, .home[data-brain-pose] .pins, .home[data-brain-pose] .tools, .home[data-brain-pose] .hint { display:none; }
+.home[data-brain-pose] .clip, .home[data-brain-pose] .field, .home[data-brain-pose] .wordmark, .home[data-brain-pose] .scrollCue, .home[data-brain-pose] .introControls, .home[data-brain-pose] .intro, .home[data-brain-pose] .pins, .home[data-brain-pose] .tools, .home[data-brain-pose] .hint { display:none; }
 .home[data-brain-pose=empty] .canvas { visibility:hidden; }

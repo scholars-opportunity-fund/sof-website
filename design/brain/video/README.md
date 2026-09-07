@@ -20,3 +20,27 @@ A glossy metallic dark-blue human brain seen from the side against pure black, e
 ## Prompt (Gemini proof, rejected)
 
 Cinematic macro shot in deep darkness. Luminous blue neural synapses and fine glowing nerve fibers emerge from black, branching and firing with tiny pulses of light, drifting together and weaving into a dense network that condenses into a glossy metallic dark-blue human brain seen from the side, matching the final frame exactly. Photoreal materials, volumetric light rays, shallow depth of field, slow camera settling to a locked side view. Background stays pure near-black throughout. No text, no logos, no people. Seamless transition into the final frame.
+
+## FLUX renders (2026-09-06, second attempt)
+
+The first attempt failed on model choice, not on Higgsfield: Gemini accepts an end image and ignored it,
+Kling accepts no end image at all, and the hybrid cross-fade between them is what read as bad flow.
+`flux_3_video` honours both keyframes in one shot, which is what these renders use.
+
+| Purpose | Settings | Job | Credits | Result |
+|---|---|---|---|---|
+| First FLUX proof | 6 s, 720p, start+end keyframes | 7fbf7461 | 33 | Accepted in principle: one continuous shot, last frame 19/255 from the keyframe, framing drifted |
+| Universe arc | 10 s, 720p, slow build to chaos to brain | be7a40f3 | 55 | Choreography confirmed; the pull-back read as a shell rather than a collapse |
+| Universe final | 10 s, 1080p, harder collapse, frozen last second | a1b3b27d | 90 | Last frame 14/255, clean settle, but no market language |
+| Market final | 10 s, 1080p, candlesticks, depth ladders, trade prints | cf647828 | 90 | **Shipped.** Last frame 15.7/255; trades read throughout the middle |
+
+Spend this round: 268 credits. Masters live in `clips/`; the shipped file is
+`public/brain/intro-market-16x9.mp4`, cropped to 1920x1080, scaled to 1600x900 and encoded at crf 26
+in the Higgsfield sandbox (25 MB to 5.5 MB, fast-start, no audio).
+
+## Why the end frame no longer has to match exactly
+
+The clip is handed over at 91.6 percent, where its own brain has resolved into a glowing glass shell.
+The live model is revealed in a matching arrival state (traffic at full tilt, shell thin and lit) and
+skins over to its metal finish across the following 1.8 seconds. The last beat is therefore rendered
+live and always matches, so the clip's residual 15.7/255 difference from the keyframe never shows.

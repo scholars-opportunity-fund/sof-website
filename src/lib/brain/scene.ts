@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { BRAIN_LOOKS, DEFAULT_LOOK, type BrainLookName } from './looks';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
@@ -111,23 +112,42 @@ export async function createBrainScene(canvas: HTMLCanvasElement, callbacks: Cal
   connections.setAttribute('birth', new THREE.Float32BufferAttribute(births, 1));
   connections.setAttribute('along', new THREE.Float32BufferAttribute(along, 1));
   const networkMaterial = new THREE.ShaderMaterial({
-    uniforms: { time: { value: 12 }, strength: { value: .45 } }, transparent: true, depthTest: false, depthWrite: false, blending: THREE.AdditiveBlending,
+    uniforms: { time: { value: 12 }, strength: { value: .45 }, baseColor: { value: new THREE.Vector3(...BRAIN_LOOKS[DEFAULT_LOOK].network.base) }, pulseColor: { value: new THREE.Vector3(...BRAIN_LOOKS[DEFAULT_LOOK].network.pulse) }, pointSize: { value: BRAIN_LOOKS[DEFAULT_LOOK].junction.size }, pointStrength: { value: BRAIN_LOOKS[DEFAULT_LOOK].junction.strength } }, transparent: true, depthTest: false, depthWrite: false, blending: THREE.AdditiveBlending,
     vertexShader: 'attribute float birth; attribute float along; varying float vBirth; varying float vAlong; void main(){vBirth=birth;vAlong=along;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',
-    fragmentShader: 'uniform float time; uniform float strength; varying float vBirth; varying float vAlong; void main(){if(time<vBirth+vAlong*.55)discard;float pulse=pow(max(0.,1.-abs(fract(time*.6-vAlong)-.5)*2.),18.);gl_FragColor=vec4(mix(vec3(.22,.52,.72),vec3(.8,.93,1.),pulse),strength*(.38+pulse*.62));}',
+    fragmentShader: 'uniform float time; uniform float strength; uniform vec3 baseColor; uniform vec3 pulseColor; varying float vBirth; varying float vAlong; void main(){if(time<vBirth+vAlong*.55)discard;float pulse=pow(max(0.,1.-abs(fract(time*.6-vAlong)-.5)*2.),18.);gl_FragColor=vec4(mix(baseColor,pulseColor,pulse),strength*(.38+pulse*.62));}',
   });
   const network = new THREE.LineSegments(connections, networkMaterial); network.renderOrder = 4; brain.add(network);
   const junctionGeometry = new THREE.BufferGeometry().setFromPoints(nodes);
   junctionGeometry.setAttribute('birth', new THREE.Float32BufferAttribute(nodes.map((_, index) => birth(index)), 1));
   const junctionMaterial = new THREE.ShaderMaterial({
     uniforms: networkMaterial.uniforms, transparent: true, depthTest: false, depthWrite: false, blending: THREE.AdditiveBlending,
-    vertexShader: 'attribute float birth; uniform float time; varying float alive; void main(){alive=step(birth,time);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);gl_PointSize=3.;}',
-    fragmentShader: 'uniform float strength; varying float alive; void main(){float light=max(0.,1.-length(gl_PointCoord-.5)*2.);gl_FragColor=vec4(.72,.88,1.,alive*light*strength*.5);}',
+    vertexShader: 'attribute float birth; uniform float time; uniform float pointSize; varying float alive; void main(){alive=step(birth,time);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);gl_PointSize=pointSize;}',
+    fragmentShader: 'uniform float strength; uniform float pointStrength; uniform vec3 pulseColor; varying float alive; void main(){float light=max(0.,1.-length(gl_PointCoord-.5)*2.);gl_FragColor=vec4(pulseColor,alive*light*strength*pointStrength*.5);}',
   });
   const junctions = new THREE.Points(junctionGeometry, junctionMaterial); junctions.renderOrder = 5; brain.add(junctions);
 
+  function applyLook() {
+    const preset = BRAIN_LOOKS[look], face = preset.surface;
+    for (const surface of surfaces) {
+      const material = surface.material;
+      material.color.set(face.color); material.emissive.set(face.emissive); material.emissiveIntensity = face.emissiveIntensity;
+      material.metalness = face.metalness; material.roughness = face.roughness; material.clearcoat = face.clearcoat;
+      material.transmission = face.transmission; material.thickness = face.thickness; material.ior = face.ior;
+      material.envMapIntensity = face.envMapIntensity; material.depthWrite = face.depthWrite;
+      material.attenuationColor.set(face.attenuationColor); material.attenuationDistance = face.attenuationDistance; material.needsUpdate = true;
+    }
+    for (const wire of wires) wire.material.opacity = preset.wireOpacity;
+    networkMaterial.uniforms.baseColor.value.set(...preset.network.base);
+    networkMaterial.uniforms.pulseColor.value.set(...preset.network.pulse);
+    networkMaterial.uniforms.pointSize.value = preset.junction.size;
+    networkMaterial.uniforms.pointStrength.value = preset.junction.strength;
+  }
+
   // The intro clock (0 → 12) is driven from outside so the 2D synapse overlay and the model agree.
   let phase: BrainPhase = 'loading', introTime = 0, frame = 0, disposed = false, visible = true, active: BrainRegion | null = null;
-  let navigation = 0, clipAspect: number | null = null;
+  let navigation = 0, clipAspect: number | null = null, look: BrainLookName = DEFAULT_LOOK;
+  // 1 the instant the clip hands over, decaying to 0 as the metal skins over and the traffic calms.
+  let arrival = 0;
   const viewport = new THREE.Vector2();
   const preference = window.matchMedia('(prefers-reduced-motion: reduce)');
   controls.enableDamping = !preference.matches;
@@ -137,9 +157,16 @@ export async function createBrainScene(canvas: HTMLCanvasElement, callbacks: Cal
     const time = phase === 'forming' ? Math.min(12, introTime) : 12;
     // The rendered clip carries the formation; the model is fully formed and static beneath it and keeps a faint network after the swap.
     networkMaterial.uniforms.time.value = 12;
-    networkMaterial.uniforms.strength.value = THREE.MathUtils.smoothstep(time, 9.4, 10.6) * .26;
-    for (const surface of surfaces) surface.material.opacity = surface.name === active ? .98 : .94;
-    for (const wire of wires) wire.material.opacity = .035;
+    const preset = BRAIN_LOOKS[look], hot = arrival;
+    // On arrival the brain is still the clip's glowing lattice: traffic at full tilt, shell thin and lit.
+    // As `hot` decays the shell closes to its finish and the network drops back to its resting hum.
+    networkMaterial.uniforms.strength.value = THREE.MathUtils.smoothstep(time, 9.4, 10.6) * .26 * preset.network.strength + hot * .95;
+    networkMaterial.uniforms.pointStrength.value = preset.junction.strength * (1 + hot * 2.4);
+    for (const surface of surfaces) {
+      surface.material.opacity = preset.surface.opacity * (1 - hot * .5) * (surface.name === active ? 1.04 : 1);
+      surface.material.emissiveIntensity = preset.surface.emissiveIntensity + hot * .7;
+    }
+    for (const wire of wires) wire.material.opacity = preset.wireOpacity + hot * .1;
     brain.scale.setScalar(1); brain.rotation.set(0, 0, 0); brain.position.set(0, 0, 0);
     const shift = THREE.MathUtils.smoothstep(time, 9.4, 10.6) * (1 - navigation);
     renderer.getSize(viewport);
@@ -218,7 +245,7 @@ export async function createBrainScene(canvas: HTMLCanvasElement, callbacks: Cal
     setNavigation(value: number) { navigation = THREE.MathUtils.clamp(value, 0, 1); invalidate(); },
     setRegion(region: BrainRegion | null) {
       active = region;
-      for (const mesh of surfaces) { const color = brainRegions.find(item => item.id === mesh.name)?.color ?? '#7BB8D6'; mesh.material.color.set(mesh.name === region ? color : '#18364d'); mesh.material.emissive.set(mesh.name === region ? color : '#183044'); mesh.material.emissiveIntensity = mesh.name === region ? .3 : .16; }
+      for (const mesh of surfaces) { const color = brainRegions.find(item => item.id === mesh.name)?.color ?? '#7BB8D6'; const face = BRAIN_LOOKS[look].surface; mesh.material.color.set(mesh.name === region ? color : face.color); mesh.material.emissive.set(mesh.name === region ? color : face.emissive); mesh.material.emissiveIntensity = mesh.name === region ? .3 : face.emissiveIntensity; }
       for (const outline of outlines) { const material = outline.material as THREE.LineBasicMaterial; outline.visible = outline.name === region; material.opacity = .4; material.color.set(brainRegions.find(item => item.id === outline.name)?.color ?? '#7BB8D6'); }
       invalidate();
     },
@@ -234,6 +261,8 @@ export async function createBrainScene(canvas: HTMLCanvasElement, callbacks: Cal
     setPhase(value: BrainPhase) { phase = value; controls.enabled = value === 'still'; invalidate(); },
     setTime(value: number) { introTime = value; invalidate(); },
     setClipAspect(value: number | null) { clipAspect = value; invalidate(); },
+    setLook(value: BrainLookName) { look = value; applyLook(); invalidate(); },
+    setArrival(value: number) { arrival = THREE.MathUtils.clamp(value, 0, 1); invalidate(); },
     dispose() {
       disposed = true; cancelAnimationFrame(frame); cancelAnimationFrame(hoverFrame); controls.dispose(); resizeObserver.disconnect(); intersection.disconnect();
       document.removeEventListener('visibilitychange', invalidate); window.removeEventListener('resize', resize); preference.removeEventListener('change', motionChanged);
