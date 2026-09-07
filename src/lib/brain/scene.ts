@@ -174,10 +174,10 @@ export async function createBrainScene(canvas: HTMLCanvasElement, callbacks: Cal
     networkMaterial.uniforms.strength.value = settled * .26 * preset.network.strength * breath + hot * .95;
     networkMaterial.uniforms.pointStrength.value = preset.junction.strength * (1 + hot * 2.4);
     for (const surface of surfaces) {
-      surface.material.opacity = preset.surface.opacity * (1 - hot * .5) * (surface.name === active ? 1.04 : 1);
+      surface.material.opacity = preset.surface.opacity * (1 - hot * .94) * (surface.name === active ? 1.04 : 1);
       surface.material.emissiveIntensity = preset.surface.emissiveIntensity + hot * .7;
     }
-    for (const wire of wires) wire.material.opacity = preset.wireOpacity + hot * .1;
+    for (const wire of wires) wire.material.opacity = preset.wireOpacity + hot * .16;
     brain.scale.setScalar(1); brain.rotation.set(0, 0, 0); brain.position.set(0, 0, 0);
     const shift = settled * (1 - navigation);
     renderer.getSize(viewport);

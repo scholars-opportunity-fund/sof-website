@@ -30,7 +30,9 @@ const HANDOFF_AT = 7.9;
 const TRACE_SPEED = .6;
 // How long the clip and the trace overlap while one fades into the other.
 const TRACE_FADE = 1.1;
-const SETTLE = 1.8;
+const SETTLE = 2.6;
+// The trace lingers over the arriving model and dissolves across this long, so neither one pops.
+const TRACE_OUT = 1.1;
 const START_BUDGET = 2500;
 const STALL_BUDGET = 1500;
 
@@ -179,7 +181,7 @@ export default function BrainExperience({ fallback }: { fallback: ReactNode }) {
         const seconds = Math.min(12, HANDOFF_AT + elapsed);
         scene.current?.setArrival(Math.max(0, 1 - elapsed / SETTLE));
         paint(seconds); scene.current?.setTime(seconds);
-        engine?.draw(seconds, seconds, Math.max(0, 1 - elapsed / .5));
+        engine?.draw(seconds, seconds, Math.max(0, 1 - elapsed / TRACE_OUT));
         if (seconds >= 12) { playing.current = false; handedOverAt.current = 0; scene.current?.setArrival(0); engine?.clear(); setPhase('still'); return; }
       } else if (traceAt) {
         // Act two: the trace owns the stage and draws the brain out of the network.
