@@ -135,14 +135,20 @@ export default function BrainExperience({ fallback }: { fallback: ReactNode }) {
     if (!element) return;
     const abort = new AbortController();
     setFollowScroll(false);
-    import('@/lib/brain/scene').then(module => module.createBrainScene(element, {
+    // The 2D intro owns the first seconds of the stage, so the WebGL boot and
+    // the model parse wait out the initial load instead of blocking it. The
+    // clip hands over around 6.4s and the hold/stall budgets already cover a
+    // late model, so the intro is unchanged; only the main thread at load is.
+    const boot = () => import('@/lib/brain/scene').then(module => module.createBrainScene(element, {
       hover: setHovered, select: setSelected, move: () => setHovered(null), zoom: setZoom, failed: fail, anchors: setAnchors,
     }, abort.signal)).then(engine => {
       if (abort.signal.aborted) { engine.dispose(); return; }
       scene.current = engine; engine.setNavigation(navigation.current);
       setReady(true); setAvailable(true);
     }).catch(() => { if (!abort.signal.aborted) fail(); });
+    const timer = setTimeout(boot, 2500);
     return () => {
+      clearTimeout(timer);
       abort.abort(); scene.current?.dispose(); scene.current = null;
       const destination = navWord.current;
       if (destination) destination.style.removeProperty('opacity');
