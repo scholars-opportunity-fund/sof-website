@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { TeamMember } from "@/lib/team";
 import MonogramTile from "./MonogramTile";
+import ProfileBody from "./ProfileBody";
 
 interface Props {
   cio: TeamMember;
@@ -11,34 +12,140 @@ interface Props {
   analysts: TeamMember[];
 }
 
+/**
+ * The panel's width is fixed rather than derived from the column, so the
+ * left/right fit test has a constant to measure against.
+ */
+const PANEL_WIDTH = 320;
+
+/** Breathing room the panel must keep from the viewport edge. */
+const EDGE_GUTTER = 16;
+
+/**
+ * Which disclosure a visitor gets.
+ *
+ * The floor is `lg`, not `sm`: in the 640-1023px band the grid is three
+ * columns of roughly 176px, so a middle-column card's panel overflows whichever
+ * side it opens on — and a panel narrow enough to fit there is too narrow to
+ * read a bio in. That band gets the modal, same as touch.
+ */
+const FOLD_OUT = "(hover: hover) and (pointer: fine) and (min-width: 1024px)";
+
 export default function TeamDirectory({ cio, cofounders, analysts }: Props) {
+  // The server has no way to know the viewer's input capability, so it renders
+  // the modal path and the effect below upgrades after mount.
+  const [foldOut, setFoldOut] = useState(false);
+  const [hovered, setHovered] = useState<string | null>(null);
+  const [pinned, setPinned] = useState<string | null>(null);
   const [openSlug, setOpenSlug] = useState<string | null>(null);
+  const [side, setSide] = useState<"left" | "right">("right");
 
   const all = useMemo(
     () => [cio, ...cofounders, ...analysts],
     [cio, cofounders, analysts]
   );
-  const active = useMemo(
+  const modalMember = useMemo(
     () => all.find((m) => m.slug === openSlug) ?? null,
     [all, openSlug]
   );
 
-  const close = useCallback(() => setOpenSlug(null), []);
+  // A pin wins over a hover, so a pinned panel does not flicker as the pointer
+  // crosses the grid.
+  const activeSlug = foldOut ? (pinned ?? hovered) : null;
 
-  // ESC to close + scroll lock when modal open
+  const closeModal = useCallback(() => setOpenSlug(null), []);
+  const clearPanel = useCallback(() => {
+    setPinned(null);
+    setHovered(null);
+  }, []);
+
+  // Decide which side the panel opens on from the card's real position.
+  const measure = useCallback((card: HTMLElement) => {
+    const rect = card.getBoundingClientRect();
+    const fitsRight =
+      rect.right + PANEL_WIDTH <= window.innerWidth - EDGE_GUTTER;
+    setSide(fitsRight ? "right" : "left");
+  }, []);
+
+  // Capability gate. Subscribing keeps a resized window or a hybrid device on
+  // the right path, and drops any open panel when the fold-out path goes away.
   useEffect(() => {
-    if (!active) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") close();
+    const query = window.matchMedia(FOLD_OUT);
+    const apply = () => {
+      setFoldOut(query.matches);
+      if (!query.matches) clearPanel();
+    };
+    apply();
+    query.addEventListener("change", apply);
+    return () => query.removeEventListener("change", apply);
+  }, [clearPanel]);
+
+  // Escape dismisses whichever panel is showing — the pin if one is set, and
+  // otherwise the hover preview, which would otherwise sit over its neighbours
+  // with no way to dismiss it but moving the pointer.
+  useEffect(() => {
+    if (!activeSlug) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") clearPanel();
+    };
+    const onDown = (event: MouseEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (!target?.closest("[data-team-card]")) clearPanel();
     };
     document.addEventListener("keydown", onKey);
-    const prevOverflow = document.body.style.overflow;
+    document.addEventListener("mousedown", onDown);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("mousedown", onDown);
+    };
+  }, [activeSlug, clearPanel]);
+
+  // The modal is the one disclosure that owns the whole page, so it alone traps
+  // Escape and locks scroll.
+  useEffect(() => {
+    if (!modalMember) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") closeModal();
+    };
+    document.addEventListener("keydown", onKey);
+    const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
       document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = prevOverflow;
+      document.body.style.overflow = previousOverflow;
     };
-  }, [active, close]);
+  }, [modalMember, closeModal]);
+
+  const cardProps = (member: TeamMember) => ({
+    member,
+    lit: pinned === member.slug || openSlug === member.slug,
+    panelOpen: activeSlug === member.slug,
+    side,
+    onPreview: (card: HTMLElement) => {
+      if (!foldOut || pinned) return;
+      setHovered(member.slug);
+      measure(card);
+    },
+    onLeave: () => {
+      if (!foldOut || pinned) return;
+      setHovered(null);
+    },
+    onActivate: (card: HTMLElement) => {
+      if (!foldOut) {
+        setOpenSlug(member.slug);
+        return;
+      }
+      if (pinned === member.slug) {
+        // Clear the hover too, or `pinned ?? hovered` would fall straight back
+        // to a preview of the card the pointer is still resting on.
+        clearPanel();
+        return;
+      }
+      setPinned(member.slug);
+      setHovered(member.slug);
+      measure(card);
+    },
+  });
 
   return (
     <>
@@ -49,13 +156,9 @@ export default function TeamDirectory({ cio, cofounders, analysts }: Props) {
             Leadership
           </p>
           <div className="mx-auto mt-8 grid max-w-2xl grid-cols-1 gap-6 sm:grid-cols-2">
-            <HeadshotCard member={cio} onClick={() => setOpenSlug(cio.slug)} />
+            <HeadshotCard key={cio.slug} {...cardProps(cio)} />
             {cofounders.map((m) => (
-              <HeadshotCard
-                key={m.slug}
-                member={m}
-                onClick={() => setOpenSlug(m.slug)}
-              />
+              <HeadshotCard key={m.slug} {...cardProps(m)} />
             ))}
           </div>
         </div>
@@ -74,69 +177,147 @@ export default function TeamDirectory({ cio, cofounders, analysts }: Props) {
           </div>
           <div className="mt-8 grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4">
             {analysts.map((m) => (
-              <HeadshotCard
-                key={m.slug}
-                member={m}
-                onClick={() => setOpenSlug(m.slug)}
-              />
+              <HeadshotCard key={m.slug} {...cardProps(m)} />
             ))}
           </div>
         </div>
       </section>
 
-      {active && <MemberModal member={active} onClose={close} />}
+      {modalMember && (
+        <MemberModal member={modalMember} onClose={closeModal} />
+      )}
     </>
   );
 }
 
 function HeadshotCard({
   member,
-  onClick,
+  lit,
+  panelOpen,
+  side,
+  onPreview,
+  onLeave,
+  onActivate,
 }: {
   member: TeamMember;
-  onClick: () => void;
+  lit: boolean;
+  panelOpen: boolean;
+  side: "left" | "right";
+  onPreview: (card: HTMLElement) => void;
+  onLeave: () => void;
+  onActivate: (card: HTMLElement) => void;
 }) {
-  const titleForBadge =
-    member.role === "Chief Investment Officer"
-      ? "Chief Investment Officer"
-      : member.role;
+  const panelId = `panel-${member.slug}`;
+  const headingId = `${panelId}-title`;
 
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="group flex flex-col text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-copper focus-visible:ring-offset-4 focus-visible:ring-offset-background"
-      aria-label={`Open profile: ${member.name}`}
+    // The group is named because the button below already carries an unnamed
+    // one; two nested unnamed groups would leave it ambiguous which drives the
+    // colour. The panel lives inside this wrapper and abuts the card with no
+    // gap, so the pointer never crosses dead space on its way to the LinkedIn
+    // button and the hover holds.
+    <div
+      data-team-card
+      data-lit={lit}
+      // The wrapper is lifted while its panel is open. Without it the panel's
+      // own z-index competes with later sibling cards, which paint after it in
+      // DOM order and can cover the LinkedIn button.
+      className={`group/card relative ${panelOpen ? "z-30" : ""}`}
+      onMouseEnter={(event) => onPreview(event.currentTarget)}
+      onMouseLeave={onLeave}
+      onFocus={(event) => onPreview(event.currentTarget)}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node)) {
+          onLeave();
+        }
+      }}
     >
-      <div className="relative aspect-square w-full overflow-hidden bg-gunmetal/10">
-        {member.image ? (
-          <Image
-            src={member.image}
-            alt={member.name}
-            fill
-            sizes="(min-width: 1024px) 280px, (min-width: 640px) 30vw, 45vw"
-            className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+      <button
+        type="button"
+        onClick={(event) => onActivate(event.currentTarget.parentElement!)}
+        aria-expanded={panelOpen}
+        aria-controls={panelOpen ? panelId : undefined}
+        className="flex w-full flex-col text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-copper focus-visible:ring-offset-4 focus-visible:ring-offset-background"
+        aria-label={`Open profile: ${member.name}`}
+      >
+        <div className="relative aspect-square w-full overflow-hidden bg-gunmetal/10 grayscale transition-[filter] duration-500 group-hover/card:grayscale-0 group-focus-within/card:grayscale-0 group-data-[lit=true]/card:grayscale-0 motion-reduce:transition-none">
+          {member.image ? (
+            <Image
+              src={member.image}
+              alt={member.name}
+              fill
+              sizes="(min-width: 1024px) 280px, (min-width: 640px) 30vw, 45vw"
+              className="object-cover transition-transform duration-500 group-hover/card:scale-[1.03] motion-reduce:transition-none"
+            />
+          ) : (
+            <MonogramTile
+              name={member.name}
+              className="transition-transform duration-500 group-hover/card:scale-[1.03] motion-reduce:transition-none"
+            />
+          )}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 bg-ink/0 transition-colors duration-300 group-hover/card:bg-ink/10"
           />
-        ) : (
-          <MonogramTile
-            name={member.name}
-            className="transition-transform duration-500 group-hover:scale-[1.03]"
-          />
-        )}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-ink/0 transition-colors duration-300 group-hover:bg-ink/10"
+        </div>
+        <div className="mt-3">
+          <p className="font-heading text-base text-ink transition-colors group-hover/card:text-copper">
+            {member.name}
+          </p>
+          <p className="mt-0.5 text-[11px] font-medium tracking-[0.12em] text-copper uppercase">
+            {member.role}
+          </p>
+        </div>
+      </button>
+
+      {panelOpen && (
+        <FoldOutPanel
+          member={member}
+          side={side}
+          panelId={panelId}
+          headingId={headingId}
         />
-      </div>
-      <div className="mt-3">
-        <p className="font-heading text-base text-ink group-hover:text-copper transition-colors">
-          {member.name}
-        </p>
-        <p className="mt-0.5 text-[11px] font-medium tracking-[0.12em] text-copper uppercase">
-          {titleForBadge}
-        </p>
-      </div>
-    </button>
+      )}
+    </div>
+  );
+}
+
+function FoldOutPanel({
+  member,
+  side,
+  panelId,
+  headingId,
+}: {
+  member: TeamMember;
+  side: "left" | "right";
+  panelId: string;
+  headingId: string;
+}) {
+  // Mount first, then show, so the panel has a state to transition from.
+  const [shown, setShown] = useState(false);
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => setShown(true));
+    return () => cancelAnimationFrame(frame);
+  }, []);
+
+  const resting = side === "right" ? "-translate-x-2" : "translate-x-2";
+
+  return (
+    <div
+      id={panelId}
+      role="region"
+      aria-labelledby={headingId}
+      style={{ width: PANEL_WIDTH }}
+      className={[
+        "absolute top-0 z-30 max-h-[26rem] overflow-y-auto",
+        "border border-border/70 bg-background p-6 shadow-2xl",
+        "transition-[opacity,transform] duration-200 motion-reduce:transition-none",
+        side === "right" ? "left-full" : "right-full",
+        shown ? "translate-x-0 opacity-100" : `${resting} opacity-0`,
+      ].join(" ")}
+    >
+      <ProfileBody member={member} variant="panel" headingId={headingId} />
+    </div>
   );
 }
 
@@ -163,7 +344,7 @@ function MemberModal({
       />
 
       {/* Panel */}
-      <div className="relative z-10 w-full max-w-3xl overflow-hidden bg-background shadow-2xl max-h-[90vh] flex flex-col sm:grid sm:grid-cols-[minmax(0,240px)_1fr]">
+      <div className="relative z-10 flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden bg-background shadow-2xl sm:grid sm:grid-cols-[minmax(0,240px)_1fr]">
         {/* Photo */}
         <div className="relative aspect-square w-full bg-gunmetal/10 sm:aspect-auto sm:h-full">
           {member.image ? (
@@ -185,7 +366,7 @@ function MemberModal({
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center text-foreground-muted transition-colors hover:text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-copper"
+            className="absolute top-4 right-4 flex h-9 w-9 items-center justify-center text-foreground-muted transition-colors hover:text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-copper"
           >
             <svg
               className="h-5 w-5"
@@ -203,72 +384,13 @@ function MemberModal({
             </svg>
           </button>
 
-          <h2
-            id={`modal-${member.slug}-title`}
-            className="pr-10 font-heading text-3xl text-ink sm:text-4xl"
-          >
-            {member.name}
-          </h2>
-          <p className="mt-2 text-[12px] font-medium tracking-[0.15em] text-copper uppercase">
-            {member.role}
-          </p>
-
-          <div className="mt-6 h-px w-12 bg-copper" />
-
-          <dl className="mt-6 space-y-4 text-[14px] leading-relaxed text-foreground-secondary">
-            {member.credentials && (
-              <div>
-                <dt className="text-[11px] font-medium tracking-[0.15em] text-foreground-muted uppercase">
-                  Major
-                </dt>
-                <dd className="mt-1">{member.credentials}</dd>
-              </div>
-            )}
-            {member.gradYear && (
-              <div>
-                <dt className="text-[11px] font-medium tracking-[0.15em] text-foreground-muted uppercase">
-                  Expected Graduation
-                </dt>
-                <dd className="mt-1">{member.gradYear}</dd>
-              </div>
-            )}
-          </dl>
-
-          <p className="mt-6 text-[15px] leading-[1.7] text-foreground-secondary">
-            {member.bio ?? member.headline}
-          </p>
-
-          {member.linkedin && (
-            <div className="mt-8">
-              <a
-                href={member.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-[13px] font-medium tracking-wide text-ink hover:text-copper transition-colors"
-                aria-label={`${member.name} on LinkedIn`}
-              >
-                <LinkedInIcon className="h-5 w-5" />
-                <span className="border-b border-copper/60 pb-0.5">
-                  View LinkedIn
-                </span>
-              </a>
-            </div>
-          )}
+          <ProfileBody
+            member={member}
+            variant="modal"
+            headingId={`modal-${member.slug}-title`}
+          />
         </div>
       </div>
     </div>
-  );
-}
-
-function LinkedInIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-      fill="currentColor"
-    >
-      <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29ZM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12ZM7.12 20.45H3.56V9h3.56v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0Z" />
-    </svg>
   );
 }

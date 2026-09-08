@@ -18,7 +18,10 @@ export default function MonogramTile({
       className={`absolute inset-0 flex items-center justify-center bg-gunmetal/10 select-none ${className ?? ""}`}
       aria-hidden="true"
     >
-      <span className="font-heading text-4xl tracking-[0.08em] text-foreground-muted sm:text-5xl">
+      {/* A photo comes to colour when engaged; grey initials on a grey tile have
+          nothing to reveal, so they take the copper accent instead. The group
+          variants simply don't match in the modal, which has no card wrapper. */}
+      <span className="font-heading text-4xl tracking-[0.08em] text-foreground-muted transition-colors duration-500 group-hover/card:text-copper group-focus-within/card:text-copper group-data-[lit=true]/card:text-copper motion-reduce:transition-none sm:text-5xl">
         {initials(name)}
       </span>
     </div>
