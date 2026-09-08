@@ -260,6 +260,7 @@ export default function BrainExperience({ fallback }: { fallback: ReactNode }) {
       setExploring(navigation.current > .6);
       scene.current?.setNavigation(navigation.current);
       if (pose) return;
+      if (progress > .02) { setEntering(null); }
       if (progress > .02 && playing.current) finish();
       else if (progress > .02) skipRequested.current = true;
       paint(progress > .02 ? 12 : time.current);
@@ -311,6 +312,12 @@ export default function BrainExperience({ fallback }: { fallback: ReactNode }) {
               setEntering(region.id);
               scene.current?.focusRegion(region.id, 900);
               window.setTimeout(() => router.push(region.href), 820);
+              // A marker pointing at a section of this page never unmounts the hero, so the swell and
+              // the camera have to be put back by hand once the travel is over.
+              window.setTimeout(() => {
+                setEntering(null);
+                if (region.href.startsWith('/#') || region.href.startsWith('#')) { setSelected(null); scene.current?.resetView(); }
+              }, 1150);
             }}>
             <span className={styles.dot} aria-hidden="true" />
             <span className={styles.markerLabel}><small>{region.anatomy}</small>{region.name}</span>

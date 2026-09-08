@@ -388,6 +388,8 @@ export async function createBrainScene(canvas: HTMLCanvasElement, callbacks: Cal
         camera.lookAt(brain.position);
         invalidate();
         if (progress < 1) requestAnimationFrame(step);
+        // Hand the camera back, or the brain stays locked wherever the travel ended.
+        else controls.enabled = phase === 'still';
       };
       requestAnimationFrame(step);
     },
