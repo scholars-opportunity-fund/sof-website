@@ -38,7 +38,7 @@ export default function AboutPage() {
   return (
     <>
       {/* Hero */}
-      <section className="relative overflow-hidden bg-ink py-24 sm:py-32">
+      <section id="approach" className="scroll-mt-24 relative overflow-hidden bg-ink py-24 sm:py-32">
         {/* Subtle signal/copper accents */}
         <div
           aria-hidden="true"
@@ -74,7 +74,7 @@ export default function AboutPage() {
       </section>
 
       {/* Investment process */}
-      <section className="py-16 sm:py-24">
+      <section id="investment-process" className="scroll-mt-24 py-16 sm:py-24">
         <Container>
           <Reveal className="grid gap-16 lg:grid-cols-[1fr_1.5fr] lg:gap-24">
             <div>
@@ -166,7 +166,7 @@ export default function AboutPage() {
       </section>
 
       {/* Structure */}
-      <section className="bg-ink py-16 sm:py-24">
+      <section id="fund-structure" className="scroll-mt-24 bg-ink py-16 sm:py-24">
         <Container>
           <Reveal className="grid gap-16 lg:grid-cols-[1fr_1.5fr] lg:gap-24">
             <div>

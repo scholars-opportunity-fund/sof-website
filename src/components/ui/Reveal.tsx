@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 
 interface RevealProps {
   children: ReactNode;
@@ -26,48 +26,45 @@ export default function Reveal({
   as: Tag = "div",
 }: RevealProps) {
   const ref = useRef<HTMLElement | null>(null);
-  const [visible, setVisible] = useState(false);
-  const [reducedMotion, setReducedMotion] = useState(false);
-
   useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReducedMotion(mq.matches);
     const node = ref.current;
-    if (!node) return;
+    const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (!node || preference.matches) return;
 
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const e of entries) {
-          if (e.isIntersecting) {
-            setVisible(true);
-            io.disconnect();
-            break;
-          }
-        }
-      },
-      { rootMargin: "0px 0px -8% 0px", threshold: 0.05 }
-    );
-    io.observe(node);
-    return () => io.disconnect();
-  }, []);
-
-  const shouldAnimate = !reducedMotion;
-  const style: React.CSSProperties = shouldAnimate
-    ? {
-        opacity: visible ? 1 : 0,
-        transform: visible ? "translateY(0)" : `translateY(${distance}px)`,
-        transition:
-          "opacity 600ms cubic-bezier(0.22, 1, 0.36, 1), transform 600ms cubic-bezier(0.22, 1, 0.36, 1)",
-        transitionDelay: visible ? `${delay}ms` : "0ms",
-        willChange: "opacity, transform",
+    // The server renders visible content, including when JavaScript never loads.
+    const animation = node.animate([
+      { opacity: 0, transform: `translateY(${distance}px)` },
+      { opacity: 1, transform: 'translateY(0)' },
+    ], { duration: 600, delay, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', fill: 'backwards' });
+    animation.pause();
+    const observer = new IntersectionObserver(entries => {
+      if (entries.some(entry => entry.isIntersecting)) {
+        animation.play();
+        observer.disconnect();
       }
-    : {};
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.05 });
+    observer.observe(node);
+    const stop = () => {
+      if (preference.matches) {
+        animation.cancel();
+        observer.disconnect();
+        preference.removeEventListener('change', stop);
+      }
+    };
+    animation.onfinish = () => preference.removeEventListener('change', stop);
+    preference.addEventListener('change', stop);
+    return () => {
+      animation.onfinish = null;
+      animation.cancel();
+      observer.disconnect();
+      preference.removeEventListener('change', stop);
+    };
+  }, [delay, distance]);
 
   // Cast for ref, since ref may be different element types via 'as' prop.
   return (
     <Tag
       ref={ref as React.MutableRefObject<never>}
-      style={style}
       className={className}
     >
       {children}

@@ -1,0 +1,62 @@
+.hero { background: var(--ink); color: var(--cloud); overflow: clip; }
+.inner { max-width: 1440px; margin: auto; padding: 38px 64px 26px; }
+.kicker { display: flex; align-items: center; gap: 12px; font-size: 10px; font-weight: 500; letter-spacing: .18em; text-transform: uppercase; color: #BCC4D0; }
+.kicker > span:first-child { width: 22px; height: 1px; background: var(--copper); }
+.location { margin-left: auto; color: #9AA7B9; }
+.composition { display: grid; grid-template-columns: .86fr 1.14fr; align-items: center; min-height: 660px; }
+.copy { z-index: 2; position: relative; padding-bottom: 20px; pointer-events: none; }
+.copy a { pointer-events: auto; }
+.eyebrow { font-size: 10px; font-weight: 500; letter-spacing: .2em; text-transform: uppercase; color: var(--signal); margin-bottom: 27px; }
+.copy h1 { font-family: var(--font-heading); color: var(--cloud); font-size: clamp(48px, 4.8vw, 70px); line-height: 1.13; letter-spacing: -.045em; }
+.copy h1 em { color: #C49A7A; font-weight: 400; }
+.description { max-width: 350px; font-size: 15px; line-height: 1.8; margin-top: 29px; color: #AAB6C7; }
+.approach { display: inline-flex; align-items: center; gap: 38px; margin-top: 32px; border-bottom: 1px solid #715948; padding: 0 0 9px; font-size: 12px; color: var(--cloud); }
+.approach:hover { color: #C49A7A; }
+.approach span { color: #C49A7A; font-size: 19px; }
+.brain { position: relative; margin-left: -95px; margin-right: -65px; min-width: 0; }
+.figureMeta { display: flex; justify-content: space-between; margin: 0 70px 12px 135px; color: #91A1B8; font-size: 9px; letter-spacing: .16em; text-transform: uppercase; }
+.figureCaption { display: flex; align-items: center; gap: 15px; margin: 0 80px 0 135px; font-size: 9px; color: #9AA7B9; letter-spacing: .16em; text-transform: uppercase; }
+.crosshair { color: var(--signal); font-size: 20px; font-weight: 400; }
+.mapLegend { display: grid; grid-template-columns: repeat(5, 1fr); border-top: 1px solid #2A3548; border-bottom: 1px solid #2A3548; }
+.legendItem { display: flex; gap: 12px; align-items: center; padding: 22px 16px; font-size: 11px; color: #D4DBE5; border-right: 1px solid #2A3548; }
+.legendItem:first-child { padding-left: 0; }
+.legendItem:last-child { border-right: 0; }
+.legendNumber { display: flex; align-items: center; gap: 10px; font-size: 9px; letter-spacing: .08em; }
+.legendNumber > span { height: 12px; width: 1px; background: currentColor; opacity: .8; }
+.bottomLine { display: flex; justify-content: space-between; margin-top: 20px; font-size: 10px; color: #9AA7B9; letter-spacing: .025em; }
+.bottomLine a { display: flex; align-items: center; gap: 22px; color: #C8D1DF; }
+.bottomLine a:hover { color: var(--signal); }
+
+@media (min-width: 1600px) { .composition { min-height: 730px; } .inner { padding-top: 42px; } }
+@media (max-width: 1199px) {
+  .inner { padding: 30px 40px 24px; }
+  .composition { min-height: 570px; grid-template-columns: .88fr 1.12fr; }
+  .brain { margin-left: -45px; margin-right: -50px; }
+  .copy h1 { font-size: 52px; }
+  .description { max-width: 290px; font-size: 14px; }
+  .figureMeta, .figureCaption { margin-left: 75px; margin-right: 45px; }
+  .legendItem { font-size: 10px; padding: 18px 10px; gap: 8px; }
+}
+@media (max-width: 767px) {
+  .inner { padding: 26px 24px 25px; }
+  .location { display: none; }
+  .kicker { font-size: 9px; }
+  .composition { display: flex; flex-direction: column; min-height: 0; }
+  .copy { width: 100%; padding-top: 45px; padding-bottom: 0; }
+  .eyebrow { font-size: 9px; margin-bottom: 20px; }
+  .copy h1 { font-size: clamp(41px, 7.7vw, 56px); line-height: 1.13; }
+  .description { max-width: 420px; font-size: 13px; margin-top: 22px; }
+  .approach { margin-top: 22px; font-size: 11px; gap: 40px; }
+  .brain { width: calc(100% + 64px); margin: 35px -32px 24px; }
+  .figureMeta { margin: 0 32px 5px; font-size: 8px; }
+  .figureCaption { margin: 5px 32px 0; font-size: 8px; gap: 8px; }
+  .mapLegend { grid-template-columns: repeat(2, 1fr); }
+  .legendItem, .legendItem:first-child { padding: 13px 8px 13px 0; font-size: 10px; border-right: 0; }
+  .legendItem:nth-child(even) { padding-left: 14px; border-left: 1px solid #2A3548; }
+  .legendItem:last-child { grid-column: 1 / -1; border-top: 1px solid #2A3548; }
+  .bottomLine { font-size: 9px; align-items: center; gap: 25px; }
+  .bottomLine > span { max-width: 155px; }
+  .bottomLine a { gap: 10px; }
+}
+
+.credit { margin-left: auto; font-size: 8px; letter-spacing: .03em; text-transform: none; color: #91A1B8; }

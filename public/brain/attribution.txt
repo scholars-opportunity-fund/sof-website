@@ -1,0 +1,15 @@
+SOF anatomical brain model
+
+Geometry: Z-Anatomy / BodyParts3D, copyright The Database Center for Life Science (DBCLS).
+Model preparation: Itay Inbar, brainproject.
+Source: https://github.com/itayinbarr/brainproject/tree/2929e94f521a8ddceab26bc100a98dc06b0da060
+Z-Anatomy: https://www.z-anatomy.com/
+BodyParts3D: https://lifesciencedb.jp/bp3d/
+
+This anatomical-brain.glb.gz model and its SOF adaptations are licensed under Creative Commons Attribution-ShareAlike 4.0 International:
+https://creativecommons.org/licenses/by-sa/4.0/
+
+SOF modifications: retained cortical, cerebellar, and brainstem geometry; grouped it into five website navigation regions; centered and uniformly scaled it; welded shared vertices, softened tessellation with four paired Taubin smoothing passes, and recomputed normals; replaced original materials with SOF visual styling. The connection network is a decorative navigation metaphor.
+The upstream source and license are retained in design/brain/source. This model license applies to the anatomical asset; it does not relicense the website's application code.
+
+Intro clips (intro-16x9.mp4, intro-9x16.mp4): generated with Higgsfield (Gemini Omni Flash 1.1 opening, Kling 3.0 Turbo tail reversed) from renders of this model, assembled with ffmpeg. See design/brain/video/README.md.

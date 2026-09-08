@@ -62,3 +62,9 @@ export const INDEXABLE_ROUTES: SiteRoute[] = [
  * published piece, only when content/insights contains at least one .mdx.
  */
 export const CONTENT_GATED_ROUTES = ["/insights"];
+
+/**
+ * Internal-only routes: noindex, absent from the sitemap, and expected to
+ * 404 in production. Each must set robots noindex in its own metadata.
+ */
+export const NONINDEXABLE_ROUTES = ["/design/brain"];

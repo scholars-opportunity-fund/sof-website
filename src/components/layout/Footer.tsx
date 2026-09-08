@@ -4,10 +4,10 @@ import { FUND, FOOTER_LINKS } from "@/lib/constants";
 
 export default function Footer() {
   return (
-    <footer className="border-t border-border/60 bg-ink text-foreground-on-dark">
-      <div className="mx-auto max-w-7xl px-8 py-14 lg:px-12">
-        <div className="grid grid-cols-1 gap-16 sm:grid-cols-5">
-          <div className="sm:col-span-2">
+    <footer className="border-t border-border-dark/60 bg-ink text-foreground-on-dark">
+      <div className="mx-auto max-w-[86rem] px-8 py-14 lg:px-12">
+        <div className="grid grid-cols-1 gap-16 sm:grid-cols-[2fr_1fr_1fr_1fr]">
+          <div>
             <Link
               href="/"
               className="inline-flex items-center gap-3 font-heading text-lg text-cloud hover:text-copper transition-colors"
@@ -84,10 +84,11 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 border-t border-border-dark/40 pt-6">
+        <div className="mt-12 flex flex-wrap justify-between gap-4 border-t border-border-dark/40 pt-6">
           <p className="text-[13px] text-foreground-on-dark-muted/60">
             &copy; {new Date().getFullYear()} {FUND.name}. All rights reserved.
           </p>
+          <p className="text-[12px] text-foreground-on-dark-muted/60">Nothing on this site is an offer to sell or a solicitation of an offer to buy any security.</p>
         </div>
       </div>
     </footer>

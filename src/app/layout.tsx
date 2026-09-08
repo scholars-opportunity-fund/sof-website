@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
+import localFont from "next/font/local";
 import { Analytics } from "@vercel/analytics/next";
-import { Inter, Libre_Baskerville } from "next/font/google";
 import "./globals.css";
 import JsonLd from "@/components/seo/JsonLd";
 import { buildGraphSchema } from "@/lib/seo";
@@ -8,17 +8,20 @@ import { SITE_URL, FUND } from "@/lib/constants";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 
-const inter = Inter({
+// Self-hosted rather than fetched from Google at build time: Turbopack's font downloader panics
+// with "http2 feature is not enabled" in some environments, which fails the dev server and the build.
+// These are the same latin variable files Google serves, committed under src/app/fonts.
+const inter = localFont({
+  src: "./fonts/inter-variable.woff2",
   variable: "--font-inter",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: "100 900",
   display: "swap",
 });
 
-const libreBaskerville = Libre_Baskerville({
+const libreBaskerville = localFont({
+  src: "./fonts/libre-baskerville-variable.woff2",
   variable: "--font-libre-baskerville",
-  subsets: ["latin"],
-  weight: ["400", "700"],
+  weight: "400 700",
   display: "swap",
 });
 

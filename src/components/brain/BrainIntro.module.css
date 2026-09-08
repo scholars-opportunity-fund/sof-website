@@ -1,0 +1,51 @@
+.intro { position: relative; aspect-ratio: 3 / 2; }
+.introControls { position: absolute; right: 80px; bottom: -25px; z-index: 3; }
+.intro[data-intro-phase='waiting']:not(:focus-within) .introControls { display: none; }
+.introControls button, .startupFooter button { display: flex; align-items: center; gap: 14px; color: #AAB6C7; border: 0; padding: 8px 0; background: transparent; cursor: pointer; font: inherit; font-size: 10px; letter-spacing: .06em; }
+.introControls button:hover, .startupFooter button:hover { color: var(--cloud); }
+.introControls button span, .startupFooter button span { color: #C49A7A; font-size: 16px; }
+
+.startup { position: fixed; inset: 0; width: 100vw; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; overflow: hidden; background: transparent; color: var(--cloud); }
+.startup::backdrop { background: var(--ink); }
+.brand { position: absolute; top: 38px; left: 48px; display: flex; align-items: center; gap: 20px; z-index: 2; }
+.brand > span:first-child { font-family: var(--font-heading); font-size: 36px; letter-spacing: -.06em; }
+.brand > span:last-child { border-left: 1px solid #536073; padding-left: 20px; color: #BCC7D8; font-size: 10px; line-height: 1.7; letter-spacing: .12em; text-transform: uppercase; }
+.edition { position: absolute; top: 43px; right: 48px; text-align: right; font-size: 10px; line-height: 1.7; letter-spacing: .12em; color: #899BB5; text-transform: uppercase; }
+.stage { --width: min(96vw, 108dvh); position: absolute; width: var(--width); left: calc((100% - var(--width)) / 2); top: calc(42dvh - var(--width) / 3); transform-origin: top left; }
+.statement { position: absolute; bottom: 13dvh; width: 100%; padding: 0 24px; text-align: center; pointer-events: none; animation: statementIn 12s ease both; }
+.statement p { font-size: 9px; letter-spacing: .22em; text-transform: uppercase; color: #8FA4BE; margin-bottom: 16px; }
+.statement > div { font-family: var(--font-heading); font-size: clamp(27px, 3.5vw, 48px); letter-spacing: -.035em; }
+.statement em { color: #C49A7A; }
+.startupFooter { position: absolute; bottom: 36px; left: 48px; right: 48px; display: flex; align-items: center; justify-content: space-between; }
+.startupFooter > span { display: flex; gap: 18px; align-items: center; color: #91A1B8; text-transform: uppercase; letter-spacing: .16em; font-size: 9px; }
+.rule { width: 54px; height: 1px; background: #4B596E; }
+.startupFooter button { padding: 12px 0 12px 16px; color: #C9D3E0; font-size: 11px; }
+.progress { position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: #192438; }
+.progress span { display: block; height: 100%; background: #B38E72; transform-origin: left; animation: progress 12s linear both; }
+.startup[data-intro-phase='docking']::backdrop { animation: revealPage 1.1s ease both; }
+.startup[data-intro-phase='docking'] .brand, .startup[data-intro-phase='docking'] .edition,
+.startup[data-intro-phase='docking'] .statement, .startup[data-intro-phase='docking'] .progress { animation: revealPage .4s ease both; }
+.startup[data-intro-phase='docking'] .startupFooter > span { animation: revealPage .4s ease both; }
+.startup[data-intro-phase='docking'] .startupFooter button { background: var(--ink); padding: 12px 16px; }
+
+@keyframes statementIn { 0%, 38% { opacity: 0; transform: translateY(12px); } 65%, 100% { opacity: 1; transform: translateY(0); } }
+@keyframes progress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes revealPage { to { opacity: 0; } }
+@media (max-width: 1199px) { .introControls { right: 45px; bottom: -32px; } }
+@media (max-width: 767px) {
+  .introControls { right: 32px; bottom: -30px; }
+  .introControls button { font-size: 9px; gap: 8px; }
+  .brand { top: 28px; left: 24px; gap: 14px; }
+  .brand > span:first-child { font-size: 30px; }
+  .brand > span:last-child { font-size: 8px; padding-left: 14px; }
+  .edition { display: none; }
+  .stage { --width: min(116vw, 108dvh); top: calc(43dvh - var(--width) / 3); }
+  .statement { bottom: 20dvh; }
+  .statement > div { max-width: 340px; margin: auto; line-height: 1.3; }
+  .statement p { font-size: 8px; letter-spacing: .16em; }
+  .startupFooter { left: 24px; right: 24px; bottom: max(22px, env(safe-area-inset-bottom)); }
+  .startupFooter > span { font-size: 8px; letter-spacing: .08em; }
+  .rule { display: none; }
+}
+@media (max-height: 520px) { .statement { bottom: 16dvh; } .statement > div { font-size: 24px; } .statement p { display: none; } .brand, .edition { top: 18px; } .startupFooter { bottom: 12px; } }
+@media (prefers-reduced-motion: reduce), (scripting: none) { .introControls { display: none; } }

@@ -2,7 +2,11 @@ import fs from "fs";
 import path from "path";
 import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/constants";
-import { INDEXABLE_ROUTES, CONTENT_GATED_ROUTES } from "@/lib/routes";
+import {
+  INDEXABLE_ROUTES,
+  CONTENT_GATED_ROUTES,
+  NONINDEXABLE_ROUTES,
+} from "@/lib/routes";
 import { getAllInsights } from "@/lib/insights";
 import { lastCommitDate } from "@/lib/last-modified";
 
@@ -31,13 +35,14 @@ function assertRegistryCoversAppTree() {
   const registered = new Set([
     ...INDEXABLE_ROUTES.map((r) => r.path),
     ...CONTENT_GATED_ROUTES,
+    ...NONINDEXABLE_ROUTES,
   ]);
   const missing = found.filter((p) => !registered.has(p));
   if (missing.length > 0) {
     throw new Error(
       `Route(s) exist in src/app but are missing from src/lib/routes.ts: ${missing.join(
         ", "
-      )}. Register each one as indexable or content-gated so the sitemap cannot drift.`
+      )}. Register each one as indexable, content-gated, or non-indexable so the sitemap cannot drift.`
     );
   }
 }

@@ -38,5 +38,7 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|images|og).*)"],
+  // Exclude every framework path, not just the static ones: the proxy has no business on Next's own
+  // routes, and running on the dev hot-reload socket breaks its handshake.
+  matcher: ["/((?!_next|favicon.ico|images|og).*)"],
 };
