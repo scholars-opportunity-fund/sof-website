@@ -270,7 +270,14 @@ export default function ProgramPage() {
                 cohort of student analysts. New analysts are admitted each
                 semester to backfill natural attrition, ensuring continuity
                 of process ownership and institutional knowledge across
-                cohort generations.
+                cohort generations. The{" "}
+                <Link
+                  href="/apply"
+                  className="text-copper underline underline-offset-4 hover:text-cloud transition-colors"
+                >
+                  Student Analyst Program application page
+                </Link>{" "}
+                shows the current cohort status.
               </p>
             </div>
             <div className="mt-16 flex flex-wrap items-center gap-5">

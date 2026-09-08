@@ -1,7 +1,17 @@
 import { SITE_SECTIONS } from './site-map';
 
-export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://scholarsoppfund.com";
+const ENV_SITE_URL = process.env.NEXT_PUBLIC_SITE_URL;
+
+// A production build that cannot know its own host must not ship: every
+// canonical, sitemap <loc>, og:url, and schema @id derives from this value.
+// See docs/seo/09-failure-modes.md ("Host and canonical drift").
+if (!ENV_SITE_URL && process.env.NODE_ENV === "production") {
+  throw new Error(
+    "NEXT_PUBLIC_SITE_URL is not set. Set it (https://www.scholarsoppfund.com) in the Vercel project for all environments before building."
+  );
+}
+
+export const SITE_URL = ENV_SITE_URL || "https://www.scholarsoppfund.com";
 
 const CONTACT_EMAIL = "contact@scholarsoppfund.com";
 

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import JsonLd from "@/components/seo/JsonLd";
 import { buildGraphSchema } from "@/lib/seo";
@@ -81,6 +82,9 @@ export default function RootLayout({
           {children}
         </main>
         <Footer />
+        {/* Only on Vercel: elsewhere the injected script 404s and fails the
+            errors-in-console audit in CI. */}
+        {process.env.VERCEL && <Analytics />}
       </body>
     </html>
   );
