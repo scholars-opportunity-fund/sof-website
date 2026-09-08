@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { TeamMember } from "@/lib/team";
 import MonogramTile from "./MonogramTile";
 import ProfileBody from "./ProfileBody";
@@ -209,6 +209,10 @@ function HeadshotCard({
 }) {
   const panelId = `panel-${member.slug}`;
   const headingId = `${panelId}-title`;
+  // The wrapper, not the button, is what gets measured for the panel's side —
+  // a ref rather than walking up from the click target, so the measurement does
+  // not silently depend on the button staying a direct child.
+  const wrapper = useRef<HTMLDivElement>(null);
 
   return (
     // The group is named because the button below already carries an unnamed
@@ -217,6 +221,7 @@ function HeadshotCard({
     // gap, so the pointer never crosses dead space on its way to the LinkedIn
     // button and the hover holds.
     <div
+      ref={wrapper}
       data-team-card
       data-lit={lit}
       // The wrapper is lifted while its panel is open. Without it the panel's
@@ -234,7 +239,7 @@ function HeadshotCard({
     >
       <button
         type="button"
-        onClick={(event) => onActivate(event.currentTarget.parentElement!)}
+        onClick={() => wrapper.current && onActivate(wrapper.current)}
         aria-expanded={panelOpen}
         aria-controls={panelOpen ? panelId : undefined}
         className="flex w-full flex-col text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-copper focus-visible:ring-offset-4 focus-visible:ring-offset-background"

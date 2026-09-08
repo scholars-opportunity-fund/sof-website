@@ -255,7 +255,7 @@ await page.send('Emulation.setEmulatedMedia', {
   features: [{ name: 'prefers-reduced-motion', value: 'reduce' }],
 });
 await viewport(1440, 900, false);
-const reducedBox = await hover(3);
+await hover(3);
 const reduced = await json(`(() => {
   const card = document.querySelectorAll('[data-team-card]')[3];
   const tile = card.querySelector('button > div');
@@ -273,7 +273,6 @@ check('reduced motion: no card transition', reduced.tileTransition === 'none', r
 check('reduced motion: no panel transition', reduced.panelTransition === null || reduced.panelTransition === 'none', String(reduced.panelTransition));
 check('reduced motion: colour still changes', /grayscale\(0\)|none/.test(reduced.lit), reduced.lit);
 check('reduced motion: panel still opens', reduced.panelFound === true);
-void reducedBox;
 await page.send('Emulation.setEmulatedMedia', { features: [] });
 
 check('console: clean', problems.length === 0, problems.slice(0, 4).join(' | '));
