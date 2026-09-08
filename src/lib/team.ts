@@ -18,7 +18,9 @@ export interface TeamMember {
   slug: string;
   name: string;
   role: TeamRole;
-  image: string;
+  /** Headshot path under /public. Omit when we have no photo yet; the card and
+   *  modal fall back to a monogram tile built from the member's initials. */
+  image?: string;
   /** 1-sentence headline shown in modal. */
   headline: string;
   /** Optional longer bio for expanded treatments (shown in modal if present). */
@@ -31,7 +33,9 @@ export interface TeamMember {
   linkedin?: string;
 }
 
-export const CIO: TeamMember = {
+/** The CIO's portrait is used on About, Program, and Signal, so his `image` is
+ *  required even though it is optional on the rest of the roster. */
+export const CIO: TeamMember & { image: string } = {
   slug: "jonathan-brogaard",
   name: "Dr. Jonathan Brogaard",
   role: "Chief Investment Officer",
@@ -60,28 +64,6 @@ export const GPS: TeamMember[] = [
 
 export const ANALYSTS: TeamMember[] = [
   {
-    slug: "gregor-hawranek",
-    name: "Gregor Hawranek",
-    role: "Analyst",
-    image: "/team/gregor.jpg",
-    headline:
-      "Incoming Bain & Company consultant. Co-founded the University of Utah's first quantitative finance student organization.",
-    gradYear: "May 2027",
-    credentials: "B.S. QAMO, Mathematics minor",
-    linkedin: "https://www.linkedin.com/in/gdhawranek/",
-  },
-  {
-    slug: "adam-ferrell",
-    name: "Adam Ferrell",
-    role: "Analyst",
-    image: "/team/adam.jpg",
-    headline:
-      "Growth Equity Intern at University Growth Fund. Sorenson Capital Case Competition finalist.",
-    gradYear: "May 2028",
-    credentials: "B.S. QAMO",
-    linkedin: "https://www.linkedin.com/in/a-ferrell",
-  },
-  {
     slug: "cash-francis",
     name: "Cash Francis",
     role: "Analyst",
@@ -102,17 +84,6 @@ export const ANALYSTS: TeamMember[] = [
     gradYear: "May 2028",
     credentials: "B.S. QAMO",
     linkedin: "https://www.linkedin.com/in/joelhbryan/",
-  },
-  {
-    slug: "maxwell-white",
-    name: "Maxwell White",
-    role: "Analyst",
-    image: "/team/max.jpg",
-    headline:
-      "Growth Equity Intern at UGF ($90M AUM). Analyst Intern at Spacestation Investments.",
-    gradYear: "May 2028",
-    credentials: "B.S. QAMO, Finance emphasis",
-    linkedin: "https://www.linkedin.com/in/maxwell-n-white/",
   },
   {
     slug: "caden-campbell",
@@ -169,6 +140,30 @@ export const ANALYSTS: TeamMember[] = [
     gradYear: "May 2029",
     credentials: "B.S. QAMO / Applied Mathematics",
     linkedin: "https://www.linkedin.com/in/ian-elvington",
+  },
+  // TODO: real copy pending. Headline, credentials, and gradYear for the three
+  // members below are placeholders — replace before this page goes to production.
+  {
+    slug: "john-pary",
+    name: "John Pary",
+    role: "Analyst",
+    image: "/team/john-pary.jpg",
+    headline: "Analyst, Scholars Opportunity Fund.",
+    linkedin: "https://www.linkedin.com/in/john-pary-bb93b7359/",
+  },
+  {
+    slug: "riley-fontanos-alfonso",
+    name: "Riley Fontanos Alfonso",
+    role: "Analyst",
+    headline: "Analyst, Scholars Opportunity Fund.",
+    linkedin: "https://www.linkedin.com/in/rileyfontanosalfonso/",
+  },
+  {
+    slug: "greyson-bailey",
+    name: "Greyson Bailey",
+    role: "Analyst",
+    headline: "Analyst, Scholars Opportunity Fund.",
+    linkedin: "https://www.linkedin.com/in/greyson-w-bailey/",
   },
 ];
 

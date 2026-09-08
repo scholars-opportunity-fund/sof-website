@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { TeamMember } from "@/lib/team";
+import MonogramTile from "./MonogramTile";
 
 interface Props {
   cio: TeamMember;
@@ -108,13 +109,20 @@ function HeadshotCard({
       aria-label={`Open profile: ${member.name}`}
     >
       <div className="relative aspect-square w-full overflow-hidden bg-gunmetal/10">
-        <Image
-          src={member.image}
-          alt={member.name}
-          fill
-          sizes="(min-width: 1024px) 280px, (min-width: 640px) 30vw, 45vw"
-          className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-        />
+        {member.image ? (
+          <Image
+            src={member.image}
+            alt={member.name}
+            fill
+            sizes="(min-width: 1024px) 280px, (min-width: 640px) 30vw, 45vw"
+            className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+          />
+        ) : (
+          <MonogramTile
+            name={member.name}
+            className="transition-transform duration-500 group-hover:scale-[1.03]"
+          />
+        )}
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 bg-ink/0 transition-colors duration-300 group-hover:bg-ink/10"
@@ -158,13 +166,17 @@ function MemberModal({
       <div className="relative z-10 w-full max-w-3xl overflow-hidden bg-background shadow-2xl max-h-[90vh] flex flex-col sm:grid sm:grid-cols-[minmax(0,240px)_1fr]">
         {/* Photo */}
         <div className="relative aspect-square w-full bg-gunmetal/10 sm:aspect-auto sm:h-full">
-          <Image
-            src={member.image}
-            alt={member.name}
-            fill
-            sizes="(min-width: 640px) 240px, 100vw"
-            className="object-cover"
-          />
+          {member.image ? (
+            <Image
+              src={member.image}
+              alt={member.name}
+              fill
+              sizes="(min-width: 640px) 240px, 100vw"
+              className="object-cover"
+            />
+          ) : (
+            <MonogramTile name={member.name} />
+          )}
         </div>
 
         {/* Text */}
