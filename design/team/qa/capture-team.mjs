@@ -123,20 +123,43 @@ const panel = () => json(`(() => {
 const filterOf = index => page.evaluate(
   `getComputedStyle(document.querySelectorAll('[data-team-card]')[${index}].querySelector('button > div')).filter`);
 
+/**
+ * Read a computed `filter` as a number. Chrome reports settled values in
+ * scientific notation (`grayscale(3.4e-07)`), so pattern-matching the string
+ * gives a gate that fails on a working feature.
+ */
+const greyLevel = value => {
+  if (!value || value === 'none') return 0;
+  const match = /grayscale\(([\d.e+-]+)\)/i.exec(value);
+  return match ? Number(match[1]) : NaN;
+};
+const isGrey = value => greyLevel(value) > 0.95;
+const isColour = value => greyLevel(value) < 0.05;
+
 // ------------------------------------------------------------- 1440px, fine pointer
 await viewport(1440, 900, false);
 
-const roster = await json(`(() => ({
-  cards: document.querySelectorAll('[data-team-card]').length,
-  analysts: document.querySelectorAll('[data-team-card]').length - 2,
-  gone: ['Gregor', 'Ferrell', 'Maxwell White'].filter(n => document.body.innerText.includes(n)),
-  missing: ${JSON.stringify(Object.keys(EXPECTED))}.filter(n => !document.body.innerText.includes(n)),
-}))()`);
-check('roster: 12 cards, 10 analysts', roster.cards === 12 && roster.analysts === 10, `${roster.cards} cards`);
+// Count analysts inside their own section. Deriving them as cards-minus-two
+// would make the second half of this gate arithmetically forced.
+const roster = await json(`(() => {
+  // innerText is the RENDERED text, and the label is CSS-uppercased, so this
+  // has to match case-insensitively.
+  const section = [...document.querySelectorAll('section')].find(s => /analyst cohort/i.test(s.innerText));
+  return {
+    cards: document.querySelectorAll('[data-team-card]').length,
+    analysts: section ? section.querySelectorAll('[data-team-card]').length : -1,
+    label: section ? (section.innerText.match(/(\\d+)\\s+MEMBERS/i) || [])[1] : null,
+    gone: ['Gregor', 'Ferrell', 'Maxwell White'].filter(n => document.body.innerText.includes(n)),
+    missing: ${JSON.stringify(Object.keys(EXPECTED))}.filter(n => !document.body.innerText.includes(n)),
+  };
+})()`);
+check('roster: 12 cards', roster.cards === 12, `${roster.cards} cards`);
+check('roster: 10 analysts in the cohort section', roster.analysts === 10, `${roster.analysts} in section`);
+check('roster: the members label agrees', roster.label === '10', `label reads ${roster.label}`);
 check('roster: departed members absent', roster.gone.length === 0, roster.gone.join(', '));
 check('roster: new members present', roster.missing.length === 0, roster.missing.join(', '));
 
-check('greyscale: grey at rest', /grayscale\(1\)/.test(await filterOf(0)), await filterOf(0));
+check('greyscale: grey at rest', isGrey(await filterOf(0)), await filterOf(0));
 
 // A photo-less card has no colour to reveal, so its initials take the accent.
 const monoColour = () => json(`(() => {
@@ -148,12 +171,17 @@ await hover(10);
 const monoLit = await monoColour();
 check('monogram: initials take the accent on engage', monoRest !== monoLit, `${monoRest} -> ${monoLit}`);
 
+const monoText = await json(`[...document.querySelectorAll('[data-team-card]')]
+  .filter(c => c.querySelector('span[class*=font-heading]'))
+  .map(c => c.querySelector('span[class*=font-heading]').textContent)`);
+check('monogram: exactly two, reading RA and GB', JSON.stringify(monoText) === '["RA","GB"]', JSON.stringify(monoText));
+
 // Card 3 is a middle column at both the 3- and 4-column layouts.
 const midBox = await hover(3);
 const hovered = await filterOf(3);
 const neighbour = await filterOf(2);
-check('greyscale: hovered card in colour', /grayscale\((0|0\.0\d+)\)|none/.test(hovered), hovered);
-check('greyscale: neighbours stay grey', /grayscale\(1\)/.test(neighbour), neighbour);
+check('greyscale: hovered card in colour', isColour(hovered), hovered);
+check('greyscale: neighbours stay grey', isGrey(neighbour), neighbour);
 
 const onHover = await panel();
 check('panel: opens on hover', onHover.found === true, onHover.name);
@@ -161,12 +189,12 @@ check('panel: fits viewport (middle column, 1440)', onHover.inside === true, JSO
 await shot('team-1440-hover');
 
 await click(midBox);
-const expanded = await json(`document.querySelectorAll('[data-team-card] button[aria-expanded=true]').length`);
-check('panel: pins on click', expanded === 1, `${expanded} expanded`);
-// Drop the pointer off the card without scrolling — scrolling to another card
-// would carry the pinned panel out of the viewport and make the hit test below
-// meaningless.
+// Park BEFORE reading aria-expanded. Hover sets it too, and click() never moves
+// the pointer — read it with the pointer still on the card and this gate passes
+// with the pin deleted entirely.
 await park();
+const expanded = await json(`document.querySelectorAll('[data-team-card] button[aria-expanded=true]').length`);
+check('panel: pins on click', expanded === 1, `${expanded} expanded with the pointer away`);
 const stillPinned = await panel();
 check('panel: pin survives the pointer leaving', stillPinned.found === true, stillPinned.name);
 
@@ -189,14 +217,18 @@ check('panel: hover reopens after unpinning', (await panel()).found === true);
 await key('Escape');
 check('panel: Escape dismisses a hover preview', (await panel()).found === false);
 
-// Every member's LinkedIn button, read from that member's own open panel.
+// Every member's LinkedIn button, read from that member's own open panel. The
+// card's own name is captured alongside the panel's so a stuck panel — twelve
+// identical reads — cannot satisfy the count.
 const links = [];
 for (let i = 0; i < roster.cards; i += 1) {
   await hover(i);
   links.push(await json(`(() => {
+    const card = document.querySelectorAll('[data-team-card]')[${i}];
     const p = document.querySelector('[role=region][id^=panel-]');
     const a = p?.querySelector('a[href*="linkedin.com"]');
     return {
+      card: card?.querySelector('button p')?.textContent ?? '(no card)',
       name: p?.querySelector('h2')?.textContent ?? '(no panel)',
       href: a?.getAttribute('href') ?? null,
       target: a?.getAttribute('target') ?? null,
@@ -205,6 +237,11 @@ for (let i = 0; i < roster.cards; i += 1) {
   })()`));
 }
 const withLink = links.filter(l => l.href);
+const mismatched = links.filter(l => l.name !== l.card);
+check('panel: each panel belongs to the card that opened it', mismatched.length === 0,
+  mismatched.map(l => `${l.card} -> ${l.name}`).join(', '));
+check('linkedin: twelve distinct profiles', new Set(withLink.map(l => l.href)).size === 12,
+  `${new Set(withLink.map(l => l.href)).size} distinct`);
 const unsafe = withLink.filter(l => l.target !== '_blank' || !/noopener/.test(l.rel ?? ''));
 const wrong = Object.entries(EXPECTED)
   .filter(([name, href]) => links.find(l => l.name === name)?.href !== href)
@@ -221,7 +258,93 @@ check('panel: fits viewport (last column, 1024)', last1024.inside === true, JSON
 await hover(4);
 const mid1024 = await panel();
 check('panel: fits viewport (middle column, 1024)', mid1024.inside === true, JSON.stringify(mid1024.rect));
+await hover(1);
+const lead1024 = await panel();
+check('panel: fits viewport (leadership card, 1024)', lead1024.inside === true, JSON.stringify(lead1024.rect));
 await shot('team-1024-hover');
+
+// The fold-out gate has three clauses. Width is covered above; this covers the
+// pointer/hover pair, which every other viewport in this file leaves untested —
+// without it, `(hover: hover) and (pointer: fine)` could be deleted from the
+// component and every gate would still pass.
+// Chrome does not emulate `pointer`/`hover` through setEmulatedMedia; touch
+// emulation plus a mobile viewport is what actually flips them. A 1024px-wide
+// touch device isolates the pointer clause from the width clause.
+await viewport(1024, 900, true);
+const coarse = await json(`({
+  pointer: matchMedia('(pointer: coarse)').matches,
+  hover: matchMedia('(hover: none)').matches,
+  width: innerWidth,
+})`);
+check('fold-out: the coarse-pointer emulation actually applied',
+  coarse.pointer === true && coarse.hover === true && coarse.width === 1024, JSON.stringify(coarse));
+const coarseBox = await hover(3);
+check('fold-out: a coarse pointer at 1024px gets no panel', (await panel()).found === false);
+await click(coarseBox);
+check('fold-out: a coarse pointer at 1024px gets the modal',
+  (await json(`document.querySelectorAll('[role=dialog]').length`)) === 1);
+await page.send('Emulation.setEmulatedMedia', { features: [] });
+
+// Keyboard path — R10's other half, and the branch the pointer gates never reach.
+await viewport(1440, 900, false);
+const keyboard = await json(`(() => {
+  const card = document.querySelectorAll('[data-team-card]')[3];
+  const button = card.querySelector('button');
+  card.scrollIntoView({ block: 'center', behavior: 'instant' });
+  button.focus();
+  return { focused: document.activeElement === button };
+})()`);
+await pause(600);
+const focusPanel = await panel();
+check('keyboard: focus alone opens the panel', keyboard.focused && focusPanel.found === true, focusPanel.name);
+const focusHeld = await json(`(() => {
+  const p = document.querySelector('[role=region][id^=panel-]');
+  return { link: !!p?.querySelector('a[href*="linkedin.com"]') };
+})()`);
+check('keyboard: the focused panel carries its LinkedIn link', focusHeld.link === true);
+// Move the pointer somewhere else entirely; the focused panel must survive it.
+await page.send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: 2, y: 2 });
+await pause(400);
+check('keyboard: a stray pointer move does not close a focused panel', (await panel()).found === true);
+// Escape must hand focus back to the card, not drop it on <body>.
+await json(`(() => {
+  const a = document.querySelector('[role=region][id^=panel-] a[href*="linkedin.com"]');
+  a.focus();
+  return { ok: document.activeElement === a };
+})()`);
+await key('Escape');
+const afterEscape = await json(`({
+  tag: document.activeElement ? document.activeElement.tagName : null,
+  onCard: !!(document.activeElement && document.activeElement.closest('[data-team-card]')),
+  panels: document.querySelectorAll('[role=region][id^=panel-]').length,
+})`);
+check('keyboard: Escape closes the panel', afterEscape.panels === 0);
+check('keyboard: Escape returns focus to the card, not the body',
+  afterEscape.onCard === true && afterEscape.tag !== 'BODY', JSON.stringify(afterEscape));
+
+// A live resize, without re-navigating, so the matchMedia change handler and the
+// side re-measurement actually run. Every other viewport switch here reloads.
+const pinBox = await hover(3);
+await click(pinBox);
+await park();
+check('resize: a panel is pinned at 1440', (await panel()).found === true);
+await page.send('Emulation.setDeviceMetricsOverride', { width: 900, height: 900, deviceScaleFactor: 1, mobile: false });
+await pause(700);
+check('resize: crossing below 1024 clears the pinned panel', (await panel()).found === false);
+await page.send('Emulation.setDeviceMetricsOverride', { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });
+await pause(500);
+// Within-band resize: the side must be re-measured, not left stale from open.
+const wideBox = await hover(7);
+await click(wideBox);
+await park();
+const beforeShrink = await panel();
+await page.send('Emulation.setDeviceMetricsOverride', { width: 1100, height: 900, deviceScaleFactor: 1, mobile: false });
+await pause(700);
+const afterShrink = await panel();
+check('resize: a pinned panel stays in the viewport after a within-band resize',
+  beforeShrink.found && afterShrink.found && afterShrink.inside === true,
+  `${JSON.stringify(beforeShrink.rect)} -> ${JSON.stringify(afterShrink.rect)}`);
+await page.send('Emulation.setDeviceMetricsOverride', { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });
 
 // ---------------------------------------- 900px, fine pointer, below the floor
 await viewport(900, 900, false);
@@ -230,6 +353,27 @@ check('fallback: no panel below 1024px', (await panel()).found === false);
 await click(box900);
 check('fallback: 900px opens the modal', (await json(`document.querySelectorAll('[role=dialog]').length`)) === 1);
 await shot('team-900-modal');
+
+// The modal's chrome was rewritten around ProfileBody, so its close paths and
+// scroll lock need gating rather than just "a dialog exists".
+check('modal: locks body scroll while open',
+  (await page.evaluate(`document.body.style.overflow`)) === 'hidden');
+await key('Escape');
+const afterModalEscape = await json(`({
+  dialogs: document.querySelectorAll('[role=dialog]').length,
+  overflow: document.body.style.overflow,
+})`);
+check('modal: Escape closes it', afterModalEscape.dialogs === 0);
+check('modal: body scroll is restored', afterModalEscape.overflow !== 'hidden', afterModalEscape.overflow);
+await click(await hover(3));
+const backdrop = await json(`(() => {
+  const b = document.querySelector('[role=dialog] button[aria-label="Close profile"]');
+  const r = b.getBoundingClientRect();
+  return { x: Math.round(r.left + 8), y: Math.round(r.top + 8) };
+})()`);
+await click(backdrop);
+check('modal: the backdrop closes it',
+  (await json(`document.querySelectorAll('[role=dialog]').length`)) === 0);
 
 // ------------------------------------------------------------- 390px, touch
 await viewport(390, 844, true);
@@ -246,7 +390,7 @@ const touch = await json(`(() => {
 })()`);
 check('fallback: touch opens the modal', touch.dialog === 1, JSON.stringify(touch));
 check('fallback: touch mounts no panel', touch.panel === 0);
-check('touch: the tapped card is in colour', /grayscale\((0|0\.0\d+)\)|none/.test(touch.lit ?? ''), String(touch.lit));
+check('touch: the tapped card is in colour', isColour(touch.lit), String(touch.lit));
 check('fallback: the modal carries the LinkedIn button', !!touch.link?.includes('linkedin.com'), String(touch.link));
 await shot('team-390-modal');
 
@@ -271,7 +415,7 @@ const reduced = await json(`(() => {
 })()`);
 check('reduced motion: no card transition', reduced.tileTransition === 'none', reduced.tileTransition);
 check('reduced motion: no panel transition', reduced.panelTransition === null || reduced.panelTransition === 'none', String(reduced.panelTransition));
-check('reduced motion: colour still changes', /grayscale\(0\)|none/.test(reduced.lit), reduced.lit);
+check('reduced motion: colour still changes', isColour(reduced.lit), reduced.lit);
 check('reduced motion: panel still opens', reduced.panelFound === true);
 await page.send('Emulation.setEmulatedMedia', { features: [] });
 

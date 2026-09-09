@@ -18,8 +18,15 @@ interface Props {
  */
 const PANEL_WIDTH = 320;
 
-/** Breathing room the panel must keep from the viewport edge. */
-const EDGE_GUTTER = 16;
+/**
+ * Breathing room the panel must keep from the viewport edge.
+ *
+ * Wide enough to swallow a classic Windows/Linux scrollbar: `window.innerWidth`
+ * counts the scrollbar as usable width, and the QA harness hides scrollbars, so
+ * a tighter gutter would keep passing in the harness while real panels tucked
+ * under the scrollbar.
+ */
+const EDGE_GUTTER = 32;
 
 /**
  * Which disclosure a visitor gets.
@@ -35,10 +42,17 @@ export default function TeamDirectory({ cio, cofounders, analysts }: Props) {
   // The server has no way to know the viewer's input capability, so it renders
   // the modal path and the effect below upgrades after mount.
   const [foldOut, setFoldOut] = useState(false);
-  const [hovered, setHovered] = useState<string | null>(null);
+  // Pointer and focus are tracked separately, and focus wins. Sharing one slot
+  // meant moving the mouse off a card closed the panel a keyboard visitor had
+  // opened on it, with no way back but blur and re-tab.
+  const [pointerSlug, setPointerSlug] = useState<string | null>(null);
+  const [focusSlug, setFocusSlug] = useState<string | null>(null);
   const [pinned, setPinned] = useState<string | null>(null);
   const [openSlug, setOpenSlug] = useState<string | null>(null);
   const [side, setSide] = useState<"left" | "right">("right");
+  // The card the current panel was measured against, so a resize can re-measure
+  // it without hunting for the element again.
+  const activeCard = useRef<HTMLElement | null>(null);
 
   const all = useMemo(
     () => [cio, ...cofounders, ...analysts],
@@ -50,22 +64,49 @@ export default function TeamDirectory({ cio, cofounders, analysts }: Props) {
   );
 
   // A pin wins over a hover, so a pinned panel does not flicker as the pointer
-  // crosses the grid.
-  const activeSlug = foldOut ? (pinned ?? hovered) : null;
+  // crosses the grid; focus wins over a bare pointer hover.
+  const activeSlug = foldOut ? (pinned ?? focusSlug ?? pointerSlug) : null;
 
   const closeModal = useCallback(() => setOpenSlug(null), []);
   const clearPanel = useCallback(() => {
     setPinned(null);
-    setHovered(null);
+    setPointerSlug(null);
+    setFocusSlug(null);
   }, []);
 
   // Decide which side the panel opens on from the card's real position.
   const measure = useCallback((card: HTMLElement) => {
+    activeCard.current = card;
     const rect = card.getBoundingClientRect();
     const fitsRight =
       rect.right + PANEL_WIDTH <= window.innerWidth - EDGE_GUTTER;
     setSide(fitsRight ? "right" : "left");
   }, []);
+
+  // Hand focus back to the card before dismissing a panel that holds it —
+  // otherwise unmounting the focused link drops the visitor to <body> with
+  // nothing announced and no tab position.
+  const restoreFocus = useCallback(() => {
+    if (!activeSlug) return;
+    const panel = document.getElementById(`panel-${activeSlug}`);
+    if (!panel?.contains(document.activeElement)) return;
+    const trigger = panel
+      .closest("[data-team-card]")
+      ?.querySelector("button");
+    if (trigger instanceof HTMLElement) trigger.focus();
+  }, [activeSlug]);
+
+  // The side is measured at open time, so a resize that stays inside the same
+  // breakpoint band would otherwise leave it stale — drag a pinned last-column
+  // panel narrower and it walks off the viewport, LinkedIn button and all.
+  useEffect(() => {
+    if (!activeSlug) return;
+    const onResize = () => {
+      if (activeCard.current) measure(activeCard.current);
+    };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [activeSlug, measure]);
 
   // Capability gate. Subscribing keeps a resized window or a hybrid device on
   // the right path, and drops any open panel when the fold-out path goes away.
@@ -86,11 +127,15 @@ export default function TeamDirectory({ cio, cofounders, analysts }: Props) {
   useEffect(() => {
     if (!activeSlug) return;
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") clearPanel();
+      if (event.key !== "Escape") return;
+      restoreFocus();
+      clearPanel();
     };
     const onDown = (event: MouseEvent) => {
       const target = event.target as HTMLElement | null;
-      if (!target?.closest("[data-team-card]")) clearPanel();
+      if (target?.closest("[data-team-card]")) return;
+      restoreFocus();
+      clearPanel();
     };
     document.addEventListener("keydown", onKey);
     document.addEventListener("mousedown", onDown);
@@ -98,7 +143,7 @@ export default function TeamDirectory({ cio, cofounders, analysts }: Props) {
       document.removeEventListener("keydown", onKey);
       document.removeEventListener("mousedown", onDown);
     };
-  }, [activeSlug, clearPanel]);
+  }, [activeSlug, clearPanel, restoreFocus]);
 
   // The modal is the one disclosure that owns the whole page, so it alone traps
   // Escape and locks scroll.
@@ -120,15 +165,28 @@ export default function TeamDirectory({ cio, cofounders, analysts }: Props) {
     member,
     lit: pinned === member.slug || openSlug === member.slug,
     panelOpen: activeSlug === member.slug,
+    foldOut,
     side,
-    onPreview: (card: HTMLElement) => {
+    onPointerPreview: (card: HTMLElement) => {
       if (!foldOut || pinned) return;
-      setHovered(member.slug);
+      setPointerSlug(member.slug);
       measure(card);
     },
-    onLeave: () => {
+    onPointerLeave: () => {
       if (!foldOut || pinned) return;
-      setHovered(null);
+      setPointerSlug(null);
+    },
+    onFocusPreview: (card: HTMLElement) => {
+      if (!foldOut) return;
+      // Focus moving to a different card takes the panel with it, the same way
+      // clicking a different card moves the pin.
+      if (pinned && pinned !== member.slug) setPinned(null);
+      setFocusSlug(member.slug);
+      measure(card);
+    },
+    onFocusLeave: () => {
+      if (!foldOut) return;
+      setFocusSlug(null);
     },
     onActivate: (card: HTMLElement) => {
       if (!foldOut) {
@@ -136,13 +194,13 @@ export default function TeamDirectory({ cio, cofounders, analysts }: Props) {
         return;
       }
       if (pinned === member.slug) {
-        // Clear the hover too, or `pinned ?? hovered` would fall straight back
-        // to a preview of the card the pointer is still resting on.
+        // Clear the previews too, or `pinned ?? focusSlug ?? pointerSlug` falls
+        // straight back to the card the pointer is still resting on.
         clearPanel();
         return;
       }
       setPinned(member.slug);
-      setHovered(member.slug);
+      setPointerSlug(member.slug);
       measure(card);
     },
   });
@@ -194,17 +252,23 @@ function HeadshotCard({
   member,
   lit,
   panelOpen,
+  foldOut,
   side,
-  onPreview,
-  onLeave,
+  onPointerPreview,
+  onPointerLeave,
+  onFocusPreview,
+  onFocusLeave,
   onActivate,
 }: {
   member: TeamMember;
   lit: boolean;
   panelOpen: boolean;
+  foldOut: boolean;
   side: "left" | "right";
-  onPreview: (card: HTMLElement) => void;
-  onLeave: () => void;
+  onPointerPreview: (card: HTMLElement) => void;
+  onPointerLeave: () => void;
+  onFocusPreview: (card: HTMLElement) => void;
+  onFocusLeave: () => void;
   onActivate: (card: HTMLElement) => void;
 }) {
   const panelId = `panel-${member.slug}`;
@@ -215,11 +279,11 @@ function HeadshotCard({
   const wrapper = useRef<HTMLDivElement>(null);
 
   return (
-    // The group is named because the button below already carries an unnamed
-    // one; two nested unnamed groups would leave it ambiguous which drives the
-    // colour. The panel lives inside this wrapper and abuts the card with no
-    // gap, so the pointer never crosses dead space on its way to the LinkedIn
-    // button and the hover holds.
+    // The group is named `card` because every descendant selector in this tree
+    // qualifies with `/card` — here and in MonogramTile — so the colour is
+    // driven by one unambiguous ancestor. The panel lives inside this wrapper
+    // and abuts the card with no gap, so the pointer never crosses dead space
+    // on its way to the LinkedIn button and the hover holds.
     <div
       ref={wrapper}
       data-team-card
@@ -228,19 +292,22 @@ function HeadshotCard({
       // own z-index competes with later sibling cards, which paint after it in
       // DOM order and can cover the LinkedIn button.
       className={`group/card relative ${panelOpen ? "z-30" : ""}`}
-      onMouseEnter={(event) => onPreview(event.currentTarget)}
-      onMouseLeave={onLeave}
-      onFocus={(event) => onPreview(event.currentTarget)}
+      onMouseEnter={(event) => onPointerPreview(event.currentTarget)}
+      onMouseLeave={onPointerLeave}
+      onFocus={(event) => onFocusPreview(event.currentTarget)}
       onBlur={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget as Node)) {
-          onLeave();
+          onFocusLeave();
         }
       }}
     >
       <button
         type="button"
         onClick={() => wrapper.current && onActivate(wrapper.current)}
-        aria-expanded={panelOpen}
+        // On the modal path the button opens a dialog, not an inline panel, so
+        // it advertises that rather than a permanently-false expanded state.
+        aria-haspopup={foldOut ? undefined : "dialog"}
+        aria-expanded={foldOut ? panelOpen : undefined}
         aria-controls={panelOpen ? panelId : undefined}
         className="flex w-full flex-col text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-copper focus-visible:ring-offset-4 focus-visible:ring-offset-background"
         aria-label={`Open profile: ${member.name}`}
