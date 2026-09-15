@@ -6,18 +6,13 @@
  *
  * Two tiers:
  *   1. Leadership. CIO + Head of Research and Operations.
- *   2. The cohort doing the fundamental work: team leads and analysts.
+ *   2. The cohort doing the fundamental work: associates and analysts.
  */
 
 export type TeamRole =
   | "Chief Investment Officer"
   | "Head of Research & Operations"
-  | "Head of Infrastructure Development & Risk"
-  | "Quantitative Risk Manager"
-  | "Investor Relations"
-  | "Alternative Research Lead"
   | "Associate"
-  | "Quantitative Analyst"
   | "Analyst";
 
 export interface TeamMember {
@@ -84,7 +79,7 @@ export const ANALYSTS: TeamMember[] = [
   {
     slug: "joel-bryan",
     name: "Joel Bryan",
-    role: "Head of Infrastructure Development & Risk",
+    role: "Associate",
     image: "/team/joel.jpg",
     headline:
       "Built the fund's cloud architecture, databases and trading systems. Founded Bryan Car Care at 18.",
@@ -96,7 +91,7 @@ export const ANALYSTS: TeamMember[] = [
   {
     slug: "caden-campbell",
     name: "Caden Campbell",
-    role: "Alternative Research Lead",
+    role: "Associate",
     image: "/team/caden.jpg",
     headline:
       "Leads the Alternative Signals pod. Mathematics at NYU.",
@@ -108,7 +103,7 @@ export const ANALYSTS: TeamMember[] = [
   {
     slug: "tyler-teo",
     name: "Tyler Teo",
-    role: "Quantitative Analyst",
+    role: "Analyst",
     image: "/team/tyler.png",
     headline:
       "Alternative Signals team. Machine-learning driven algorithmic trading strategies.",
@@ -144,7 +139,7 @@ export const ANALYSTS: TeamMember[] = [
   {
     slug: "ian-elvington",
     name: "Ian Elvington",
-    role: "Quantitative Risk Manager",
+    role: "Analyst",
     image: "/team/ian.png",
     headline:
       "Runs the fund's middle-office functions. Headed for a Master's in Applied Mathematics.",
@@ -181,7 +176,7 @@ export const ANALYSTS: TeamMember[] = [
   {
     slug: "greyson-bailey",
     name: "Greyson Bailey",
-    role: "Investor Relations",
+    role: "Analyst",
     image: "/team/greyson-bailey.jpg",
     headline:
       "Analyst at University Growth Fund and Investment Intern at FJ Management. Helping raise the inaugural fund.",
