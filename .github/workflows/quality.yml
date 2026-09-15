@@ -1,0 +1,55 @@
+# SEO and performance guardrails (docs/seo/02, 06, 08).
+#
+# Two gates on every PR:
+#   1. scripts/seo-checks.mjs - orphans, broken/redirecting internal links,
+#      banned anchor text, sitemap health, canonicals, dangling JSON-LD @ids.
+#   2. Lighthouse budget - Performance >= 95, SEO / Accessibility /
+#      Best Practices = 100, mobile emulation (.lighthouserc.json).
+#
+# Treat a failure here as a real defect, not CI noise: every check maps to a
+# documented failure mode that has already happened on this site.
+
+name: quality
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+env:
+  NEXT_PUBLIC_SITE_URL: https://www.scholarsoppfund.com
+
+jobs:
+  seo-and-performance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Full history so per-page sitemap <lastmod> reflects real edits
+          # instead of falling back to build time.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run build
+
+      - name: Start server
+        run: |
+          npm run start &
+          for i in $(seq 1 30); do
+            curl -sf http://localhost:3000/ > /dev/null && break
+            sleep 1
+          done
+
+      - name: SEO checks
+        run: node scripts/seo-checks.mjs
+        env:
+          BASE_URL: http://localhost:3000
+
+      - name: Lighthouse budget
+        run: npx --yes @lhci/cli@0.15.x autorun

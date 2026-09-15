@@ -3,6 +3,12 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   trailingSlash: false,
 
+  // /about is retired: its approach, process, leadership, and fund-structure
+  // content all live on the landing page now, so old links land there.
+  async redirects() {
+    return [{ source: "/about", destination: "/", permanent: true }];
+  },
+
   async headers() {
     return [
       {

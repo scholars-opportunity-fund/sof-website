@@ -7,7 +7,6 @@ export const metadata = generatePageMetadata({
   description:
     "Applications to the Scholars Opportunity Fund Student Analyst Program are not currently open.",
   path: "/apply",
-  noIndex: true,
 });
 
 export default function ApplyPage() {
