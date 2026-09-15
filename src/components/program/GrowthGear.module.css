@@ -1,0 +1,25 @@
+/* The gear turns a third at a time; its numerals turn back the same amount so they stay upright. */
+/* The view-box reference box starts at user-space 0,0, which the centred viewBox puts at the hub. */
+.gear { transform-box: view-box; transform-origin: 0 0; transition: transform 1100ms cubic-bezier(0.65, 0, 0.35, 1); }
+.numeral { transform-box: fill-box; transform-origin: center; transition: transform 1100ms cubic-bezier(0.65, 0, 0.35, 1), fill 400ms; }
+.marker { transition: fill 400ms, stroke 400ms; }
+
+/* The phase card pops out of the gear's side once the turn is mostly done. */
+.pop { animation: pop 700ms 350ms cubic-bezier(0.22, 1, 0.36, 1) backwards; }
+
+@keyframes pop {
+  from { opacity: 0; transform: translateX(-24px) scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+
+.progress { transform-origin: 0 50%; animation-name: progress; animation-timing-function: linear; animation-fill-mode: forwards; }
+
+@keyframes progress {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gear, .numeral, .marker { transition: none; }
+  .pop { animation: none; }
+}

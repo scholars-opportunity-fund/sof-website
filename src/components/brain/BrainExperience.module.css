@@ -21,28 +21,58 @@
 .word { display:inline-flex; align-items:center; font-family:var(--font-heading); font-size:min(240px,20vw); line-height:1; letter-spacing:-.03em; color:var(--word-color); transform-origin:0 0; }
 .cursor { width:.06em; height:.82em; margin-left:.06em; background:var(--copper); animation:blink 1s steps(1) infinite; }
 .subtitle { margin-top:20px; font-size:12px; font-weight:500; letter-spacing:.22em; text-transform:uppercase; color:var(--copper); opacity:var(--subtitle-opacity); }
-.pins { position:absolute; inset:0; pointer-events:none; visibility:hidden; opacity:0; transition:opacity .4s; }
-/* A marker sits on the brain itself: the scene reports where each region projects to on screen and the
-   link is placed there, so the navigation belongs to the model rather than floating beside it. */
-.marker { position:absolute; transform:translate(-50%,-50%); display:flex; align-items:center; gap:10px; pointer-events:auto; color:var(--ink); transition:opacity .35s ease, filter .35s ease; }
-.marker[data-behind=true] { opacity:.18; filter:saturate(.4); pointer-events:none; }
-.dot { position:relative; width:11px; height:11px; flex:none; border-radius:50%; background:var(--region-color); box-shadow:0 0 0 4px color-mix(in srgb, var(--region-color) 26%, transparent); transition:transform .3s ease, box-shadow .3s ease; }
-.dot::after { content:''; position:absolute; inset:-9px; border-radius:50%; border:1px solid var(--region-color); opacity:0; transition:opacity .3s ease, transform .3s ease; }
-/* The label sits over polished metal, so it carries its own ground. */
-.markerLabel { display:flex; flex-direction:column; gap:1px; padding:6px 10px; border-radius:2px; background:color-mix(in srgb, var(--cloud) 92%, transparent); box-shadow:0 1px 2px rgb(11 18 33 / .12); backdrop-filter:blur(4px); font-size:12px; font-weight:500; line-height:1.25; white-space:nowrap; opacity:0; transform:translateX(-4px); transition:opacity .3s ease, transform .3s ease; }
-.markerLabel small { font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:var(--slate); }
-.marker:focus-visible .markerLabel, .marker[data-active=true] .markerLabel { opacity:1; transform:none; }
-.marker[data-active=true] .dot { transform:scale(1.35); }
-.marker[data-active=true] .dot::after { opacity:.75; transform:scale(1.15); }
-/* A generous invisible target, so a 12px dot is still easy to hit. */
-.marker::before { content:''; position:absolute; left:-14px; top:-14px; width:40px; height:40px; border-radius:50%; }
-/* Following a marker: it swells into the frame while the camera travels into that region. */
-.marker[data-entering=true] { z-index:4; }
-.marker[data-entering=true] .dot { transform:scale(90); opacity:.9; box-shadow:none; transition:transform .85s cubic-bezier(.7,0,.85,.3), opacity .85s ease; }
-.marker[data-entering=true] .markerLabel { opacity:0; }
-@media(prefers-reduced-motion:reduce) { .marker[data-entering=true] .dot { transition:opacity .2s ease; transform:none; } }
-.pins[data-visible=true], .pins:focus-within { visibility:visible; opacity:1; }
-.pin { position:absolute; padding:10px 14px; border:1px solid #e2e5eae6; background:#ffffffb8; backdrop-filter:blur(6px); color:var(--ink); pointer-events:auto; max-width:260px; transition:background .3s,border-color .3s; }
+/* The brain is the navigation. Three lobes carry the site; hovering one lights it
+   and draws its three destinations out of the lit surface along filaments. */
+.lobes { position:absolute; inset:0; pointer-events:none; visibility:hidden; opacity:0; transition:opacity .4s; }
+.lobes[data-visible=true], .lobes:focus-within { visibility:visible; opacity:1; }
+.lobes[data-travelling=true] { opacity:0; transition:opacity .3s; }
+.filaments { position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+.filament {
+  fill:none; stroke:var(--copper); stroke-width:1.6; stroke-linecap:round;
+  stroke-dasharray:1; stroke-dashoffset:1; opacity:.85;
+  animation:draw .62s cubic-bezier(.22,.8,.3,1) var(--delay,0ms) both;
+}
+/* The lit node where the filament leaves the lobe: the visible join between the
+   destination and the part of the brain that produced it. */
+.origin { fill:var(--copper); transform-box:fill-box; transform-origin:50% 50%; animation:bloom .62s cubic-bezier(.22,.8,.3,1) var(--delay,0ms) both; }
+@keyframes draw { from { stroke-dashoffset:1; opacity:0; } to { stroke-dashoffset:0; opacity:.85; } }
+@keyframes bloom { from { transform:scale(.2); opacity:0; } to { transform:scale(1); opacity:1; } }
+
+/* At rest, a line of copy says the brain is the navigation, since nothing on it
+   is marked until a lobe is hovered. Touch screens have no hover, so they are told to tap. */
+.prompt {
+  position:absolute; left:50%; bottom:118px; transform:translateX(-50%);
+  display:flex; align-items:center; gap:10px; white-space:nowrap;
+  color:var(--slate); font-size:11px; font-weight:500; letter-spacing:.2em; text-transform:uppercase;
+  animation:fadeIn .5s ease-out both;
+}
+.prompt i { width:6px; height:6px; border-radius:50%; background:var(--copper); flex:none; }
+.prompt [data-touch] { display:none; }
+/* Exploring, the bottom row belongs to the orbit hints and the centred brainstem hangs low,
+   so the prompt leads the hints from a row above them. */
+.home[data-exploring=true] .prompt { left:48px; bottom:64px; transform:none; }
+@media(max-width:767px) { .home[data-exploring=true] .prompt { left:50%; bottom:104px; transform:translateX(-50%); } }
+@media(hover:none) { .prompt [data-pointer] { display:none; } .prompt [data-touch] { display:inline; } }
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+.destination {
+  position:absolute; transform:translate(-50%,-50%); pointer-events:auto;
+  display:flex; align-items:center; gap:9px; padding:10px 16px 10px 13px;
+  border-radius:999px; background:color-mix(in srgb, var(--cloud) 96%, transparent); color:var(--ink);
+  font-size:13.5px; font-weight:500; white-space:nowrap;
+  box-shadow:0 12px 34px -14px #000c, 0 0 0 1px #ffffff2e;
+  animation:pop .62s cubic-bezier(.22,.8,.3,1) var(--delay,0ms) both;
+}
+.destination i { width:7px; height:7px; border-radius:50%; background:var(--copper); flex:none; }
+.destination:hover { background:var(--cloud); box-shadow:0 12px 34px -12px #000c, 0 0 0 1px var(--copper); }
+.destination:focus-visible { outline:2px solid var(--copper); outline-offset:3px; }
+@keyframes pop { from { transform:translate(-50%,-50%) scale(.72); opacity:0; } to { transform:translate(-50%,-50%) scale(1); opacity:1; } }
+
+@media(prefers-reduced-motion:reduce) {
+  .filament, .origin, .destination { animation-duration:.01ms; }
+  .prompt { animation:none; }
+}
+
 .pin:nth-child(1) { left:12%; top:24%; }
 .pin:nth-child(2) { right:12%; top:18%; }
 .pin:nth-child(3) { left:10%; top:56%; }

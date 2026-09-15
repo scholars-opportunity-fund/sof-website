@@ -4,11 +4,14 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { brainRegions, type BrainRegion } from './regions';
+import { NAV_MESHES, LOBE_MOTION } from './lobes';
 
 export type BrainPhase = 'loading' | 'forming' | 'still';
 export type BrainScene = Awaited<ReturnType<typeof createBrainScene>>;
 export type RegionAnchor = { id: BrainRegion; x: number; y: number; facing: number };
-type Callbacks = { hover: (region: BrainRegion | null) => void; select: (region: BrainRegion | null) => void; move: () => void; zoom: (zoom: number) => void; failed: () => void; anchors?: (anchors: RegionAnchor[]) => void };
+/** Where one lobe's three destinations hang from, in 0-1 screen space. */
+export type LobeAnchors = { mesh: string; facing: number; points: { x: number; y: number }[] };
+type Callbacks = { hover: (region: BrainRegion | null) => void; select: (region: BrainRegion | null) => void; move: () => void; zoom: (zoom: number) => void; failed: () => void; anchors?: (anchors: RegionAnchor[]) => void; lobeAnchors?: (lobes: LobeAnchors[]) => void };
 const HOME = new THREE.Vector3(4.6, .6, 2.65);
 const BASE_DISTANCE = HOME.length();
 
@@ -189,7 +192,10 @@ export async function createBrainScene(canvas: HTMLCanvasElement, callbacks: Cal
   for (const surface of surfaces) {
     if (!surface.name) continue;
     const positions = surface.geometry.getAttribute('position');
-    const step = Math.max(1, Math.floor(positions.count / 64));
+    // Denser on the navigable lobes: their anchors have to spread across the
+    // lobe rather than cluster, which needs candidates to choose between.
+    const dense = NAV_MESHES.includes(surface.name);
+    const step = Math.max(1, Math.floor(positions.count / (dense ? 320 : 64)));
     const samples: THREE.Vector3[] = [];
     for (let i = 0; i < positions.count; i += step) samples.push(new THREE.Vector3().fromBufferAttribute(positions, i).multiplyScalar(1.04));
     if (samples.length) regionSamples.set(surface.name as BrainRegion, samples);
@@ -199,6 +205,9 @@ export async function createBrainScene(canvas: HTMLCanvasElement, callbacks: Cal
   const outward = new THREE.Vector3();
   const best = new THREE.Vector3();
   function reportAnchors() {
+    // The two feeds are independent: the lobe navigation does not need the
+    // per-region anchors, and gating on them silently starves it.
+    if (callbacks.lobeAnchors) callbacks.lobeAnchors(lobeAnchors());
     if (!callbacks.anchors) return;
     const list: RegionAnchor[] = [];
     for (const [id, samples] of regionSamples) {
@@ -214,6 +223,62 @@ export async function createBrainScene(canvas: HTMLCanvasElement, callbacks: Cal
       list.push({ id, x: (best.x + 1) / 2, y: (1 - best.y) / 2, facing });
     }
     callbacks.anchors(list);
+  }
+
+  /**
+   * Where each navigable lobe's destinations should hang from.
+   *
+   * Points are chosen for separation in *screen* space, not in the model, so the
+   * filaments visibly leave the lobe from different places however it is turned.
+   * Candidates are capped to the lobe's middle band: farthest-point over the
+   * whole lobe drives anchors to its extremes and throws the labels off-screen.
+   */
+  function lobeAnchors(): LobeAnchors[] {
+    const out: LobeAnchors[] = [];
+    for (const mesh of NAV_MESHES) {
+      const samples = regionSamples.get(mesh as BrainRegion);
+      if (!samples) continue;
+      const facing: { x: number; y: number; score: number }[] = [];
+      for (const sample of samples) {
+        projected.copy(sample).applyMatrix4(brain.matrixWorld);
+        toCamera.copy(camera.position).sub(projected).normalize();
+        outward.copy(projected).sub(brain.position).normalize();
+        const score = toCamera.dot(outward);
+        if (score < .15) continue;
+        projected.project(camera);
+        facing.push({ x: (projected.x + 1) / 2, y: (1 - projected.y) / 2, score });
+      }
+      if (!facing.length) { out.push({ mesh, facing: -1, points: [] }); continue; }
+      const cx = facing.reduce((sum, f) => sum + f.x, 0) / facing.length;
+      const cy = facing.reduce((sum, f) => sum + f.y, 0) / facing.length;
+      const radii = facing.map(f => Math.hypot(f.x - cx, f.y - cy)).sort((a, b) => a - b);
+      const limit = radii[Math.floor(radii.length * LOBE_MOTION.reach)] ?? Infinity;
+      const pool = facing.filter(f => Math.hypot(f.x - cx, f.y - cy) <= limit);
+      const candidates = pool.length >= 3 ? pool : facing;
+
+      let seed = candidates[0], nearest = Infinity;
+      for (const f of candidates) {
+        const d = (f.x - cx) ** 2 + (f.y - cy) ** 2;
+        if (d < nearest) { nearest = d; seed = f; }
+      }
+      const chosen = [seed];
+      while (chosen.length < 3) {
+        let pick = null, furthest = -1;
+        for (const f of candidates) {
+          const closest = Math.min(...chosen.map(c => (c.x - f.x) ** 2 + (c.y - f.y) ** 2));
+          if (closest > furthest) { furthest = closest; pick = f; }
+        }
+        if (!pick) break;
+        chosen.push(pick);
+      }
+      chosen.sort((a, b) => a.y - b.y);
+      out.push({
+        mesh,
+        facing: Math.max(...facing.map(f => f.score)),
+        points: chosen.map(c => ({ x: c.x, y: c.y })),
+      });
+    }
+    return out;
   }
 
   function applyLook() {
@@ -236,6 +301,12 @@ export async function createBrainScene(canvas: HTMLCanvasElement, callbacks: Cal
   // The intro clock (0 → 12) is driven from outside so the 2D synapse overlay and the model agree.
   let phase: BrainPhase = 'loading', introTime = 0, frame = 0, disposed = false, visible = true, active: BrainRegion | null = null;
   let navigation = 0, clipAspect: number | null = null, look: BrainLookName = DEFAULT_LOOK;
+  // Which lobe is lit, and how far each lobe has eased toward or away from lit.
+  let litMesh: string | null = null;
+  let burn = 0;
+  const glow = new Map<string, number>(NAV_MESHES.map(mesh => [mesh, 0]));
+  const COPPER = new THREE.Color('#A0755A');
+  const litColour = new THREE.Color();
   // 1 the instant the clip hands over, decaying to 0 as the metal skins over and the traffic calms.
   let arrival = 0;
   // Keeps the resting brain alive: a slow clock so pulses keep travelling the connections once it settles.
@@ -257,6 +328,7 @@ export async function createBrainScene(canvas: HTMLCanvasElement, callbacks: Cal
     // The rendered clip carries the formation; the model is fully formed and static beneath it and keeps a faint network after the swap.
     networkMaterial.uniforms.time.value = 12 + idle;
     const preset = BRAIN_LOOKS[look], hot = arrival;
+    litColour.set(preset.surface.emissive);
     // On arrival the brain is still the clip's glowing lattice: traffic at full tilt, shell thin and lit.
     // As `hot` decays the shell closes to its finish and the network drops back to its resting hum.
     const settled = THREE.MathUtils.smoothstep(time, 9.4, 10.6);
@@ -265,9 +337,21 @@ export async function createBrainScene(canvas: HTMLCanvasElement, callbacks: Cal
     networkMaterial.uniforms.pointStrength.value = preset.junction.strength * (1 + hot * 2.4);
     // Ease the frontier so it starts quickly at the seed and slows as it closes over the far lobes.
     growth.grown.value = hot > 0 ? Math.pow(1 - hot, .7) : 1;
+    // Ease each lobe toward or away from lit, so the highlight is animated rather
+    // than snapping, then let the unlit remainder recede so the lit one carries the eye.
+    const ease = Math.min(1, (delta * 1000) / LOBE_MOTION.fade);
+    for (const mesh of NAV_MESHES) {
+      const target = mesh === litMesh ? 1 : 0;
+      glow.set(mesh, (glow.get(mesh) ?? 0) + (target - (glow.get(mesh) ?? 0)) * ease);
+    }
+    const recede = (litMesh ? (glow.get(litMesh) ?? 0) : 0) * LOBE_MOTION.dim;
     for (const surface of surfaces) {
-      surface.material.opacity = preset.surface.opacity * (surface.name === active ? 1.04 : 1);
-      surface.material.emissiveIntensity = preset.surface.emissiveIntensity + hot * .7;
+      const lit = glow.get(surface.name) ?? 0;
+      const dimmed = lit > .01 ? 0 : recede;
+      surface.material.opacity = preset.surface.opacity * (1 - dimmed * .35) * (1 - burn * .85);
+      surface.material.emissiveIntensity =
+        (preset.surface.emissiveIntensity + hot * .7 + lit * LOBE_MOTION.lift) * (1 - dimmed) + burn * 2.1;
+      surface.material.emissive.copy(litColour).lerp(COPPER, lit * .35);
     }
     for (const wire of wires) wire.material.opacity = preset.wireOpacity * (1 + hot * .8);
     brain.scale.setScalar(1); brain.rotation.set(0, 0, 0); brain.position.set(0, 0, 0);
@@ -277,7 +361,8 @@ export async function createBrainScene(canvas: HTMLCanvasElement, callbacks: Cal
     // While a clip is matched the aspect factor follows the clip, so the model matches the height-fitted video; it settles to the stage's own factor across the shift.
     const stageFactor = Math.min(1, viewport.x / viewport.y * 1.05);
     const factor = clipAspect ? THREE.MathUtils.lerp(Math.min(1, clipAspect * 1.05), stageFactor, settled) : stageFactor;
-    brain.scale.multiplyScalar(factor * THREE.MathUtils.lerp(1, mobile ? .72 : .66, shift));
+    // Scrolled into the explorer the brain sits at 4/5 of full size, so it has room around it; the hero and the intro keep theirs.
+    brain.scale.multiplyScalar(factor * THREE.MathUtils.lerp(1, mobile ? .72 : .66, shift) * THREE.MathUtils.lerp(1, .8, navigation));
     camera.setViewOffset(viewport.x, viewport.y, mobile ? 0 : -viewport.x * .25 * shift, mobile ? viewport.y * .14 * shift : 0, viewport.x, viewport.y);
     controls.update();
     renderer.render(scene, camera);
@@ -370,6 +455,50 @@ export async function createBrainScene(canvas: HTMLCanvasElement, callbacks: Cal
     setClipAspect(value: number | null) { clipAspect = value; invalidate(); },
     setLook(value: BrainLookName) { look = value; applyLook(); invalidate(); },
     setArrival(value: number) { arrival = THREE.MathUtils.clamp(value, 0, 1); invalidate(); },
+    /** Light one lobe and let the rest recede. `null` clears. */
+    setLitLobe(mesh: string | null) { litMesh = mesh; invalidate(); },
+    /**
+     * Dive into a lobe: the camera rides in while the shell burns off to light.
+     * Resolves when the camera has arrived, so the caller can hand off to the
+     * destination underneath. Timings settled against the motion prototype.
+     */
+    diveIntoLobe(mesh: string, onHandoff?: () => void) {
+      const samples = regionSamples.get(mesh as BrainRegion);
+      if (!samples || !samples.length) { onHandoff?.(); return; }
+      if (preference.matches) { burn = 0; onHandoff?.(); return; }
+      const centre = samples.reduce((sum, sample) => sum.add(sample), new THREE.Vector3()).multiplyScalar(1 / samples.length);
+      const target = centre.applyMatrix4(brain.matrixWorld);
+      const from = camera.position.clone();
+      const to = from.clone().lerp(target, LOBE_MOTION.depth);
+      const startedAt = performance.now();
+      const handoffAt = LOBE_MOTION.dive * LOBE_MOTION.overlap;
+      let handedOff = false;
+      controls.enabled = false;
+      const step = () => {
+        if (disposed) return;
+        const elapsed = performance.now() - startedAt;
+        const progress = Math.min(1, elapsed / LOBE_MOTION.dive);
+        camera.position.copy(from).lerp(to, progress * progress * (3 - 2 * progress));
+        camera.lookAt(brain.position);
+        burn = progress;
+        invalidate();
+        if (!handedOff && elapsed >= handoffAt) { handedOff = true; onHandoff?.(); }
+        if (progress < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    },
+    /** Put the camera and the shell back after a dive. */
+    endDive() {
+      burn = 0;
+      litMesh = null;
+      const damping = controls.enableDamping;
+      controls.enableDamping = false;
+      controls.update();
+      controls.reset();
+      controls.enableDamping = damping;
+      controls.enabled = phase === 'still';
+      invalidate();
+    },
     // Travel towards a region over `duration`, so following a marker reads as going into the brain.
     focusRegion(id: BrainRegion, duration = 900) {
       const samples = regionSamples.get(id);
@@ -388,6 +517,8 @@ export async function createBrainScene(canvas: HTMLCanvasElement, callbacks: Cal
         camera.lookAt(brain.position);
         invalidate();
         if (progress < 1) requestAnimationFrame(step);
+        // Hand the camera back, or the brain stays locked wherever the travel ended.
+        else controls.enabled = phase === 'still';
       };
       requestAnimationFrame(step);
     },

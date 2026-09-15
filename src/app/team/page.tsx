@@ -25,7 +25,7 @@ export default function TeamPage() {
           <p className="mt-8 max-w-xl text-[17px] leading-[1.8] text-foreground-on-dark-muted">
             Experienced leadership, rigorous process, and a cohort of analysts
             selected for depth of technical preparation and professional
-            trajectory. Click any headshot to view a full profile.
+            trajectory. Open any headshot for a full profile.
           </p>
         </Container>
       </section>

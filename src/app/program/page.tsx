@@ -5,6 +5,9 @@ import Button from "@/components/ui/Button";
 import Reveal from "@/components/ui/Reveal";
 import CountUp from "@/components/ui/CountUp";
 import WeekInLife from "@/components/program/WeekInLife";
+import GrowthGear from "@/components/program/GrowthGear";
+import WorkThread from "@/components/program/WorkThread";
+import HeadquartersMap from "@/components/program/HeadquartersMap";
 import { generatePageMetadata } from "@/lib/seo";
 import { CIO } from "@/lib/team";
 
@@ -71,78 +74,30 @@ export default function ProgramPage() {
         <Container>
           <Reveal>
             <div className="grid gap-16 lg:grid-cols-[1fr_1.5fr] lg:gap-24">
-              <div>
+              <div className="lg:sticky lg:top-32 lg:self-start">
                 <p className="text-xs font-medium tracking-[0.2em] text-copper uppercase">
                   Program
                 </p>
                 <h2 className="mt-6 text-4xl sm:text-5xl">
                   What students do
                 </h2>
-              </div>
-              <div>
-                <p className="text-[17px] leading-[1.8] text-foreground-secondary">
+                <p className="mt-6 text-[17px] leading-[1.8] text-foreground-muted">
                   The fund&apos;s sourcing process surfaces catalyst-driven
                   candidates across the public equity universe. The analyst
                   team takes it from there: company-level diligence, internal
                   pressure-testing, and a collective investment memo
                   delivered to the Chief Investment Officer.
                 </p>
-                <div className="mt-16 space-y-8">
-                  {[
-                    {
-                      title: "Candidate Analysis",
-                      text: "Build a collective investment case on each screened candidate. Conclusions are challenged internally before they reach the CIO. The standard is whether the work is fit to inform a real capital decision.",
-                    },
-                    {
-                      title: "Position Monitoring",
-                      text: "When a position drifts from thesis or a material event occurs, the team investigates and delivers an update within 24 hours.",
-                    },
-                    {
-                      title: "Quarterly Reporting",
-                      text: "Students produce the analytical inputs for LP reporting, a direct line of accountability from their work product to the people whose capital is deployed.",
-                    },
-                  ].map((item) => (
-                    <div
-                      key={item.title}
-                      className="group border-l-2 border-copper/30 pl-8 transition-[border-color] duration-300 hover:border-copper"
-                    >
-                      <h3 className="font-heading text-xl transition-colors group-hover:text-copper">
-                        {item.title}
-                      </h3>
-                      <p className="mt-3 text-[15px] leading-relaxed text-foreground-muted">
-                        {item.text}
-                      </p>
-                    </div>
-                  ))}
-                </div>
               </div>
+              {/* One copper thread carries the work from sourcing to the LPs as you scroll */}
+              <WorkThread />
             </div>
           </Reveal>
         </Container>
       </section>
 
-      {/* A week in the life: interactive tabs */}
-      <section id="week" className="border-t border-border/60 bg-cloud py-16 sm:py-24">
-        <Container>
-          <Reveal>
-            <div className="grid gap-10 lg:grid-cols-[1fr_1.5fr] lg:items-start lg:gap-20">
-              <div>
-                <p className="text-xs font-medium tracking-[0.2em] text-copper uppercase">
-                  Rhythm
-                </p>
-                <h2 className="mt-6 text-4xl sm:text-5xl">
-                  A week in the life
-                </h2>
-                <p className="mt-6 text-[17px] leading-[1.8] text-foreground-muted">
-                  A typical analyst week, from Monday&apos;s sourcing digest
-                  to Friday&apos;s memo handoff.
-                </p>
-              </div>
-              <WeekInLife />
-            </div>
-          </Reveal>
-        </Container>
-      </section>
+      {/* A week in the life: a desk calendar that flips as the days scroll sideways */}
+      <WeekInLife />
 
       {/* How responsibility grows */}
       <section id="growth" className="py-16 sm:py-24">
@@ -161,43 +116,7 @@ export default function ProgramPage() {
                   not title.
                 </p>
               </div>
-              <div>
-                <div className="grid gap-px bg-border/60 sm:grid-cols-3">
-                  {[
-                    {
-                      phase: "First Semester",
-                      text: "Learn the research methodology, shadow live sourcing and diligence, and contribute to collective memos under supervision.",
-                    },
-                    {
-                      phase: "Returning Analyst",
-                      text: "Own candidate memos end-to-end. Position monitoring, event-driven updates, and direct input into LP reporting.",
-                    },
-                    {
-                      phase: "Senior Cohort",
-                      text: "Co-lead the research process, mentor new analysts, and run internal review sessions before memos reach the CIO.",
-                    },
-                  ].map((phase, i) => (
-                    <div
-                      key={phase.phase}
-                      className="group relative bg-background p-10 sm:p-12"
-                    >
-                      <span className="text-[11px] font-medium tracking-[0.15em] text-copper uppercase">
-                        Phase {i + 1}
-                      </span>
-                      <h3 className="mt-4 font-heading text-xl transition-colors group-hover:text-copper">
-                        {phase.phase}
-                      </h3>
-                      <p className="mt-4 text-[15px] leading-relaxed text-foreground-muted">
-                        {phase.text}
-                      </p>
-                      <span
-                        aria-hidden="true"
-                        className="absolute bottom-0 left-0 h-0.5 w-0 bg-copper transition-[width] duration-500 group-hover:w-full"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <GrowthGear />
             </div>
           </Reveal>
         </Container>
@@ -308,23 +227,7 @@ export default function ProgramPage() {
                 </p>
               </div>
               <div className="flex items-stretch justify-center">
-                <div className="relative flex w-full max-w-sm flex-col justify-between bg-ink p-10 text-cloud">
-                  <div>
-                    <p className="text-[11px] font-medium tracking-[0.2em] text-copper uppercase">
-                      Headquarters
-                    </p>
-                    <p className="mt-4 font-heading text-2xl">
-                      Salt Lake City, UT
-                    </p>
-                  </div>
-                  <div className="mt-10 flex items-center gap-2 text-[12px] font-medium tracking-[0.15em] text-copper uppercase">
-                    <span
-                      aria-hidden="true"
-                      className="inline-block h-2 w-2 animate-pulse rounded-full bg-copper"
-                    />
-                    Active Cohort
-                  </div>
-                </div>
+                <HeadquartersMap />
               </div>
             </div>
           </Reveal>

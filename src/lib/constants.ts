@@ -1,4 +1,4 @@
-import { SITE_SECTIONS } from './site-map';
+import { SITE_SECTIONS, CONTACT_EMAIL } from './site-map';
 
 const ENV_SITE_URL = process.env.NEXT_PUBLIC_SITE_URL;
 
@@ -13,7 +13,6 @@ if (!ENV_SITE_URL && process.env.NODE_ENV === "production") {
 
 export const SITE_URL = ENV_SITE_URL || "https://www.scholarsoppfund.com";
 
-const CONTACT_EMAIL = "contact@scholarsoppfund.com";
 
 export const FUND = {
   name: "Scholars Opportunity Fund",
