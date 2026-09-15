@@ -22,21 +22,40 @@ export default function ProfileBody({
 
   return (
     <>
-      <h2
-        id={headingId}
-        className={
-          panel
-            ? "pr-2 font-heading text-2xl text-ink"
-            : "pr-10 font-heading text-3xl text-ink sm:text-4xl"
-        }
-      >
-        {member.name}
-      </h2>
-      <p
-        className={`${panel ? "mt-1.5" : "mt-2"} text-[12px] font-medium tracking-[0.15em] text-copper uppercase`}
-      >
-        {member.role}
-      </p>
+      {/* LinkedIn sits beside the name, so it is in view the moment a profile opens
+          however long the bio runs. The modal's row stops short of its close button. */}
+      <div className={`flex items-start justify-between gap-4 ${panel ? "" : "pr-10"}`}>
+        <div className="min-w-0">
+          <h2
+            id={headingId}
+            className={
+              panel
+                ? "font-heading text-2xl text-ink"
+                : "font-heading text-3xl text-ink sm:text-4xl"
+            }
+          >
+            {member.name}
+          </h2>
+          <p
+            className={`${panel ? "mt-1.5" : "mt-2"} text-[12px] font-medium tracking-[0.15em] text-copper uppercase`}
+          >
+            {member.role}
+          </p>
+        </div>
+
+        {member.linkedin && (
+          <a
+            href={member.linkedin}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`${member.name} on LinkedIn`}
+            title="View LinkedIn"
+            className={`${panel ? "mt-0.5 h-9 w-9" : "mt-1 h-10 w-10"} flex shrink-0 items-center justify-center border border-border text-ink transition-colors hover:border-copper hover:text-copper focus:outline-none focus-visible:ring-2 focus-visible:ring-copper`}
+          >
+            <LinkedInIcon className={panel ? "h-4 w-4" : "h-[18px] w-[18px]"} />
+          </a>
+        )}
+      </div>
 
       <div className={`${panel ? "mt-4" : "mt-6"} h-px w-12 bg-copper`} />
 
@@ -68,23 +87,6 @@ export default function ProfileBody({
       >
         {member.bio ?? member.headline}
       </p>
-
-      {member.linkedin && (
-        <div className={panel ? "mt-6" : "mt-8"}>
-          <a
-            href={member.linkedin}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-[13px] font-medium tracking-wide text-ink transition-colors hover:text-copper"
-            aria-label={`${member.name} on LinkedIn`}
-          >
-            <LinkedInIcon className="h-5 w-5" />
-            <span className="border-b border-copper/60 pb-0.5">
-              View LinkedIn
-            </span>
-          </a>
-        </div>
-      )}
     </>
   );
 }

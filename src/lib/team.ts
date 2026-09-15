@@ -6,12 +6,18 @@
  *
  * Two tiers:
  *   1. Leadership. CIO + Head of Research and Operations.
- *   2. Analysts. The cohort doing the fundamental work.
+ *   2. The cohort doing the fundamental work: team leads and analysts.
  */
 
 export type TeamRole =
   | "Chief Investment Officer"
   | "Head of Research & Operations"
+  | "Head of Infrastructure Development & Risk"
+  | "Quantitative Risk Manager"
+  | "Investor Relations"
+  | "Alternative Research Lead"
+  | "Associate"
+  | "Quantitative Analyst"
   | "Analyst";
 
 export interface TeamMember {
@@ -55,7 +61,7 @@ export const GPS: TeamMember[] = [
     image: "/team/ronan.jpg",
     headline:
       "Co-founder of Scholars Opportunity Fund. Oversees the analyst team, the research pipeline, and fund operations.",
-    bio: "Ronan co-founded Scholars Opportunity Fund alongside Dr. Brogaard and will be with the fund for its full lifespan. As Head of Research and Operations, he owns the day-to-day engine of the fund: the analyst cohort, the research workflow from candidate detection to memo delivery, and all operating infrastructure supporting the CIO's investment decisions.",
+    bio: "Schultz co-founded Scholars Opportunity Fund alongside Dr. Brogaard and will be with the fund for its full lifespan. As Head of Research and Operations, Schultz owns the day-to-day engine: the analyst cohort, the research workflow from candidate detection to memo delivery, and all the operating infrastructure behind the CIO's investment decisions.",
     gradYear: "May 2028",
     credentials: "B.S. Quantitative Analysis of Markets & Organizations",
     linkedin: "https://www.linkedin.com/in/ronanschultz/",
@@ -66,46 +72,49 @@ export const ANALYSTS: TeamMember[] = [
   {
     slug: "cash-francis",
     name: "Cash Francis",
-    role: "Analyst",
+    role: "Associate",
     image: "/team/cash.jpg",
     headline:
-      "Incoming Data Science Intern at Pattern. Selected for the Goldman Sachs Emerging Leaders Series.",
+      "Leads fundamental signal research. Headed to Goldman Sachs' Risk division.",
+    bio: "Francis brings a background spanning data science at Pattern and consulting work through Korn Ferry and the University of Utah. Francis currently leads fundamental signal research as a team lead at SOF and is headed to Goldman Sachs' Risk division in finance.",
     gradYear: "May 2028",
-    credentials: "B.S. QAMO",
+    credentials: "B.S. QAMO, Advanced Financial Analysis minor",
     linkedin: "https://www.linkedin.com/in/cash-francis/",
   },
   {
     slug: "joel-bryan",
     name: "Joel Bryan",
-    role: "Analyst",
+    role: "Head of Infrastructure Development & Risk",
     image: "/team/joel.jpg",
     headline:
-      "Founder of Bryan Car Care, LLC. Data Analytics Competition winner (1st of 70+ teams).",
-    gradYear: "May 2028",
+      "Built the fund's cloud architecture, databases and trading systems. Founded Bryan Car Care at 18.",
+    bio: "From Coeur d'Alene, Idaho, Bryan is studying Quantitative Analysis of Markets and Organizations at the University of Utah's David Eccles School of Business, on track to graduate in December 2027, a year and a half early. At 18, Bryan founded Bryan Car Care, a private car collection management company with more than $30M in vehicles actively under management, and runs its six-person team remotely from Salt Lake City on self-built software. At SOF, Bryan leads infrastructure and risk: building the fund's cloud architecture, databases, security controls and trading systems, and owning their deployment, monitoring and reliability in production.",
+    gradYear: "December 2027",
     credentials: "B.S. QAMO",
     linkedin: "https://www.linkedin.com/in/joelhbryan/",
   },
   {
     slug: "caden-campbell",
     name: "Caden Campbell",
-    role: "Analyst",
+    role: "Alternative Research Lead",
     image: "/team/caden.jpg",
     headline:
-      "Incoming Summer Analyst at Cimarron Healthcare Capital. Summer Growth Equity Intern at UGF.",
+      "Leads the Alternative Signals pod. Mathematics at NYU.",
+    bio: "Campbell is a sophomore studying mathematics and minoring in business at NYU. Campbell leads the Alternative Signals pod, identifying and developing novel applications of data analytics and mathematics in financial markets, and plans to continue similar work after graduating. Outside the fund, Campbell enjoys rock climbing, snowboarding, hiking, and exploring new places.",
     gradYear: "May 2029",
-    credentials: "Honors B.S. Finance, Mathematics minor",
+    credentials: "B.A. Mathematics, Business minor, NYU",
     linkedin: "https://www.linkedin.com/in/caden-campbell-an7",
   },
   {
     slug: "tyler-teo",
     name: "Tyler Teo",
-    role: "Analyst",
+    role: "Quantitative Analyst",
     image: "/team/tyler.png",
     headline:
-      "Honors dual-degree in QAMO and Mathematics. SEO Strategy & Analytics Intern at Optodex.",
+      "Alternative Signals team. Machine-learning driven algorithmic trading strategies.",
+    bio: "Originally from Ogden, Utah, Teo joined the fund during its inaugural year. Teo works on the Alternative Signals team, focusing on the research and development of machine learning driven algorithmic trading strategies, and is building toward a long-term career in quantitative finance.",
     gradYear: "May 2029",
-    credentials:
-      "Honors B.S. QAMO (Finance) and B.S. Mathematics (Statistics)",
+    credentials: "Honors B.S. QAMO and Mathematics",
     linkedin: "https://www.linkedin.com/in/tyler-teo/",
   },
   {
@@ -114,9 +123,10 @@ export const ANALYSTS: TeamMember[] = [
     role: "Analyst",
     image: "/team/nick.jpg",
     headline:
-      "Utah Real Estate Competition development team. Eagle Scout and former Associated Student Body President.",
+      "Fundamental Signals team. Venture capital student analyst at the Sorenson Impact Institute.",
+    bio: "Kouzmanoff is from Palos Verdes, California, and joined the fund in its inaugural year. Kouzmanoff works on the Fundamental Signals team building trading strategies and serves as a venture capital student analyst at the Sorenson Impact Institute, with plans for a career in investment banking and a long-term interest in buy-side investing.",
     gradYear: "May 2029",
-    credentials: "B.S. Finance",
+    credentials: "B.S. Finance, Advanced Financial Analysis minor",
     linkedin: "https://www.linkedin.com/in/nicholas-kouzmanoff",
   },
   {
@@ -125,44 +135,59 @@ export const ANALYSTS: TeamMember[] = [
     role: "Analyst",
     image: "/team/taggart.jpg",
     headline:
-      "Bloomberg Finance Fundamentals certified. Incoming Treasurer, Business Economics Society.",
+      "Treasurer, Business Economics Society. Building toward a career in real estate development.",
+    bio: "Severson is a sophomore from San Jose, California, studying Quantitative Analysis of Markets and Organizations at the University of Utah. Beyond SOF, Severson serves as Treasurer of the Business Economics Society and is a member of the Goff Strategic Leadership Institute, through which Severson also interns at the Grant County Economic Growth Council. After graduation, Severson plans to apply those analytical and strategic skills to a career in real estate development.",
     gradYear: "May 2029",
-    credentials: "B.S. QAMO",
+    credentials: "B.S. QAMO, Advanced Financial Analysis and Real Estate minors",
     linkedin: "https://www.linkedin.com/in/taggart-severson",
   },
   {
     slug: "ian-elvington",
     name: "Ian Elvington",
-    role: "Analyst",
+    role: "Quantitative Risk Manager",
     image: "/team/ian.png",
     headline:
-      "Dual-path in QAMO and Applied Mathematics. Independent research in Bayesian statistics and alternative data.",
+      "Runs the fund's middle-office functions. Headed for a Master's in Applied Mathematics.",
+    bio: "Elvington is the Quantitative Risk Manager at SOF, responsible for the firm's middle-office functions. Elvington plans to pursue a Master's in Applied Mathematics and hopes to keep working in quantitative finance.",
     gradYear: "May 2029",
-    credentials: "B.S. QAMO / Applied Mathematics",
+    credentials: "B.S. Applied Mathematics and QAMO",
     linkedin: "https://www.linkedin.com/in/ian-elvington",
   },
-  // TODO: real copy pending. Headline, credentials, and gradYear for the three
-  // members below are placeholders — replace before this page goes to production.
+  // Bios are written in the third person.
   {
     slug: "john-pary",
     name: "John Pary",
     role: "Analyst",
     image: "/team/john-pary.jpg",
-    headline: "Analyst, Scholars Opportunity Fund.",
+    headline:
+      "AI Special Projects Manager at Renew Health. Builds signals through to live trading.",
+    bio: "Pary is from Spokane, Washington, and spent the summer as an AI Special Projects Manager at Renew Health. Pary now pairs that technical side with finance research, building signals through to live trading end to end, and is looking to pursue a career in management consulting or banking.",
+    gradYear: "May 2029",
+    credentials: "B.S. QAMO, Advanced Financial Analysis and AI minors",
     linkedin: "https://www.linkedin.com/in/john-pary-bb93b7359/",
   },
   {
     slug: "riley-fontanos-alfonso",
-    name: "Riley Fontanos Alfonso",
+    name: "Riley Alfonso",
     role: "Analyst",
-    headline: "Analyst, Scholars Opportunity Fund.",
+    image: "/team/riley-alfonso.jpg",
+    headline:
+      "Alternative Signals pod. Data Science and Cognitive Science at UC Berkeley.",
+    bio: "Alfonso is a Data Science and Cognitive Science double major at UC Berkeley who joined SOF to apply that background to real market research. Alfonso's long-term goal is to build a career applying machine learning and data science in novel ways across interdisciplinary fields, currently exploring this in the realm of quantitative analysis.",
+    gradYear: "May 2029",
+    credentials: "B.A. Data Science and Cognitive Science, UC Berkeley",
     linkedin: "https://www.linkedin.com/in/rileyfontanosalfonso/",
   },
   {
     slug: "greyson-bailey",
     name: "Greyson Bailey",
-    role: "Analyst",
-    headline: "Analyst, Scholars Opportunity Fund.",
+    role: "Investor Relations",
+    image: "/team/greyson-bailey.jpg",
+    headline:
+      "Analyst at University Growth Fund and Investment Intern at FJ Management. Helping raise the inaugural fund.",
+    bio: "Bailey is an Analyst at University Growth Fund, leading deals in growth-stage companies, and an Investment Intern at FJ Management. Bailey is applying that experience toward helping raise SOF's inaugural fund, and previously worked at InvestNest Park City in partnership with the Park City Angels. Bailey hopes to pursue a career in asset management; outside of finance, Bailey is an avid reader, a 14-handicap golfer, and fluent in Spanish.",
+    gradYear: "May 2028",
+    credentials: "B.S. QAMO, Advanced Financial Analysis minor",
     linkedin: "https://www.linkedin.com/in/greyson-w-bailey/",
   },
 ];
