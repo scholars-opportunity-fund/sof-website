@@ -5,7 +5,7 @@
 .brand span { transition:opacity .4s; }
 .nav { display:flex; align-items:center; gap:4px; font-size:14px; font-weight:500; }
 .nav > a,.nav > button { padding:8px 14px; color:var(--gunmetal); cursor:pointer; }
-.nav button[aria-expanded=true] { background:var(--border); }
+.nav > [aria-expanded=true] { background:var(--border); }
 .nav small { font-size:10px; opacity:.6; }
 .nav > a.apply { margin-left:16px; padding:10px 18px; background:var(--ink); color:var(--cloud); font-size:13px; letter-spacing:.04em; }
 .panel { position:absolute; left:0; right:0; top:71px; background:var(--cloud); border-bottom:1px solid var(--border); box-shadow:0 24px 48px -24px #0b122140; }

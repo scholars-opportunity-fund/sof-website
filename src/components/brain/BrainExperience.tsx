@@ -3,10 +3,11 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import type { BrainPhase, RegionAnchor } from '@/lib/brain/scene';
+import type { BrainPhase, LobeAnchors } from '@/lib/brain/scene';
 import type { BrainIntro } from '@/lib/brain/intro';
 import { isBrainLook, type BrainLookName } from '@/lib/brain/looks';
 import { brainRegions } from '@/lib/brain/regions';
+import { lobeForMesh, LOBE_MOTION } from '@/lib/brain/lobes';
 import { useExplorer } from './BrainContext';
 import SignalField from '@/components/signal/SignalField';
 import styles from './BrainExperience.module.css';
@@ -38,7 +39,7 @@ const START_BUDGET = 2500;
 const STALL_BUDGET = 1500;
 
 export default function BrainExperience({ fallback }: { fallback: ReactNode }) {
-  const { scene, setAvailable, active, selected, setHovered, setFocused, setSelected, zoom, setZoom, setFollowScroll, reset } = useExplorer();
+  const { scene, setAvailable, active, setHovered,  setSelected, zoom, setZoom, setFollowScroll, reset } = useExplorer();
   const root = useRef<HTMLElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const introCanvas = useRef<HTMLCanvasElement>(null);
@@ -63,9 +64,17 @@ export default function BrainExperience({ fallback }: { fallback: ReactNode }) {
   // True once the trace has taken over from the clip, which fades the video out from under it.
   const [clipOut, setClipOut] = useState(false);
   // Screen positions of the region markers, reported by the scene each frame.
-  const [anchors, setAnchors] = useState<RegionAnchor[]>([]);
-  // The region being travelled into, which grows its marker while the camera moves.
-  const [entering, setEntering] = useState<string | null>(null);
+  // Where each navigable lobe's three destinations hang from, reported per frame.
+  const [lobeAnchors, setLobeAnchors] = useState<LobeAnchors[]>([]);
+  // The lobe whose destinations are showing, and the destination being travelled into.
+  const [openLobe, setOpenLobe] = useState<string | null>(null);
+  const [travelling, setTravelling] = useState(false);
+  const [stage, setStage] = useState({ w: 0, h: 0 });
+  const overLinks = useRef(false);
+  // The hover handler reaches the scene through a ref: naming it as an effect
+  // dependency would rebuild the WebGL scene every time a travel starts.
+  const hoverHandler = useRef<(mesh: string | null) => void>(() => {});
+  const closeTimer = useRef(0);
   const router = useRouter();
   // Development-only finish switch, so the live brain can be compared against the intro clip's ending.
   const [look, setLook] = useState<BrainLookName | null>(null);
@@ -136,7 +145,7 @@ export default function BrainExperience({ fallback }: { fallback: ReactNode }) {
     const abort = new AbortController();
     setFollowScroll(false);
     import('@/lib/brain/scene').then(module => module.createBrainScene(element, {
-      hover: setHovered, select: setSelected, move: () => setHovered(null), zoom: setZoom, failed: fail, anchors: setAnchors,
+      hover: mesh => { setHovered(mesh); hoverHandler.current(mesh); }, select: setSelected, move: () => setHovered(null), zoom: setZoom, failed: fail, lobeAnchors: setLobeAnchors,
     }, abort.signal)).then(engine => {
       if (abort.signal.aborted) { engine.dispose(); return; }
       scene.current = engine; engine.setNavigation(navigation.current);
@@ -260,7 +269,6 @@ export default function BrainExperience({ fallback }: { fallback: ReactNode }) {
       setExploring(navigation.current > .6);
       scene.current?.setNavigation(navigation.current);
       if (pose) return;
-      if (progress > .02) { setEntering(null); }
       if (progress > .02 && playing.current) finish();
       else if (progress > .02) skipRequested.current = true;
       paint(progress > .02 ? 12 : time.current);
@@ -270,6 +278,100 @@ export default function BrainExperience({ fallback }: { fallback: ReactNode }) {
     window.addEventListener('scroll', schedule, { passive: true }); window.addEventListener('resize', schedule); preference.addEventListener('change', schedule);
     return () => { cancelAnimationFrame(frame); window.removeEventListener('scroll', schedule); window.removeEventListener('resize', schedule); preference.removeEventListener('change', schedule); };
   }, [scene, paint, finish, pose]);
+
+  // The stage's pixel box, so 0-1 anchors can be drawn as real coordinates.
+  useEffect(() => {
+    const element = root.current?.querySelector('[data-startup-stage]');
+    if (!element) return;
+    const observer = new ResizeObserver(([entry]) => {
+      setStage({ w: entry.contentRect.width, h: entry.contentRect.height });
+    });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
+  const scheduleLobeClose = useCallback(() => {
+    window.clearTimeout(closeTimer.current);
+    closeTimer.current = window.setTimeout(() => {
+      if (!overLinks.current) setOpenLobe(null);
+    }, 220);
+  }, []);
+
+  // Hovering a navigable lobe opens it. A lobe is a large piece of mesh rather
+  // than a projected dot, so this cannot misfire as the model turns.
+  const onHoverMesh = useCallback((mesh: string | null) => {
+    if (travelling) return;
+    if (mesh && lobeForMesh(mesh)) { window.clearTimeout(closeTimer.current); setOpenLobe(mesh); }
+    else scheduleLobeClose();
+  }, [travelling, scheduleLobeClose]);
+
+  useEffect(() => { hoverHandler.current = onHoverMesh; }, [onHoverMesh]);
+
+  useEffect(() => { scene.current?.setLitLobe(openLobe); }, [openLobe, scene]);
+
+  // Geometry for the open lobe: where each filament leaves the surface, and where
+  // its destination sits. Bubbles fan away from the brain so none is pushed off
+  // the top of the stage, and each is clamped inside the frame.
+  const reveal = (() => {
+    const lobe = lobeForMesh(openLobe);
+    const anchorSet = lobeAnchors.find(item => item.mesh === openLobe);
+    if (!lobe || !anchorSet || !anchorSet.points.length || !stage.w) return [];
+    const centre = lobeAnchors.reduce((sum, item) => {
+      const mid = item.points[Math.floor(item.points.length / 2)];
+      return mid ? { x: sum.x + mid.x, y: sum.y + mid.y, n: sum.n + 1 } : sum;
+    }, { x: 0, y: 0, n: 0 });
+    const cx = (centre.n ? centre.x / centre.n : .5) * stage.w;
+    const cy = (centre.n ? centre.y / centre.n : .5) * stage.h;
+
+    // Three anchors are reported per region; take them evenly for however many
+    // destinations this one carries, so a single destination hangs off the
+    // middle of the region rather than an arbitrary edge.
+    const count = lobe.links.length;
+    const picked = count >= anchorSet.points.length
+      ? anchorSet.points
+      : count === 1
+        ? [anchorSet.points[Math.floor(anchorSet.points.length / 2)]]
+        : [anchorSet.points[0], anchorSet.points[anchorSet.points.length - 1]];
+
+    return picked.slice(0, count).map((point, index) => {
+      const link = lobe.links[index];
+      const ax = point.x * stage.w;
+      const ay = point.y * stage.h;
+      const outward = Math.atan2(ay - cy, ax - cx);
+      const angle = outward + (index - (count - 1) / 2) * (26 * Math.PI / 180);
+      const bx = Math.min(stage.w - 96, Math.max(96, ax + Math.cos(angle) * LOBE_MOTION.spread));
+      const by = Math.min(stage.h - 34, Math.max(34, ay + Math.sin(angle) * LOBE_MOTION.spread));
+      const mx = (ax + bx) / 2 - Math.sin(angle) * LOBE_MOTION.curve;
+      const my = (ay + by) / 2 + Math.cos(angle) * LOBE_MOTION.curve;
+      return {
+        key: `${lobe.id}-${link.href}`,
+        mesh: lobe.mesh, href: link.href, name: link.name,
+        ax, ay, bx, by,
+        path: `M ${ax} ${ay} Q ${mx} ${my} ${bx} ${by}`,
+        delay: index * LOBE_MOTION.stagger,
+      };
+    });
+  })();
+
+  // One gesture, one meaning: the camera rides into the lobe and the shell burns
+  // off, and what is revealed underneath is a section of this page or another
+  // route without the visitor being able to tell which.
+  const travelTo = useCallback((mesh: string, href: string) => {
+    setTravelling(true);
+    setOpenLobe(null);
+    const engine = scene.current;
+    if (!engine) { router.push(href); return; }
+    engine.setLitLobe(mesh);
+    engine.diveIntoLobe(mesh, () => {
+      router.push(href);
+      // A destination on this page never unmounts the hero, so the camera and the
+      // shell have to be put back by hand once the handoff is done.
+      window.setTimeout(() => {
+        engine.endDive();
+        setTravelling(false);
+      }, LOBE_MOTION.handoff);
+    });
+  }, [router, scene]);
 
   function replay() {
     reset(); skipRequested.current = false; handedOverAt.current = 0; scene.current?.setArrival(0);
@@ -294,36 +396,33 @@ export default function BrainExperience({ fallback }: { fallback: ReactNode }) {
         <p ref={word} className={styles.word}><span ref={letters} /><span className={styles.cursor} /></p>
         <p className={styles.subtitle}>Scholars Opportunity Fund · Salt Lake City</p>
       </div></div>
-      <nav className={styles.pins} aria-label="Explore the five areas of SOF" data-brain-navigation data-visible={ready && (phase === 'still' || exploring)}>
-        {brainRegions.map(region => {
-          const anchor = anchors.find(item => item.id === region.id);
-          // Markers around the far side fade out rather than floating over the front of the model.
-          const behind = !anchor || anchor.facing < -.1;
-          return <Link key={region.id} href={region.href} className={styles.marker} data-pin={region.id}
-            data-active={active === region.id} data-behind={behind} data-entering={entering === region.id}
-            style={{ '--region-color': region.color, left: `${(anchor?.x ?? .5) * 100}%`, top: `${(anchor?.y ?? .5) * 100}%` } as CSSProperties}
-            onFocus={() => setFocused(region.id)} onBlur={() => setFocused(null)}
+      <div className={styles.lobes} aria-hidden={!ready} data-brain-navigation data-visible={ready && (phase === 'still' || exploring)} data-travelling={travelling}>
+        {/* Filaments are drawn in stage pixels, so a bowed line keeps an even stroke. */}
+        <svg className={styles.filaments} viewBox={`0 0 ${Math.max(1, stage.w)} ${Math.max(1, stage.h)}`} aria-hidden="true">
+          {reveal.map(item => <g key={item.key}>
+            <path d={item.path} pathLength={1} className={styles.filament} style={{ '--delay': `${item.delay}ms` } as CSSProperties} />
+            <circle cx={item.ax} cy={item.ay} r={4.6} className={styles.origin} style={{ '--delay': `${item.delay}ms` } as CSSProperties} />
+          </g>)}
+        </svg>
+        {/* At rest a line of copy, rather than markers on the model, says the brain is the navigation. */}
+        {!openLobe && !travelling && !activeRegion && <p className={styles.prompt} aria-hidden="true">
+          <i /><span data-pointer>Hover over the brain to explore</span><span data-touch>Tap the brain to explore</span>
+        </p>}
+        <nav aria-label="Explore Scholars Opportunity Fund">
+          {reveal.map(item => <Link key={item.key} href={item.href} className={styles.destination}
+            style={{ left: `${item.bx}px`, top: `${item.by}px`, '--delay': `${item.delay}ms` } as CSSProperties}
+            onPointerEnter={() => { overLinks.current = true; window.clearTimeout(closeTimer.current); }}
+            onPointerLeave={() => { overLinks.current = false; scheduleLobeClose(); }}
             onClick={event => {
-              // Click to name the region, click again to travel into it. Hovering does nothing, so
-              // markers cannot fire as the model turns under the pointer.
-              if (event.metaKey || event.ctrlKey || event.shiftKey || entering) return;
+              if (event.metaKey || event.ctrlKey || event.shiftKey || travelling) return;
+              if (item.href.startsWith('mailto:')) return;
               event.preventDefault();
-              if (selected !== region.id) { setSelected(region.id); return; }
-              setEntering(region.id);
-              scene.current?.focusRegion(region.id, 900);
-              window.setTimeout(() => router.push(region.href), 820);
-              // A marker pointing at a section of this page never unmounts the hero, so the swell and
-              // the camera have to be put back by hand once the travel is over.
-              window.setTimeout(() => {
-                setEntering(null);
-                if (region.href.startsWith('/#') || region.href.startsWith('#')) { setSelected(null); scene.current?.resetView(); }
-              }, 1150);
+              travelTo(item.mesh, item.href);
             }}>
-            <span className={styles.dot} aria-hidden="true" />
-            <span className={styles.markerLabel}><small>{region.anatomy}</small>{region.name}</span>
-          </Link>;
-        })}
-      </nav>
+            <i aria-hidden="true" />{item.name}
+          </Link>)}
+        </nav>
+      </div>
       {activeRegion && controlsVisible && <div className={styles.selection} data-brain-detail><span>{activeRegion.name}</span><Link href={activeRegion.href}>Explore →</Link><button type="button" aria-label="Clear selected region" onClick={() => { setSelected(null); setHovered(null); }}>×</button></div>}
       <div className={styles.hint} hidden={!controlsVisible}>Drag to orbit <span>Pinch or Shift + scroll to zoom</span><a href="#sof-overview">Explore the fund &darr;</a></div>
       <div className={styles.tools} hidden={!controlsVisible} data-brain-tools data-available={ready} role="group" aria-label="Brain view">

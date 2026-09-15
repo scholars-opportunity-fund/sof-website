@@ -8,7 +8,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const staticPages: MetadataRoute.Sitemap = [
     { url: SITE_URL, lastModified: new Date(), changeFrequency: "weekly", priority: 1.0 },
-    { url: `${SITE_URL}/about`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.8 },
+    // /about is retired: its approach, process, leadership, and fund-structure
+    // content all live on the landing page now, so listing it would offer
+    // search engines a duplicate of the homepage in the old design.
     { url: `${SITE_URL}/team`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.7 },
     { url: `${SITE_URL}/insights`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
     { url: `${SITE_URL}/program`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.8 },
