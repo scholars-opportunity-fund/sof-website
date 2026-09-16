@@ -12,6 +12,7 @@ if (!ENV_SITE_URL && process.env.NODE_ENV === "production") {
 }
 
 export const SITE_URL = ENV_SITE_URL || "https://www.scholarsoppfund.com";
+export const SCHOLARS_URL = "https://scholars.scholarsoppfund.com";
 
 
 export const FUND = {
@@ -30,6 +31,7 @@ export const NAV_ITEMS = [
   { label: SITE_SECTIONS.approach.name, href: SITE_SECTIONS.approach.href },
   { label: SITE_SECTIONS.team.name, href: SITE_SECTIONS.team.href },
   { label: SITE_SECTIONS.program.name, href: SITE_SECTIONS.program.href },
+  { label: "SOF Scholars", href: SCHOLARS_URL },
   { label: "Contact", href: `mailto:${CONTACT_EMAIL}` },
 ] as const;
 
@@ -40,7 +42,10 @@ export const FOOTER_LINKS = {
     { label: SITE_SECTIONS.approach.name, href: SITE_SECTIONS.approach.href },
     { label: SITE_SECTIONS.team.name, href: SITE_SECTIONS.team.href },
   ],
-  program: [{ label: SITE_SECTIONS.program.name, href: SITE_SECTIONS.program.href }],
+  program: [
+    { label: SITE_SECTIONS.program.name, href: SITE_SECTIONS.program.href },
+    { label: "SOF Scholars", href: SCHOLARS_URL },
+  ],
   contact: [
     {
       label: CONTACT_EMAIL,
