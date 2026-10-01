@@ -21,16 +21,26 @@ export default function Frontier() {
   const nebula = useRef<Nebula | null>(null);
   const [lit, setLit] = useState(false);
 
+  // The field is the page's heaviest piece of work and none of it is needed to read the line, so it is
+  // held back until the browser is idle. The line and the cue are painted and interactive before any of
+  // three.js is fetched, and a browser that never goes idle still gets it a second in.
   useEffect(() => {
     const element = canvas.current;
     if (!element) return;
     let cancelled = false;
-    import('@/lib/hero/nebula').then(module => {
+    const begin = () => {
       if (cancelled) return;
-      nebula.current = module.createNebula(element);
-      setLit(true);
-    }).catch(() => {});
-    return () => { cancelled = true; nebula.current?.dispose(); nebula.current = null; };
+      import('@/lib/hero/nebula')
+        .then(module => module.createNebula(element))
+        .then(scene => { if (cancelled) { scene.dispose(); return; } nebula.current = scene; setLit(true); })
+        .catch(() => {});
+    };
+    const idle = window.requestIdleCallback?.(begin, { timeout: 1200 }) ?? window.setTimeout(begin, 400);
+    return () => {
+      cancelled = true;
+      window.cancelIdleCallback?.(idle); clearTimeout(idle);
+      nebula.current?.dispose(); nebula.current = null;
+    };
   }, []);
 
   useEffect(() => {

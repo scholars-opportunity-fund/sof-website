@@ -104,6 +104,9 @@ export default function BrainExperience({ fallback }: { fallback: ReactNode }) {
   // Development-only finish switch, so the live brain can be compared against the intro clip's ending.
   const [look, setLook] = useState<BrainLookName | null>(null);
   const [ready, setReady] = useState(false);
+  // True once this section is within a screen of the viewport. Everything expensive here waits on it,
+  // so the homepage above can load without a 3D scene and a particle trace competing for the main thread.
+  const [near, setNear] = useState(false);
   const [failed, setFailed] = useState(false);
   const [exploring, setExploring] = useState(false);
   const [lightVisible, setLightVisible] = useState(false);
@@ -182,10 +185,9 @@ export default function BrainExperience({ fallback }: { fallback: ReactNode }) {
     if (!element) return;
     const abort = new AbortController();
     setFollowScroll(false);
-    // The 2D intro owns the first seconds of the stage, so the WebGL boot and
-    // the model parse wait out the initial load instead of blocking it. The
-    // model is not needed until the timeline is scrubbed past the handover at
-    // 7.9s, and a late one simply fades in, so only the main thread at load is affected.
+    // This stage is a screen below the hero, so nothing here may touch the main thread during the page's
+    // load: the WebGL boot and the model parse wait until the section is within a screen of the viewport.
+    // A visitor scrolling normally meets a model that has been ready since before they arrived.
     const boot = () => import('@/lib/brain/scene').then(module => module.createBrainScene(element, {
       hover: mesh => { setHovered(mesh); hoverHandler.current(mesh); }, select: setSelected, move: () => setHovered(null), zoom: setZoom, failed: fail, lobeAnchors: setLobeAnchors,
     }, abort.signal)).then(engine => {
@@ -193,24 +195,24 @@ export default function BrainExperience({ fallback }: { fallback: ReactNode }) {
       scene.current = engine; engine.setNavigation(navigation.current);
       setReady(true); setAvailable(true);
     }).catch(() => { if (!abort.signal.aborted) fail(); });
-    // Phones get a still of the brain first and start the 3D scene on the first touch, scroll or key, so the
-    // download and parse never compete with the first load on a slow CPU. Larger screens boot after the delay.
-    const deferred = innerWidth < innerHeight && (innerWidth < 768 || matchMedia('(pointer: coarse)').matches);
-    const triggers = ['pointerdown', 'touchstart', 'keydown', 'scroll'] as const;
-    let started = false, timer = 0;
+    // Phones keep the still of the brain until the scene is up, since the parse is slowest there.
+    setPoster(innerWidth < innerHeight && (innerWidth < 768 || matchMedia('(pointer: coarse)').matches));
+    let started = false;
     const start = () => {
       if (started) return;
-      started = true; clearTimeout(timer);
-      triggers.forEach(type => window.removeEventListener(type, start));
+      started = true;
+      removeEventListener('scroll', watch);
+      setNear(true);
       boot();
     };
-    setPoster(deferred);
-    // Larger screens also start early on the first input, so a visitor scrolling through the intro meets the model.
-    triggers.forEach(type => window.addEventListener(type, start, { passive: true }));
-    if (!deferred) timer = window.setTimeout(start, 2500);
+    // Not visibility: this section is pulled up behind the hero, so it is on screen — under an opaque
+    // one — from the first paint, and an observer would fire during the load. The signal is the visitor
+    // setting off down the page, which still leaves a screen of scrolling before the brain is uncovered.
+    const watch = () => { if (scrollY > innerHeight * .3) start(); };
+    addEventListener('scroll', watch, { passive: true });
+    watch();
     return () => {
-      clearTimeout(timer);
-      triggers.forEach(type => window.removeEventListener(type, start));
+      removeEventListener('scroll', watch);
       abort.abort(); scene.current?.dispose(); scene.current = null;
       const destination = navWord.current;
       if (destination) destination.style.removeProperty('opacity');
@@ -234,7 +236,7 @@ export default function BrainExperience({ fallback }: { fallback: ReactNode }) {
   // the scroll asks for, the clip is seeked to it, the trace is drawn at it, and the model is posed at it.
   // Scrolling back up runs the whole formation in reverse, since every act is a pure function of the time.
   useEffect(() => {
-    if (pose || clipMode === null) return;
+    if (pose || clipMode === null || !near) return;
     const canvasElement = introCanvas.current;
     if (!canvasElement) return;
     let cancelled = false, frame = 0;
@@ -291,7 +293,7 @@ export default function BrainExperience({ fallback }: { fallback: ReactNode }) {
       cancelled = true; cancelAnimationFrame(frame);
       strip.current?.dispose(); strip.current = null;
     };
-  }, [pose, clipMode, scene, paint, finish]);
+  }, [pose, clipMode, scene, paint, finish, near]);
 
   useEffect(() => {
     let frame = 0;

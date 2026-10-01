@@ -1,7 +1,5 @@
 import * as THREE from 'three';
-import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import type { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 
 // A field of drifting particles behind the opening line, in the fund's own colours.
 //
@@ -19,7 +17,7 @@ const glsl = (value: number) => value.toFixed(4);
 const SETTINGS = {
   // Particles, and the cube they are seeded in. Phones take a third of the count: the look survives it,
   // a mid-range phone GPU does not survive the full field.
-  count: 46000, mobileCount: 15000, box: 5.2,
+  count: 46000, mobileCount: 9000, box: 5.2,
   // Point size in pixels at the field's resting depth, the spread of sizes across it, and how far the
   // drift carries a particle. Anything under a pixel is clamped to one by the driver, which is the
   // difference between a field of dust and a field with cores and halos.
@@ -149,9 +147,9 @@ const FRAGMENT = `
   }
 `;
 
-export type Nebula = ReturnType<typeof createNebula>;
+export type Nebula = Awaited<ReturnType<typeof createNebula>>;
 
-export function createNebula(canvas: HTMLCanvasElement) {
+export async function createNebula(canvas: HTMLCanvasElement) {
   const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false, powerPreference: 'high-performance' });
   renderer.setClearColor(0x0b1221, 0);
   const scene = new THREE.Scene();
@@ -204,9 +202,16 @@ export function createNebula(canvas: HTMLCanvasElement) {
   scene.add(points);
 
   // Bloom is a pair of full-screen passes, so it runs at a lower pixel ratio than the page and is dropped
-  // on phones altogether. The field is additive, which already glows; bloom only softens the cores.
-  const composer = phone ? null : new EffectComposer(renderer);
-  if (composer) {
+  // on phones altogether — where it is also never downloaded, since these three modules are a third of
+  // the hero's JavaScript. The field is additive, which already glows; bloom only softens the cores.
+  let composer: EffectComposer | null = null;
+  if (!phone) {
+    const [{ EffectComposer: Composer }, { RenderPass }, { UnrealBloomPass }] = await Promise.all([
+      import('three/addons/postprocessing/EffectComposer.js'),
+      import('three/addons/postprocessing/RenderPass.js'),
+      import('three/addons/postprocessing/UnrealBloomPass.js'),
+    ]);
+    composer = new Composer(renderer);
     composer.addPass(new RenderPass(scene, camera));
     composer.addPass(new UnrealBloomPass(new THREE.Vector2(1, 1), SETTINGS.bloom.strength, SETTINGS.bloom.radius, SETTINGS.bloom.threshold));
   }
