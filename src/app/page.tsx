@@ -1,3 +1,4 @@
+import Frontier from '@/components/hero/Frontier';
 import BrainHero from '@/components/brain/BrainHero';
 import SignalContent from '@/components/signal/SignalContent';
 import { FUND } from "@/lib/constants";
@@ -10,5 +11,5 @@ export const metadata = generatePageMetadata({
 });
 
 export default function Home() {
-  return <><BrainHero /><SignalContent /></>;
+  return <><Frontier /><BrainHero /><SignalContent /></>;
 }
