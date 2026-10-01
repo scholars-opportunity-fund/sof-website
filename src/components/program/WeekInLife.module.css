@@ -22,3 +22,12 @@
 @media (prefers-reduced-motion: reduce) {
   .tearAway, .dropIn { animation: none; }
 }
+
+/* The pinned stage keeps its content centred under the header but ends closer below it than the
+   foot of the screen, so the gap down to the next section is about half what a full-height stage
+   left. The trim is half that old gap: half the empty band under the ~390px of content, plus half
+   the next section's top padding, which works out to a quarter of the screen less 68px.
+   Unlayered, so it wins over the lg: utilities on the same element. Matches PINNED in the component. */
+@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+  .stage { --trim: max(0px, 25vh - 68px); height: calc(100vh - 72px - var(--trim)); padding-top: var(--trim); }
+}
