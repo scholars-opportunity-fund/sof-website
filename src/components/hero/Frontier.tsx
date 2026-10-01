@@ -22,12 +22,13 @@ export default function Frontier() {
   const [lit, setLit] = useState(false);
 
   // The field is the page's heaviest piece of work and none of it is needed to read the line, so it is
-  // held back until the browser is idle. The line and the cue are painted and interactive before any of
-  // three.js is fetched, and a browser that never goes idle still gets it a second in.
+  // held back until the browser is idle — the line and the cue are painted and interactive before any of
+  // three.js is fetched. Phones hold it back further still, until the first touch, scroll or key: a phone
+  // CPU and a phone GPU both pay for this, and neither should be paying during the page's first seconds.
   useEffect(() => {
     const element = canvas.current;
     if (!element) return;
-    let cancelled = false;
+    let cancelled = false, idle = 0;
     const begin = () => {
       if (cancelled) return;
       import('@/lib/hero/nebula')
@@ -35,9 +36,14 @@ export default function Frontier() {
         .then(scene => { if (cancelled) { scene.dispose(); return; } nebula.current = scene; setLit(true); })
         .catch(() => {});
     };
-    const idle = window.requestIdleCallback?.(begin, { timeout: 1200 }) ?? window.setTimeout(begin, 400);
+    const whenIdle = () => { idle = window.requestIdleCallback?.(begin, { timeout: 1200 }) ?? window.setTimeout(begin, 400); };
+    const triggers = ['pointerdown', 'touchstart', 'keydown', 'scroll'] as const;
+    const wake = () => { triggers.forEach(type => removeEventListener(type, wake)); whenIdle(); };
+    if (innerWidth < 900 || matchMedia('(pointer: coarse)').matches) triggers.forEach(type => addEventListener(type, wake, { passive: true }));
+    else whenIdle();
     return () => {
       cancelled = true;
+      triggers.forEach(type => removeEventListener(type, wake));
       window.cancelIdleCallback?.(idle); clearTimeout(idle);
       nebula.current?.dispose(); nebula.current = null;
     };

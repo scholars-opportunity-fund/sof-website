@@ -30,11 +30,15 @@ export default function Header() {
   // Close the menu when browser navigation changes the route as well as on link clicks.
   if (openedOn !== pathname) { setOpenedOn(pathname); setMenu(null); setMobile(false); }
   const close = () => { setMenu(null); setMobile(false); };
+  // The homepage's hero owns the fund's name until the brain hands it up to the header, so the header
+  // renders it hidden there rather than painting it and having the hero's script take it away — which
+  // flashed the name on every load and made it the page's largest paint.
+  const home = pathname === '/';
   return <header className={styles.header} onPointerLeave={event => { if (event.pointerType === 'mouse') setMenu(null); }}
     onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) close(); }}
     onKeyDown={event => { if (event.key === 'Escape') { close(); trigger.current?.focus(); } }}>
     <div className={styles.inner}>
-      <Link href="/" aria-label="Scholars Opportunity Fund home" className={styles.brand} onClick={close}><Image src="/brand/logo-on-light.png" alt="" width={44} height={44} priority /><span data-nav-word>{FUND.name}</span></Link>
+      <Link href="/" aria-label="Scholars Opportunity Fund home" className={styles.brand} onClick={close}><Image src="/brand/logo-on-light.png" alt="" width={44} height={44} priority /><span data-nav-word style={home ? { opacity: 0 } : undefined}>{FUND.name}</span></Link>
       <button type="button" data-menu-toggle className={styles.mobileToggle} aria-label={mobile ? 'Close menu' : 'Open menu'} aria-expanded={mobile} aria-controls="signal-navigation" onClick={event => { trigger.current = event.currentTarget; if (mobile) close(); else setMobile(true); }}> {mobile ? 'Close ×' : 'Menu +'} </button>
       <nav id="signal-navigation" className={styles.nav} data-open={mobile} aria-label="Main navigation">
         <Link href="/" aria-expanded={menu === 'overview'} aria-controls="overview-panel" onPointerEnter={event => { if (event.pointerType === 'mouse') { trigger.current = event.currentTarget; setMenu('overview'); } }} onFocus={event => { trigger.current = event.currentTarget; setMenu('overview'); }} onClick={close}>Overview <small>▾</small></Link>
@@ -44,7 +48,7 @@ export default function Header() {
         <Link href="/program#apply" className={styles.apply} onPointerEnter={() => setMenu(null)} onClick={close}>Apply</Link>
       </nav>
     </div>
-    <noscript><style>{`[data-menu-toggle],#signal-navigation{display:none!important}`}</style><nav className={styles.noScriptNav} aria-label="Main navigation without JavaScript"><Link href="/">Overview</Link><Link href="/team">Team</Link><Link href="/program">Process</Link><a href={`mailto:${FUND.contactEmail}`}>Contact</a><Link href="/program#apply">Apply</Link></nav></noscript>
+    <noscript><style>{`[data-menu-toggle],#signal-navigation{display:none!important}[data-nav-word]{opacity:1!important}`}</style><nav className={styles.noScriptNav} aria-label="Main navigation without JavaScript"><Link href="/">Overview</Link><Link href="/team">Team</Link><Link href="/program">Process</Link><a href={`mailto:${FUND.contactEmail}`}>Contact</a><Link href="/program#apply">Apply</Link></nav></noscript>
     {(Object.keys(panels) as (keyof typeof panels)[]).map(key => <div key={key} id={`${key}-panel`} className={styles.panel} hidden={menu !== key}><div className={styles.panelInner}>
       <div><p>{panels[key].label}</p><h3>{panels[key].title}</h3></div>
       {panels[key].links.map(link => <Link key={link.href} href={link.href} onClick={close}><strong>{link.title}</strong><span>{link.text}</span></Link>)}
