@@ -20,7 +20,7 @@ await mkdir(out, { recursive: true });
 /** The three new members, whose URLs must match the request character for character. */
 const EXPECTED = {
   'John Pary': 'https://www.linkedin.com/in/john-pary-bb93b7359/',
-  'Riley Fontanos Alfonso': 'https://www.linkedin.com/in/rileyfontanosalfonso/',
+  'Riley Alfonso': 'https://www.linkedin.com/in/rileyfontanosalfonso/',
   'Greyson Bailey': 'https://www.linkedin.com/in/greyson-w-bailey/',
 };
 
@@ -161,20 +161,29 @@ check('roster: new members present', roster.missing.length === 0, roster.missing
 
 check('greyscale: grey at rest', isGrey(await filterOf(0)), await filterOf(0));
 
-// A photo-less card has no colour to reveal, so its initials take the accent.
-const monoColour = () => json(`(() => {
-  const card = [...document.querySelectorAll('[data-team-card]')].find(c => c.innerText.includes('Riley'));
-  return getComputedStyle(card.querySelector('span[class*=font-heading]')).color;
-})()`);
-const monoRest = await monoColour();
-await hover(10);
-const monoLit = await monoColour();
-check('monogram: initials take the accent on engage', monoRest !== monoLit, `${monoRest} -> ${monoLit}`);
-
-const monoText = await json(`[...document.querySelectorAll('[data-team-card]')]
+// Every member has a photo now, so the monogram fallback has nothing to exercise.
+// Assert that state rather than crashing on the missing element, and only run the
+// accent gate when a photo-less member actually exists.
+const monograms = await json(`[...document.querySelectorAll('[data-team-card]')]
   .filter(c => c.querySelector('span[class*=font-heading]'))
   .map(c => c.querySelector('span[class*=font-heading]').textContent)`);
-check('monogram: exactly two, reading RA and GB', JSON.stringify(monoText) === '["RA","GB"]', JSON.stringify(monoText));
+const photos = await json(`document.querySelectorAll('[data-team-card] img').length`);
+check('photos: every member has one', photos === 12 && monograms.length === 0,
+  `${photos} photos, ${monograms.length} monograms`);
+
+if (monograms.length) {
+  const monoColour = () => json(`(() => {
+    const card = [...document.querySelectorAll('[data-team-card]')].find(c => c.querySelector('span[class*=font-heading]'));
+    return getComputedStyle(card.querySelector('span[class*=font-heading]')).color;
+  })()`);
+  const monoRest = await monoColour();
+  const index = await json(`[...document.querySelectorAll('[data-team-card]')].findIndex(c => c.querySelector('span[class*=font-heading]'))`);
+  await hover(index);
+  const monoLit = await monoColour();
+  check('monogram: initials take the accent on engage', monoRest !== monoLit, `${monoRest} -> ${monoLit}`);
+} else {
+  console.log('SKIP  monogram accent — no photo-less member to exercise it');
+}
 
 // Card 3 is a middle column at both the 3- and 4-column layouts.
 const midBox = await hover(3);
@@ -199,13 +208,18 @@ const stillPinned = await panel();
 check('panel: pin survives the pointer leaving', stillPinned.found === true, stillPinned.name);
 
 const linkHit = await page.evaluate(`(() => {
-  const a = document.querySelector('[role=region][id^=panel-] a[href*="linkedin"]');
+  const panel = document.querySelector('[role=region][id^=panel-]');
+  const a = panel?.querySelector('a[href*="linkedin"]');
   if (!a) return 'no-link';
+  const pr = panel.getBoundingClientRect();
   const r = a.getBoundingClientRect();
+  // A real bio overflows the panel, so the button must be visible without
+  // scrolling inside it — not merely present in the DOM.
+  if (r.top < pr.top - 1 || r.bottom > pr.bottom + 1) return 'below the fold';
   const top = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
   return a === top || a.contains(top) ? 'hit' : 'occluded';
 })()`);
-check('panel: LinkedIn button is hit-testable while pinned', linkHit === 'hit', linkHit);
+check('panel: LinkedIn button is reachable without scrolling the panel', linkHit === 'hit', linkHit);
 await shot('team-1440-pinned');
 
 const reBox = await hover(3);

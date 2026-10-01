@@ -36,7 +36,8 @@ export const brainLobes = [
     mesh: 'team',
     label: 'Temporal',
     note: 'people and memory',
-    links: [SITE_SECTIONS.team, SITE_SECTIONS.insights],
+    // Insights stays off the brain until the first piece ships; the route 404s while it is empty.
+    links: [SITE_SECTIONS.team],
   },
   {
     id: 'cerebellum',

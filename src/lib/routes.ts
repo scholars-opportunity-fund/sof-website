@@ -27,6 +27,20 @@ export const INDEXABLE_ROUTES: SiteRoute[] = [
     sources: ["src/app/page.tsx"],
   },
   {
+    path: "/approach",
+    title: "Approach",
+    changeFrequency: "monthly",
+    priority: 0.8,
+    sources: ["src/app/approach", "src/components/signal/SignalSections.tsx"],
+  },
+  {
+    path: "/process",
+    title: "Investment process",
+    changeFrequency: "monthly",
+    priority: 0.8,
+    sources: ["src/app/process", "src/components/signal/SignalProcess.tsx"],
+  },
+  {
     path: "/team",
     title: "Team",
     changeFrequency: "monthly",

@@ -8,12 +8,10 @@ import styles from './Header.module.css';
 import { FUND } from '@/lib/constants';
 
 const panels = {
-  // Overview is the landing page itself, so its panel points at that page's own
-  // sections rather than sending people out to /about.
   overview: { label: 'Overview', title: 'A student-run event-driven fund in public equities.', links: [
-    { href: '/#approach', title: 'The approach', text: 'Catalysts, special situations, uneven coverage.' },
-    { href: '/#pipeline', title: 'Investment process', text: 'Sourcing, diligence, committee, monitoring.' },
-    { href: '/#leadership', title: 'Leadership', text: 'Dr. Jonathan Brogaard, Chief Investment Officer.' },
+    { href: '/approach', title: 'The approach', text: 'Catalysts, special situations, uneven coverage.' },
+    { href: '/process', title: 'Investment process', text: 'Sourcing, diligence, committee, monitoring.' },
+    { href: '/team', title: 'Leadership', text: 'Dr. Jonathan Brogaard, Chief Investment Officer.' },
   ] },
   process: { label: 'Process', title: 'From sourcing to decision, documented end to end.', links: [
     { href: '/program#work', title: 'What analysts do', text: 'Candidate analysis, monitoring, LP reporting inputs.' },
