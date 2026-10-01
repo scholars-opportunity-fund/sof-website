@@ -201,7 +201,7 @@ export default function WeekInLife() {
       id="week"
       className="relative overflow-x-clip border-t border-border/60 bg-cloud lg:h-[380vh] motion-reduce:lg:h-auto"
     >
-      <div className="py-16 sm:py-24 lg:sticky lg:top-[72px] lg:flex lg:h-[calc(100vh-72px)] lg:items-center lg:py-0 motion-reduce:lg:static motion-reduce:lg:h-auto motion-reduce:lg:py-24">
+      <div className={`${styles.stage} py-16 sm:py-24 lg:sticky lg:top-[72px] lg:flex lg:h-[calc(100vh-72px)] lg:items-center lg:py-0 motion-reduce:lg:static motion-reduce:lg:h-auto motion-reduce:lg:py-24`}>
         <Container>
           <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)] lg:items-center lg:gap-20">
             <div>
