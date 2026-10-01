@@ -1,10 +1,12 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type { BrainPhase, LobeAnchors } from '@/lib/brain/scene';
 import type { BrainIntro } from '@/lib/brain/intro';
+import type { ClipStrip } from '@/lib/brain/clip';
 import { isBrainLook, type BrainLookName } from '@/lib/brain/looks';
 import { brainRegions } from '@/lib/brain/regions';
 import { lobeForMesh, LOBE_MOTION } from '@/lib/brain/lobes';
@@ -13,50 +15,73 @@ import SignalField from '@/components/signal/SignalField';
 import styles from './BrainExperience.module.css';
 
 const smooth = (value: number) => { const p = Math.max(0, Math.min(1, value)); return p * p * (3 - 2 * p); };
-const SPEED = .85;
-// The 2D synapse intro carries the formation until the model has loaded, then dissolves into it.
-const HOLD_AT = 5;
+const clamp01 = (value: number) => Math.max(0, Math.min(1, value));
+// The whole intro, in timeline seconds. Nothing plays on its own: scroll position is the only clock.
+const INTRO_LENGTH = 12;
+// Where the band begins, per stage. Both intros open on an empty frame — the clip on nearly three seconds
+// of black, the drawn trace on an unlit field — which read as a fade-up while they played and as a blank
+// stage now that they do not. The band starts where each one has something on screen.
+const CLIP_START = 2.4, TRACE_START = 3.6;
 // The synapse trace owns the stage until it starts dissolving; the model is revealed under the fade.
 const REVEAL_AT = 8.2;
-// The cinematic intro. The clip is handed over while its brain is still a glowing lattice, so the live
-// model performs the last beat itself: the metal skins over on screen and always matches exactly.
-// 0.80 is where the clip's market storm has begun to collapse inward. The drawn trace takes it from there
-// and builds the brain itself, so the network that flew past you is the thing that forms.
-const CLIP = { src: '/brain/intro-market-16x9.mp4', handoff: .8 };
-// Page seconds at the moment the clip gives way to the trace, and at the moment the trace gives way to the model.
+// The cinematic intro, exported as still frames covering exactly the stretch the band scrubs — from the
+// market storm at CLIP_START to the moment it collapses inward at TRACE_AT, where the drawn trace picks the
+// brain up and builds it, so the network that flew past you is the thing that forms. A video cannot be
+// scrubbed: see src/lib/brain/clip.ts. The first frame is preloaded, since it is the landing image.
+const FIRST_FRAME = '/brain/intro/f00.webp';
+// Timeline seconds at the moment the clip gives way to the trace, and at the moment the trace gives way to the model.
 const TRACE_AT = 6.4;
 // The trace is densest just before 8 s of its own build, so the model takes over there rather than later,
 // when the drawn network has begun to thin out again.
 const HANDOFF_AT = 7.9;
-// Act two runs the trace clock slower than real time, to dwell on the formation.
-const TRACE_SPEED = .6;
 // How long the clip and the trace overlap while one fades into the other.
 const TRACE_FADE = 1.1;
 const SETTLE = 3.2;
 // The trace lingers over the arriving model and dissolves across this long, so neither one pops.
 const TRACE_OUT = 2;
-const START_BUDGET = 2500;
-const STALL_BUDGET = 1500;
+// The intro is scrubbed by the scroll: this many viewport heights carry the whole timeline. Much less than
+// this and a single trackpad flick, which is most of a screen in one gesture, throws the whole intro past.
+const INTRO_BAND = 1.8;
+// The hero above this one ends by throwing its particle field outward, and this section is pulled up
+// behind that burst (the margin in BrainExperience.module.css, matched to the hero's band). Its own
+// timeline still starts where it always did — the moment this section reaches the header — which by
+// then is the moment the burst opens onto it.
+// The rendered time chases the scrolled time by this much each frame, so a wheel notch reads as
+// motion through the formation rather than a jump, and so a video seek is never asked for twice a frame.
+const CHASE = .18;
 
 export default function BrainExperience({ fallback }: { fallback: ReactNode }) {
   const { scene, setAvailable, active, setHovered,  setSelected, zoom, setZoom, setFollowScroll, reset } = useExplorer();
   const root = useRef<HTMLElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const introCanvas = useRef<HTMLCanvasElement>(null);
-  const video = useRef<HTMLVideoElement>(null);
-  const handedOverAt = useRef(0);
+  const clipCanvas = useRef<HTMLCanvasElement>(null);
+  const strip = useRef<ClipStrip | null>(null);
   const intro = useRef<BrainIntro | null>(null);
   const word = useRef<HTMLParagraphElement>(null);
   const letters = useRef<HTMLSpanElement>(null);
   const navigation = useRef(0);
   const time = useRef(0);
-  const startedAt = useRef(0);
-  const held = useRef(0);
   const navWord = useRef<HTMLElement | null>(null);
+  // True once the intro has been given up on — reduced motion, a failed scene, or a click on the stage.
+  // The timeline is then pinned at its end and the scroll no longer scrubs it.
   const skipRequested = useRef(false);
-  // Read by the intro clock so a frame already queued cannot repaint after Skip, scroll, or failure.
-  const playing = useRef(false);
   const failedRef = useRef(false);
+  // The timeline second the scroll position asks for, and the one currently rendered, which chases it.
+  const scrollTarget = useRef(0);
+  const rendered = useRef(0);
+  // Where navigation starts along the page. Normally the far end of the intro band; a skip fixes it at
+  // whatever was scrolled then, so nothing jumps and no dead band is left behind.
+  const navStart = useRef<number | null>(null);
+  // The timeline second the head of the band sits at, which the clip and the trace answer differently.
+  const introStart = useRef(CLIP_START);
+  // False until the scroll has been read once. A page restored partway down starts at the second it is
+  // already scrolled to rather than racing the formation from the top to catch up.
+  const armed = useRef(false);
+  // Mirror the transition states the timeline drives, so each is set once rather than every frame.
+  const clipOutRef = useRef(false);
+  const revealedRef = useRef(false);
+  const formingRef = useRef(false);
   const [phase, setPhase] = useState<BrainPhase>('loading');
   const [revealed, setRevealed] = useState(false);
   // null until the mount effect decides; true runs the clip, false runs the 2D synapse trace.
@@ -82,6 +107,8 @@ export default function BrainExperience({ fallback }: { fallback: ReactNode }) {
   const [failed, setFailed] = useState(false);
   const [exploring, setExploring] = useState(false);
   const [lightVisible, setLightVisible] = useState(false);
+  // True on phones, where a still of the brain holds the stage until the 3D scene is started and ready.
+  const [poster, setPoster] = useState(false);
   // Development-only capture mode for the clip's keyframes: `?pose=formed` shows the model at its formed pose, `?pose=empty` the bare stage.
   const [pose, setPose] = useState<'formed' | 'empty' | null>(null);
   const activeRegion = brainRegions.find(region => region.id === active);
@@ -98,7 +125,9 @@ export default function BrainExperience({ fallback }: { fallback: ReactNode }) {
     element.style.setProperty('--word-color', `rgb(${243 - 232 * light},${245 - 227 * light},${248 - 215 * light})`);
     element.style.setProperty('--word-opacity', String(seconds < 9.5 ? 0 : 1 - smooth((nav - .78) / .2)));
     element.style.setProperty('--subtitle-opacity', seconds > 11 && nav < .05 ? '1' : '0');
-    element.style.setProperty('--cue-opacity', seconds > 11.3 && nav < .05 ? '1' : '0');
+    // The cue also stands at the head of the timeline: since nothing moves until the page is scrolled,
+    // the stage has to say so before it is scrolled.
+    element.style.setProperty('--cue-opacity', (seconds > 11.3 || seconds < introStart.current + .35) && nav < .05 ? '1' : '0');
     if (letters.current) letters.current.textContent = 'SOF'.slice(0, Math.min(3, Math.floor(Math.max(0, (seconds - 9.6) / 1.1) * 3.999)));
     const destination = navWord.current;
     if (word.current && destination) {
@@ -112,15 +141,21 @@ export default function BrainExperience({ fallback }: { fallback: ReactNode }) {
     }
   }, []);
 
+  // Give up on the intro and pin the timeline at its end. The clip keeps its source, so a Replay can
+  // scrub it again without downloading it twice.
   const finish = useCallback(() => {
-    skipRequested.current = true; playing.current = false; handedOverAt.current = 0;
-    const element = video.current;
-    if (element) { element.pause(); element.removeAttribute('src'); element.load(); }
-    setRevealed(true); setPhase('still'); paint(12); intro.current?.clear(); scene.current?.setArrival(0);
+    skipRequested.current = true;
+    // Navigation takes over from wherever the page is standing, so giving up on the intro leaves no
+    // stretch of band behind that scrolls past nothing.
+    const box = root.current?.getBoundingClientRect();
+    if (box) navStart.current = Math.max(0, Math.min(innerHeight * INTRO_BAND, 72 - box.top));
+    rendered.current = INTRO_LENGTH; scrollTarget.current = INTRO_LENGTH;
+    clipOutRef.current = true; revealedRef.current = true; formingRef.current = false;
+    setClipOut(true); setRevealed(true); setPhase('still'); paint(INTRO_LENGTH); intro.current?.clear(); scene.current?.setArrival(0);
   }, [paint, scene]);
   const fail = useCallback(() => { scene.current?.dispose(); scene.current = null; failedRef.current = true; setFailed(true); setReady(false); setAvailable(false); finish(); }, [scene, setAvailable, finish]);
 
-  // Decide on mount whether the intro plays, and start it right away while the model loads.
+  // Decide on mount which intro the stage is scrubbing, and arm it at its first frame.
   useEffect(() => {
     navWord.current = document.querySelector<HTMLElement>('[data-nav-word]');
     if (process.env.NODE_ENV === 'development') {
@@ -135,9 +170,12 @@ export default function BrainExperience({ fallback }: { fallback: ReactNode }) {
     const saveData = Boolean((navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData);
     // The clip is landscape only and heavy, so portrait stages and metered connections take the drawn trace.
     setClipMode(previous => previous ?? (!saveData && innerWidth >= innerHeight && innerWidth >= 900));
-    startedAt.current = performance.now(); held.current = 0; playing.current = true; setRevealed(false); setClipOut(false);
+    revealedRef.current = false; clipOutRef.current = false; formingRef.current = true;
+    setRevealed(false); setClipOut(false);
+    rendered.current = introStart.current; scrollTarget.current = introStart.current; navStart.current = null;
+    paint(introStart.current);
     setPhase('forming');
-  }, [finish]);
+  }, [finish, paint]);
 
   useEffect(() => {
     const element = canvas.current;
@@ -146,8 +184,8 @@ export default function BrainExperience({ fallback }: { fallback: ReactNode }) {
     setFollowScroll(false);
     // The 2D intro owns the first seconds of the stage, so the WebGL boot and
     // the model parse wait out the initial load instead of blocking it. The
-    // clip hands over around 6.4s and the hold/stall budgets already cover a
-    // late model, so the intro is unchanged; only the main thread at load is.
+    // model is not needed until the timeline is scrubbed past the handover at
+    // 7.9s, and a late one simply fades in, so only the main thread at load is affected.
     const boot = () => import('@/lib/brain/scene').then(module => module.createBrainScene(element, {
       hover: mesh => { setHovered(mesh); hoverHandler.current(mesh); }, select: setSelected, move: () => setHovered(null), zoom: setZoom, failed: fail, lobeAnchors: setLobeAnchors,
     }, abort.signal)).then(engine => {
@@ -155,9 +193,24 @@ export default function BrainExperience({ fallback }: { fallback: ReactNode }) {
       scene.current = engine; engine.setNavigation(navigation.current);
       setReady(true); setAvailable(true);
     }).catch(() => { if (!abort.signal.aborted) fail(); });
-    const timer = setTimeout(boot, 2500);
+    // Phones get a still of the brain first and start the 3D scene on the first touch, scroll or key, so the
+    // download and parse never compete with the first load on a slow CPU. Larger screens boot after the delay.
+    const deferred = innerWidth < innerHeight && (innerWidth < 768 || matchMedia('(pointer: coarse)').matches);
+    const triggers = ['pointerdown', 'touchstart', 'keydown', 'scroll'] as const;
+    let started = false, timer = 0;
+    const start = () => {
+      if (started) return;
+      started = true; clearTimeout(timer);
+      triggers.forEach(type => window.removeEventListener(type, start));
+      boot();
+    };
+    setPoster(deferred);
+    // Larger screens also start early on the first input, so a visitor scrolling through the intro meets the model.
+    triggers.forEach(type => window.addEventListener(type, start, { passive: true }));
+    if (!deferred) timer = window.setTimeout(start, 2500);
     return () => {
       clearTimeout(timer);
+      triggers.forEach(type => window.removeEventListener(type, start));
       abort.abort(); scene.current?.dispose(); scene.current = null;
       const destination = navWord.current;
       if (destination) destination.style.removeProperty('opacity');
@@ -168,99 +221,77 @@ export default function BrainExperience({ fallback }: { fallback: ReactNode }) {
   useEffect(() => { scene.current?.setZoom(zoom); }, [zoom, ready, scene]);
   useEffect(() => { scene.current?.setPhase(phase); if (phase === 'forming') scene.current?.setTime(pose ? 9.4 : time.current); }, [phase, ready, scene, pose]);
   useEffect(() => { scene.current?.setClipAspect(innerWidth < innerHeight ? 9 / 16 : 16 / 9); }, [ready, scene]);
-
-  // The clip clock. The video drives the stage to the handoff, then the code clock finishes in real time
-  // while the model settles out of its arrival glow. Any failure drops to the drawn trace, never a blank stage.
+  // Deciding on the clip, or falling back from it mid-scroll, moves the head of the band with it.
   useEffect(() => {
-    if (phase !== 'forming' || pose || clipMode !== true) return;
-    const element = video.current, canvasElement = introCanvas.current;
-    if (!element || !canvasElement) return;
-    let cancelled = false, frame = 0, startTimer = 0, startedPlaying = 0, traceAt = 0;
+    if (clipMode === null || pose) return;
+    const from = clipMode ? CLIP_START : TRACE_START;
+    introStart.current = from;
+    if (rendered.current < from) rendered.current = from;
+    if (scrollTarget.current < from) scrollTarget.current = from;
+  }, [clipMode, pose]);
+
+  // The one intro clock, and it is the scroll bar. Nothing plays: the rendered second chases the second
+  // the scroll asks for, the clip is seeked to it, the trace is drawn at it, and the model is posed at it.
+  // Scrolling back up runs the whole formation in reverse, since every act is a pure function of the time.
+  useEffect(() => {
+    if (pose || clipMode === null) return;
+    const canvasElement = introCanvas.current;
+    if (!canvasElement) return;
+    let cancelled = false, frame = 0;
     let engine = intro.current;
-    // The trace runs from the first frame, hidden under the clip, so by the time the storm collapses it is
-    // already mid-formation and can carry the brain the rest of the way.
-    if (!engine) import('@/lib/brain/intro').then(module => { if (!cancelled) engine = intro.current = module.createBrainIntro(canvasElement); }).catch(() => {});
-    const toTrace = () => {
-      if (cancelled || !playing.current || handedOverAt.current) return;
-      element.pause(); element.removeAttribute('src'); element.load();
-      startedAt.current = performance.now(); held.current = 0;
-      setClipMode(false);
-    };
-    element.src = CLIP.src;
-    element.currentTime = 0;
-    startTimer = window.setTimeout(() => { if (element.paused || element.currentTime === 0) toTrace(); }, START_BUDGET);
-    const onPlaying = () => { clearTimeout(startTimer); if (!startedPlaying) startedPlaying = performance.now(); };
-    element.addEventListener('playing', onPlaying);
-    element.addEventListener('error', toTrace);
-    element.play().catch(toTrace);
+    if (!engine) import('@/lib/brain/intro').then(module => { if (!cancelled) engine = intro.current = module.createBrainIntro(canvasElement); }).catch(() => finish());
+    // The clip's frames start loading with the stage, nearest-first, and a strip that cannot be fetched
+    // hands the whole intro to the drawn trace rather than leaving the stage bare.
+    const clipElement = clipMode ? clipCanvas.current : null;
+    if (clipElement && !strip.current) import('@/lib/brain/clip').then(module => {
+      if (!cancelled) strip.current = module.createClipStrip(clipElement);
+    }).catch(() => { if (!cancelled) setClipMode(false); });
     function tick() {
       frame = 0;
-      if (cancelled || !playing.current || !element) return;
-      if (handedOverAt.current) {
-        // Act three: the live model, arriving lit and skinning over to its finish.
-        const elapsed = (performance.now() - handedOverAt.current) / 1000;
-        const seconds = Math.min(12, HANDOFF_AT + elapsed);
-        scene.current?.setArrival(Math.max(0, 1 - elapsed / SETTLE));
-        paint(seconds); scene.current?.setTime(seconds);
-        engine?.draw(seconds, seconds, Math.max(0, 1 - elapsed / TRACE_OUT));
-        if (seconds >= 12) { playing.current = false; handedOverAt.current = 0; scene.current?.setArrival(0); engine?.clear(); setPhase('still'); return; }
-      } else if (traceAt) {
-        // Act two: the trace owns the stage and draws the brain out of the network.
-        const seconds = Math.min(HANDOFF_AT, TRACE_AT + (performance.now() - traceAt) / 1000 * TRACE_SPEED);
-        paint(seconds); scene.current?.setTime(seconds);
-        engine?.draw(seconds, seconds, 1);
-        if (seconds >= HANDOFF_AT && scene.current) {
-          handedOverAt.current = performance.now();
-          scene.current.setArrival(1); scene.current.setTime(HANDOFF_AT);
-          setRevealed(true);
-        }
-      } else if (element.duration) {
-        // Act one: the clip, from the first signal through the market storm.
-        const handoff = element.duration * CLIP.handoff;
-        const progress = Math.min(1, element.currentTime / handoff);
-        // Cut it for the trace if the clip falls a budget's worth behind the wall clock, however it stutters.
-        if (startedPlaying && !element.ended && performance.now() - startedPlaying - element.currentTime * 1000 > STALL_BUDGET) { toTrace(); return; }
-        const seconds = TRACE_AT * progress;
-        paint(seconds); scene.current?.setTime(seconds);
-        // The trace fades up under the clip's last second so the two overlap rather than cut.
-        engine?.draw(seconds, seconds, smooth((seconds - (TRACE_AT - TRACE_FADE)) / TRACE_FADE));
-        if (progress >= 1 || element.ended) { traceAt = performance.now(); setClipOut(true); element.pause(); }
-      }
+      if (cancelled) return;
       frame = requestAnimationFrame(tick);
+      if (skipRequested.current) return;
+      const target = scrollTarget.current;
+      let seconds = rendered.current;
+      const moving = seconds !== target;
+      if (moving) {
+        seconds += (target - seconds) * CHASE;
+        if (Math.abs(target - seconds) < .015) seconds = target;
+        rendered.current = seconds;
+      } else if (!formingRef.current) return;
+      if (moving) {
+        paint(seconds);
+        scene.current?.setTime(seconds);
+      }
+      // Act one is the clip, drawn frame by frame; act two the trace; act three the model arriving and settling.
+      if (clipElement && seconds < TRACE_AT) {
+        strip.current?.draw((seconds - CLIP_START) / (TRACE_AT - CLIP_START));
+        if (strip.current?.broken()) { setClipMode(false); return; }
+      }
+      const fadeIn = clipElement ? smooth((seconds - (TRACE_AT - TRACE_FADE)) / TRACE_FADE) : 1;
+      const revealAt = clipElement ? HANDOFF_AT : REVEAL_AT;
+      const fadeOut = 1 - smooth((seconds - revealAt) / (clipElement ? TRACE_OUT : 1.4));
+      // The formation is frozen where the scroll left it, but the network it is drawn from still fires:
+      // the second argument is a live clock, so a stage at rest breathes without advancing.
+      engine?.draw(seconds, performance.now() / 1000, Math.min(fadeIn, fadeOut));
+      scene.current?.setArrival(seconds < revealAt ? 1 : Math.max(0, 1 - (seconds - revealAt) / SETTLE));
+      // A hair short of the end still counts as finished: the band's last pixel lands a rounding error
+      // below the full length, and the brain is already at rest by then.
+      const clipOver = seconds >= TRACE_AT, shown = seconds >= revealAt, forming = seconds < INTRO_LENGTH - .02;
+      if (clipOver !== clipOutRef.current) { clipOutRef.current = clipOver; setClipOut(clipOver); }
+      if (shown !== revealedRef.current) { revealedRef.current = shown; setRevealed(shown); }
+      if (forming !== formingRef.current) {
+        formingRef.current = forming;
+        if (!forming) { engine?.clear(); scene.current?.setArrival(0); }
+        setPhase(forming ? 'forming' : 'still');
+      }
     }
     frame = requestAnimationFrame(tick);
     return () => {
-      cancelled = true; cancelAnimationFrame(frame); clearTimeout(startTimer);
-      element.removeEventListener('playing', onPlaying); element.removeEventListener('error', toTrace);
+      cancelled = true; cancelAnimationFrame(frame);
+      strip.current?.dispose(); strip.current = null;
     };
-  }, [phase, pose, clipMode, scene, paint]);
-
-  // The intro clock: draws the synapse overlay, updates the stage, and feeds the model the same time.
-  useEffect(() => {
-    if (phase !== 'forming' || pose || clipMode !== false) return;
-    const element = introCanvas.current;
-    if (!element) return;
-    let cancelled = false, frame = 0;
-    let engine = intro.current;
-    if (!engine) import('@/lib/brain/intro').then(module => { if (!cancelled) engine = intro.current = module.createBrainIntro(element); }).catch(() => finish());
-    const preference = window.matchMedia('(prefers-reduced-motion: reduce)');
-    function tick(now: number) {
-      frame = 0;
-      if (cancelled || !playing.current) return;
-      if (preference.matches) { finish(); return; }
-      const clock = (now - startedAt.current) / 1000;
-      let seconds = clock * SPEED - held.current;
-      if (!scene.current && seconds > HOLD_AT) { held.current += seconds - HOLD_AT; seconds = HOLD_AT; }
-      paint(seconds);
-      if (seconds >= REVEAL_AT) setRevealed(true);
-      engine?.draw(seconds, clock, 1 - smooth((seconds - REVEAL_AT) / 1.4));
-      scene.current?.setTime(seconds);
-      if (seconds >= 12) { playing.current = false; setPhase('still'); engine?.clear(); return; }
-      frame = requestAnimationFrame(tick);
-    }
-    frame = requestAnimationFrame(tick);
-    return () => { cancelled = true; cancelAnimationFrame(frame); };
-  }, [phase, scene, paint, finish, pose, clipMode]);
+  }, [pose, clipMode, scene, paint, finish]);
 
   useEffect(() => {
     let frame = 0;
@@ -270,14 +301,22 @@ export default function BrainExperience({ fallback }: { fallback: ReactNode }) {
       const element = root.current;
       if (!element) return;
       const box = element.getBoundingClientRect();
-      const progress = Math.max(0, Math.min(1, (72 - box.top) / Math.max(1, box.height - (innerHeight - 72))));
+      const band = innerHeight * INTRO_BAND, scrolled = 72 - box.top;
+      // The band is the intro's scroll bar: where it is scrolled to is the second the stage renders.
+      const from = introStart.current;
+      if (!pose && !skipRequested.current) {
+        scrollTarget.current = from + clamp01(scrolled / band) * (INTRO_LENGTH - from);
+        if (!armed.current) { armed.current = true; rendered.current = scrollTarget.current; }
+      }
+      // Navigation begins where the intro ends, so the two never fight over the same stretch of page.
+      const start = navStart.current ?? band;
+      const progress = clamp01((scrolled - start) / Math.max(1, box.height - (innerHeight - 72) - band));
       navigation.current = preference.matches ? (progress > .2 ? 1 : 0) : smooth(progress / .4);
       setExploring(navigation.current > .6);
       scene.current?.setNavigation(navigation.current);
-      if (pose) return;
-      if (progress > .02 && playing.current) finish();
-      else if (progress > .02) skipRequested.current = true;
-      paint(progress > .02 ? 12 : time.current);
+      // Past the band the timeline no longer moves, but the wordmark still travels with the scroll,
+      // so the stage is repainted at whatever second it is resting on.
+      if (!pose) paint(skipRequested.current ? INTRO_LENGTH : rendered.current);
     }
     const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
     schedule();
@@ -379,30 +418,41 @@ export default function BrainExperience({ fallback }: { fallback: ReactNode }) {
     });
   }, [router, scene]);
 
+  // Replaying is simply going back to the head of the band; the timeline follows the scroll from there.
   function replay() {
-    reset(); skipRequested.current = false; handedOverAt.current = 0; scene.current?.setArrival(0);
+    reset(); skipRequested.current = false; scene.current?.setArrival(1);
+    rendered.current = introStart.current; scrollTarget.current = introStart.current; navStart.current = null; armed.current = false;
     window.scrollTo({ top: root.current ? window.scrollY + root.current.getBoundingClientRect().top - 72 : 0, behavior: 'instant' });
     navigation.current = 0; scene.current?.setNavigation(0); setExploring(false);
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { finish(); return; }
-    startedAt.current = performance.now(); held.current = 0; playing.current = true; setRevealed(false);
-    paint(0); setClipOut(false); scene.current?.setTime(0); setPhase('forming');
+    revealedRef.current = false; clipOutRef.current = false; formingRef.current = true;
+    setRevealed(false); setClipOut(false);
+    paint(introStart.current); scene.current?.setTime(introStart.current); setPhase('forming');
+  }
+  // Skipping means scrolling to the far end of the band: the state on screen and the scroll position
+  // always agree, so the intro stays where the scroll left it rather than jumping out from under the page.
+  function skip() {
+    const box = root.current?.getBoundingClientRect();
+    if (!box) { finish(); return; }
+    window.scrollTo({ top: window.scrollY + box.top - 72 + innerHeight * INTRO_BAND, behavior: 'smooth' });
   }
   const controlsVisible = exploring || failed;
   const forming = phase === 'forming';
-  return <section ref={root} className={styles.home} aria-label="Scholars Opportunity Fund — connected intelligence" data-brain data-brain-home data-brain-phase={phase} data-brain-ready={ready} data-brain-failed={failed} data-exploring={exploring} data-brain-reveal={revealed} data-brain-pose={pose ?? undefined}>
+  return <section ref={root} id="sof-brain" className={styles.home} aria-label="Scholars Opportunity Fund — connected intelligence" data-brain data-brain-home data-brain-phase={phase} data-brain-ready={ready} data-brain-failed={failed} data-exploring={exploring} data-brain-reveal={revealed} data-brain-pose={pose ?? undefined}>
     <div className={styles.stage} data-startup-stage>
       <div className={styles.field}><SignalField active={lightVisible} /></div>
       <div className={styles.fallback} data-brain-fallback hidden={!failed}>{fallback}</div>
+      {poster && !failed && <div className={styles.poster} data-ready={ready} aria-hidden="true"><Image src="/brain/poster-portrait.webp" alt="" fill sizes="80vw" /></div>}
       <canvas ref={canvas} className={styles.canvas} data-brain-canvas data-ready={ready} tabIndex={ready && phase === 'still' ? 0 : -1}
         aria-label="3D brain. Drag to rotate. Pinch or Shift and scroll to zoom. Arrow keys rotate; plus and minus zoom. Select a region to explore it." />
-      <video ref={video} className={styles.clip} data-brain-clip data-fading={clipOut || revealed} hidden={!forming || clipMode !== true || Boolean(pose)} muted playsInline preload="auto" aria-hidden="true"
-        onPointerUp={event => { if (event.pointerType === 'mouse' && event.button === 0) finish(); }} />
-      <canvas ref={introCanvas} className={styles.intro} data-brain-intro hidden={!forming} aria-hidden="true" onPointerUp={event => { if (event.pointerType === 'mouse' && event.button === 0) finish(); }} />
+      {clipMode === true && <link rel="preload" as="image" href={FIRST_FRAME} />}
+      <canvas ref={clipCanvas} className={styles.clip} data-brain-clip data-fading={clipOut || revealed} hidden={!forming || clipMode !== true || Boolean(pose)} aria-hidden="true" />
+      <canvas ref={introCanvas} className={styles.intro} data-brain-intro hidden={!forming} aria-hidden="true" />
       <div className={styles.wordmark} aria-hidden="true"><div className={styles.wordInner}>
         <p ref={word} className={styles.word}><span ref={letters} /><span className={styles.cursor} /></p>
         <p className={styles.subtitle}>Scholars Opportunity Fund · Salt Lake City</p>
       </div></div>
-      <div className={styles.lobes} aria-hidden={!ready} data-brain-navigation data-visible={ready && (phase === 'still' || exploring)} data-travelling={travelling}>
+      <div className={styles.lobes} aria-hidden={!ready} data-brain-navigation data-visible={(ready || (poster && !failed)) && (phase === 'still' || exploring)} data-travelling={travelling}>
         {/* Filaments are drawn in stage pixels, so a bowed line keeps an even stroke. */}
         <svg className={styles.filaments} viewBox={`0 0 ${Math.max(1, stage.w)} ${Math.max(1, stage.h)}`} aria-hidden="true">
           {reveal.map(item => <g key={item.key}>
@@ -438,7 +488,7 @@ export default function BrainExperience({ fallback }: { fallback: ReactNode }) {
       </div>
       <a href="#sof-overview" className={styles.scrollCue} tabIndex={exploring ? -1 : 0}><span><i /></span>Scroll</a>
       <div className={styles.introControls}>
-        {!exploring && forming && <button type="button" onClick={finish}>Skip intro</button>}
+        {!exploring && forming && <button type="button" onClick={skip}>Skip intro</button>}
         <button type="button" disabled={failed} onClick={replay}>Replay</button>
         {controlsVisible && <a href="/brain/attribution.txt">Model credits</a>}
       </div>

@@ -1,14 +1,24 @@
-﻿.home { position:relative; height:calc(230vh - 72px); background:var(--cloud); --stage-color:#0b1221; --light:0; --word-opacity:0; --subtitle-opacity:0; --cue-opacity:0; }
+﻿/* 180vh on top of the explore range is the intro band (INTRO_BAND): the scroll that scrubs the intro.
+   The negative margin pulls this section up behind the hero's transition band, so its stage is already
+   pinned and holding its first frame when the hero throws its particle field outward and goes clear.
+   It is matched to the hero's height in Frontier.module.css; the two move together. */
+.home { position:relative; z-index:1; margin-top:-130svh; height:calc(410vh - 72px); background:var(--cloud); --stage-color:#0b1221; --light:0; --word-opacity:0; --subtitle-opacity:0; --cue-opacity:0; }
 .stage { position:sticky; top:72px; height:calc(100svh - 72px); min-height:460px; background:var(--stage-color); overflow:clip; }
 .canvas { position:absolute; inset:0; width:100%; height:100%; display:block; cursor:grab; opacity:1; transition:opacity .9s ease; }
 .canvas:active { cursor:grabbing; }
-.canvas[data-ready=false] { visibility:hidden; }
+/* A model that lands after the intro has finished fades in rather than popping onto the stage. */
+.canvas[data-ready=false] { visibility:hidden; opacity:0; }
 /* The model waits under the synapse trace and fades up as the trace dissolves, so it emerges rather than appears. */
 .home[data-brain-phase=forming][data-brain-reveal=false]:not([data-brain-pose]) .canvas { opacity:0; }
+/* The phone still sits exactly where the resting model renders and hands over to it. The numbers are measured
+   from the live scene on a 390x772 stage; on a portrait stage the model scales with width, so they hold across phones. */
+.poster { position:absolute; left:48.78%; top:35.65%; width:72.95%; aspect-ratio:569 / 507; transform:translate(-50%,-50%); pointer-events:none; opacity:1; transition:opacity .9s ease; }
+.poster[data-ready=true], .home[data-exploring=true] .poster { opacity:0; }
+.home[data-brain-phase=forming][data-brain-reveal=false] .poster { opacity:0; }
 .intro { position:absolute; inset:0; width:100%; height:100%; display:block; z-index:1; }
-/* The clip is scaled to the stage height and centred; feathered side edges hide the seam between
-   its encoded black and the stage colour. max-width:none lifts the Tailwind preflight cap. */
-.clip { position:absolute; top:0; left:50%; height:100%; width:auto; max-width:none; transform:translateX(-50%); z-index:1; opacity:1; transition:opacity .45s ease;
+/* The clip's frames are drawn to the stage's height and centred by the strip itself; feathered side
+   edges hide the seam between the footage's black and the stage colour. */
+.clip { position:absolute; inset:0; width:100%; height:100%; z-index:1; opacity:1; transition:opacity .45s ease;
   -webkit-mask-image:linear-gradient(to right, transparent 0%, #000 7%, #000 93%, transparent 100%); mask-image:linear-gradient(to right, transparent 0%, #000 7%, #000 93%, transparent 100%); }
 .clip[data-fading=true] { opacity:0; pointer-events:none; }
 .clip[hidden] { display:none; }
