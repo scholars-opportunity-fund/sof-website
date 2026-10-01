@@ -100,27 +100,18 @@ export default function ProgramPage() {
       <WeekInLife />
 
       {/* How responsibility grows */}
-      <section id="growth" className="py-16 sm:py-24">
-        <Container>
-          <Reveal>
-            <div className="grid gap-16 lg:grid-cols-[1fr_1.5fr] lg:gap-24">
-              <div>
-                <p className="text-xs font-medium tracking-[0.2em] text-copper uppercase">
-                  Growth
-                </p>
-                <h2 className="mt-6 text-4xl sm:text-5xl">
-                  How responsibility grows
-                </h2>
-                <p className="mt-6 text-[17px] leading-[1.8] text-foreground-muted">
-                  SOF runs a flat Analyst cohort. Scope expands with judgment,
-                  not title.
-                </p>
-              </div>
-              <GrowthGear />
-            </div>
-          </Reveal>
-        </Container>
-      </section>
+      <GrowthGear>
+        <p className="text-xs font-medium tracking-[0.2em] text-copper uppercase">
+          Growth
+        </p>
+        <h2 className="mt-6 text-4xl sm:text-5xl">
+          How responsibility grows
+        </h2>
+        <p className="mt-6 text-[17px] leading-[1.8] text-foreground-muted">
+          SOF runs a flat Analyst cohort. Scope expands with judgment,
+          not title.
+        </p>
+      </GrowthGear>
 
       {/* Mentorship / learn from */}
       <section className="border-t border-border/60 bg-cloud py-16 sm:py-24">
