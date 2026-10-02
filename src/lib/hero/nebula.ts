@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import type { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { sampleFormation } from './formation';
 
 // A field of drifting particles behind the opening line, in the fund's own colours.
 //
@@ -85,9 +86,10 @@ const NOISE = `
 `;
 
 const VERTEX = `
-  uniform float uTime, uSize, uRatio, uAmplitude, uScale, uRepulsion, uReach, uReveal, uGather, uBurst;
+  uniform float uTime, uSize, uRatio, uAmplitude, uScale, uRepulsion, uReach, uReveal, uGather, uBurst, uMorph;
   uniform vec3 uMouse;
-  attribute float aTint, aScale, aPhase;
+  attribute float aTint, aScale, aPhase, aFormTint;
+  attribute vec3 aFormation;
   varying vec3 vColor;
   varying float vAlpha;
   ${NOISE}
@@ -107,23 +109,31 @@ const VERTEX = `
     vec3 bearing = normalize(seed + vec3(0.0001));
     vec3 core = bearing * (${glsl(SETTINGS.gather.core)} + aScale * ${glsl(SETTINGS.gather.spread)});
     drifted = mix(drifted, core, uGather);
+    // Or, where the clip follows, the field resolves into the frame it is about to hand over to: each
+    // particle takes its place in that image but keeps a trace of the drift, so the picture breathes
+    // instead of freezing into a dead diagram. Without a formation loaded this is the identity.
+    drifted = mix(drifted, aFormation + flow * uAmplitude * 0.055, uMorph);
     // Then it throws itself outward, accelerating, and the next screen is behind it.
     float thrown = uBurst * uBurst;
     drifted += bearing * thrown * ${glsl(SETTINGS.burst.distance)} * (0.55 + aScale);
     drifted.z += thrown * ${glsl(SETTINGS.burst.lift)};
-    // The pointer pushes the field aside, falling off with the square of the distance.
+    // The pointer pushes the field aside, falling off with the square of the distance. It is held back
+    // as the picture resolves: a full shove there would drag the dots off the frame they have to match.
     vec2 away = drifted.xy - uMouse.xy;
     float distance = length(away);
-    drifted.xy += normalize(away + 1e-5) * uRepulsion / (1.0 + distance * distance / (uReach * uReach)) * uMouse.z;
+    drifted.xy += normalize(away + 1e-5) * uRepulsion * (1.0 - uMorph * 0.6) / (1.0 + distance * distance / (uReach * uReach)) * uMouse.z;
     vec4 viewPosition = modelViewMatrix * vec4(drifted, 1.0);
     gl_Position = projectionMatrix * viewPosition;
     // Sized in pixels, scaled by how near the particle is: the resting field sits five units out, so that
     // distance is the one the configured size describes.
-    gl_PointSize = uSize * aScale * uRatio * (5.0 / -viewPosition.z);
+    // Points tighten as the picture resolves, so the image reads as grain rather than as blobs.
+    gl_PointSize = uSize * aScale * uRatio * (5.0 / -viewPosition.z) * (1.0 - uMorph * 0.22);
     // Warm a minority of the field to copper and let the rest run from sky to a deep blue, so the colour
     // reads as one palette rather than a rainbow. Depth and a slow pulse carry the rest of the variation.
-    vColor = mix(mix(vec3(${glsl(DEEP.r)}, ${glsl(DEEP.g)}, ${glsl(DEEP.b)}), vec3(${glsl(SKY.r)}, ${glsl(SKY.g)}, ${glsl(SKY.b)}), smoothstep(0.0, 0.55, aTint)),
-                 vec3(${glsl(COPPER.r)}, ${glsl(COPPER.g)}, ${glsl(COPPER.b)}), smoothstep(0.82, 1.0, aTint));
+    // Resolving into a frame carries each particle to the tint its own pixel asked for.
+    float tint = mix(aTint, aFormTint, uMorph);
+    vColor = mix(mix(vec3(${glsl(DEEP.r)}, ${glsl(DEEP.g)}, ${glsl(DEEP.b)}), vec3(${glsl(SKY.r)}, ${glsl(SKY.g)}, ${glsl(SKY.b)}), smoothstep(0.0, 0.55, tint)),
+                 vec3(${glsl(COPPER.r)}, ${glsl(COPPER.g)}, ${glsl(COPPER.b)}), smoothstep(0.82, 1.0, tint));
     // Nearer particles burn brighter, far ones sink into the field. The camera sits five units out, so
     // the range is measured from there rather than from the origin.
     float depth = clamp(1.0 - (-viewPosition.z - 2.4) / 7.0, 0.38, 1.0);
@@ -131,7 +141,7 @@ const VERTEX = `
     float fade = 1.0 - smoothstep(0.3, 0.95, uBurst);
     // Additive blending stacks: held this low, the overlaps read as the field's own colour rather than
     // burning through to white, and the line in front of it stays legible.
-    vAlpha = uReveal * depth * fade * (0.34 + 0.16 * sin(t * 6.0 + aPhase)) * (1.0 + uGather * 0.35);
+    vAlpha = uReveal * depth * fade * (0.34 + 0.16 * sin(t * 6.0 + aPhase)) * (1.0 + uGather * 0.35 + uMorph * 0.55);
   }
 `;
 
@@ -179,6 +189,12 @@ export async function createNebula(canvas: HTMLCanvasElement) {
   geometry.setAttribute('aTint', new THREE.BufferAttribute(tints, 1));
   geometry.setAttribute('aScale', new THREE.BufferAttribute(scales, 1));
   geometry.setAttribute('aPhase', new THREE.BufferAttribute(phases, 1));
+  // Where each particle goes when the field resolves into a still. Seeded to where it already is, so a
+  // morph before `formFrom` has run — or after it failed — moves nothing rather than collapsing the field.
+  const formation = new THREE.BufferAttribute(positions.slice(), 3);
+  const formTints = new THREE.BufferAttribute(tints.slice(), 1);
+  geometry.setAttribute('aFormation', formation);
+  geometry.setAttribute('aFormTint', formTints);
 
   const uniforms = {
     uTime: { value: 0 }, uSize: { value: SETTINGS.size }, uRatio: { value: 1 },
@@ -186,8 +202,9 @@ export async function createNebula(canvas: HTMLCanvasElement) {
     uRepulsion: { value: SETTINGS.repulsion }, uReach: { value: SETTINGS.reach },
     // Rises from zero on the first frames, so the field gathers rather than appearing.
     uReveal: { value: 0 },
-    // Driven by the scroll out of the hero: the field contracts, then is thrown outward.
-    uGather: { value: 0 }, uBurst: { value: 0 },
+    // Driven by the scroll out of the hero: the field contracts, then is thrown outward — or, where the
+    // clip follows, resolves into its first frame instead of being thrown anywhere.
+    uGather: { value: 0 }, uBurst: { value: 0 }, uMorph: { value: 0 },
     // x and y are the pointer in world units; z fades the whole effect out when the pointer leaves.
     uMouse: { value: new THREE.Vector3(0, 0, 0) },
   };
@@ -206,14 +223,20 @@ export async function createNebula(canvas: HTMLCanvasElement) {
   // the hero's JavaScript. The field is additive, which already glows; bloom only softens the cores.
   let composer: EffectComposer | null = null;
   if (!phone) {
-    const [{ EffectComposer: Composer }, { RenderPass }, { UnrealBloomPass }] = await Promise.all([
+    const [{ EffectComposer: Composer }, { RenderPass }, { UnrealBloomPass }, { OutputPass }] = await Promise.all([
       import('three/addons/postprocessing/EffectComposer.js'),
       import('three/addons/postprocessing/RenderPass.js'),
       import('three/addons/postprocessing/UnrealBloomPass.js'),
+      import('three/addons/postprocessing/OutputPass.js'),
     ]);
     composer = new Composer(renderer);
     composer.addPass(new RenderPass(scene, camera));
     composer.addPass(new UnrealBloomPass(new THREE.Vector2(1, 1), SETTINGS.bloom.strength, SETTINGS.bloom.radius, SETTINGS.bloom.threshold));
+    // The bloom pass composites itself onto whatever it renders into, and when it is the last pass that
+    // is the canvas — which leaves the canvas opaque and the scene below it only ever the glow. Ending on
+    // an output pass copies the composed buffer instead, so the field keeps its alpha and the clip that
+    // the hero resolves into can be seen through it rather than painted over.
+    composer.addPass(new OutputPass());
   }
 
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
@@ -249,10 +272,13 @@ export async function createNebula(canvas: HTMLCanvasElement) {
     // mouse reads as the field turning its head.
     aim.lerp(uniforms.uMouse.value.set(pointer.x * SETTINGS.box * .5, pointer.y * SETTINGS.box * .32, aim.z), 1);
     uniforms.uMouse.value.copy(aim);
-    camera.position.x += (pointer.x * SETTINGS.parallax - camera.position.x) * .025;
-    camera.position.y += (pointer.y * SETTINGS.parallax - camera.position.y) * .025;
+    // Both leans are given up as the picture resolves: the formation is placed for a camera at rest, and
+    // a camera still leaning would slide the dots off the frame they are about to be replaced by.
+    const settled = 1 - uniforms.uMorph.value;
+    camera.position.x += (pointer.x * SETTINGS.parallax * settled - camera.position.x) * .025;
+    camera.position.y += (pointer.y * SETTINGS.parallax * settled - camera.position.y) * .025;
     // The camera leans in as the field gathers and is overtaken as it bursts, so the particles pass the viewer.
-    camera.position.z = 5 - uniforms.uGather.value * .9 - uniforms.uBurst.value * 1.8;
+    camera.position.z = 5 - uniforms.uGather.value * .9 * settled - uniforms.uBurst.value * 1.8;
     camera.lookAt(0, 0, 0);
     if (composer) composer.render(); else renderer.render(scene, camera);
     // Reduced motion gets the field drawn once, at rest, and then nothing.
@@ -289,11 +315,33 @@ export async function createNebula(canvas: HTMLCanvasElement) {
   return {
     /** Dims the field as the page scrolls past it, so the hero hands over rather than cutting. */
     setOpacity(value: number) { canvas.style.opacity = String(value); },
-    /** The scroll out of the hero, as two stages: the field contracting, then thrown outward. */
-    setTransition(gather: number, burst: number) {
+    /**
+     * The scroll out of the hero: the field contracting, then either thrown outward (`burst`) or
+     * resolved into the loaded still (`morph`). The two are alternatives, not a sequence.
+     */
+    setTransition(gather: number, burst: number, morph = 0) {
       uniforms.uGather.value = gather;
       uniforms.uBurst.value = burst;
+      uniforms.uMorph.value = morph;
       wake();
+    },
+    /**
+     * Point the field at a still, so `morph` resolves it into that image. Framed the way the clip
+     * strip frames the same file, which is what lets the footage replace the dots without a cut.
+     * Returns false when the image cannot be sampled, leaving the field able only to burst.
+     */
+    formFrom(image: HTMLImageElement) {
+      const box = canvas.getBoundingClientRect();
+      if (!box.width || !box.height) return false;
+      // The world-space height the camera sees at the field's resting depth — five units out, which is
+      // where the formation is laid out and where `settled` holds the camera while it resolves.
+      const visibleHeight = 2 * 5 * Math.tan(camera.fov * Math.PI / 360);
+      const sampled = sampleFormation(image, count, box.width / box.height, visibleHeight);
+      if (!sampled) return false;
+      formation.copyArray(sampled.positions); formation.needsUpdate = true;
+      formTints.copyArray(sampled.tints); formTints.needsUpdate = true;
+      wake();
+      return true;
     },
     dispose() {
       disposed = true; sleep();
