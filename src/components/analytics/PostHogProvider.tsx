@@ -3,12 +3,13 @@ import { useEffect, useRef, useSyncExternalStore } from "react";
 import { usePathname } from "next/navigation";
 import { getConsent, onConsentChange } from "@/lib/analytics/consent-client";
 import { createPostHogController, type PostHogController } from "@/lib/analytics/posthog-core";
+import { POSTHOG_KEY } from "@/lib/posthog";
 
 // Optional PostHog layer for the public site: always anonymous (the site has no
 // accounts), and posthog-js is only downloaded after the visitor accepts the
-// banner and NEXT_PUBLIC_POSTHOG_KEY is set. The controller in
-// src/lib/analytics/posthog-core.ts is a byte-identical copy of the platform's.
-const POSTHOG_KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY;
+// banner. The layout mounts this only when NEXT_PUBLIC_POSTHOG_KEY is set
+// (src/lib/posthog.ts). The controller in src/lib/analytics/posthog-core.ts is
+// a byte-identical copy of the platform's.
 
 export default function PostHogProvider() {
   const pathname = usePathname();

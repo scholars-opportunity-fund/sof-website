@@ -6,6 +6,11 @@
 #   2. Lighthouse budget - Performance >= 95, SEO / Accessibility /
 #      Best Practices = 100, mobile emulation (.lighthouserc.json).
 #
+# Before both, scripts/check-shared-analytics.mjs checks that the analytics
+# files shared with scholars-opportunity-fund/sof-web still match the hashes in
+# src/lib/analytics/shared-manifest.json. It runs before npm ci so drift fails
+# in seconds.
+#
 # Treat a failure here as a real defect, not CI noise: every check maps to a
 # documented failure mode that has already happened on this site.
 
@@ -33,6 +38,9 @@ jobs:
         with:
           node-version: 22
           cache: npm
+
+      - name: Shared analytics files match the manifest
+        run: node scripts/check-shared-analytics.mjs
 
       - run: npm ci
 

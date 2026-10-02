@@ -11,6 +11,8 @@ import {
 // answers for the visitor, so the banner never appears on its own then. The
 // footer's "Cookie settings" link reopens it. The choice logic lives in the
 // shared consent-client copy; the platform has its own banner in its own style.
+// The layout mounts the banner only in builds with a PostHog key
+// (src/lib/posthog.ts); without one there is nothing optional to ask about.
 const noSubscription = () => () => {};
 const buttonBase = "inline-flex flex-1 items-center justify-center px-5 py-3 text-[14px] font-medium tracking-wide transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-copper sm:flex-none";
 

@@ -1,16 +1,20 @@
 import Container from "@/components/ui/Container";
 import CookieSettingsLink from "@/components/consent/CookieSettingsLink";
 import { generatePageMetadata } from "@/lib/seo";
+import { POSTHOG_ENABLED } from "@/lib/posthog";
 
 // Draft — pending counsel review. Mirrors the analytics disclosures in the SOF
 // Scholars platform notice (app/privacy/page.tsx at the repo root); keep the two
-// in step when either changes.
+// in step when either changes. The PostHog and banner passages render only in
+// builds with a PostHog key (src/lib/posthog.ts), the same builds that show the
+// banner, so the notice matches what the deploy actually runs.
 const PRIVACY_CONTACT = "ronan@scholarsoppfund.com";
 
 export const metadata = generatePageMetadata({
   title: "Privacy",
-  description:
-    "How the Scholars Opportunity Fund website measures visits: cookieless analytics for everyone, Global Privacy Control honored, and optional PostHog analytics only with your permission.",
+  description: POSTHOG_ENABLED
+    ? "How the Scholars Opportunity Fund website measures visits: cookieless analytics for everyone, Global Privacy Control honored, and optional PostHog analytics only with your permission."
+    : "How the Scholars Opportunity Fund website measures visits: cookieless analytics for everyone, with Global Privacy Control honored.",
   path: "/privacy",
 });
 
@@ -65,41 +69,42 @@ export default function PrivacyPage() {
               <h2 className="text-2xl text-ink sm:text-3xl">Global Privacy Control</h2>
               <p className="mt-4">
                 If your browser sends Global Privacy Control or Do Not Track, we
-                record nothing at all, and we will not ask you about optional
-                analytics.
+                record nothing at all
+                {POSTHOG_ENABLED ? ", and we will not ask you about optional analytics." : "."}
               </p>
             </div>
 
-            <div>
-              <h2 className="text-2xl text-ink sm:text-3xl">Optional analytics, only if you agree</h2>
-              <p className="mt-4">
-                A banner lets you allow more. If you accept, your browser keeps a
-                persistent random identifier (in local storage, not a cookie) so
-                repeat visits can be counted together, and PostHog analytics runs,
-                including click heatmaps and session replay. Session replay records
-                how the page looked and moved as you used it; every form field and
-                typed input is masked before anything leaves your browser. PostHog
-                requests pass through this site&apos;s own address.
-              </p>
-              <p className="mt-4">
-                We remember your answer in a small first-party cookie named
-                sof_consent for up to 12 months. It holds only your choice and when
-                you made it, never an identifier. Declining keeps only the basic
-                measurement above. You can change your choice at any time.
-              </p>
-              <p className="mt-6">
-                <CookieSettingsLink className="inline-flex items-center justify-center border border-ink/20 px-6 py-3 text-[14px] font-medium tracking-wide text-ink transition-colors duration-200 hover:border-ink/40" />
-              </p>
-            </div>
+            {POSTHOG_ENABLED && (
+              <div>
+                <h2 className="text-2xl text-ink sm:text-3xl">Optional analytics, only if you agree</h2>
+                <p className="mt-4">
+                  A banner lets you allow more. If you accept, your browser keeps a
+                  persistent random identifier (in local storage, not a cookie) so
+                  repeat visits can be counted together, and PostHog analytics runs,
+                  including click heatmaps and session replay. Session replay records
+                  how the page looked and moved as you used it; every form field and
+                  typed input is masked before anything leaves your browser. PostHog
+                  requests pass through this site&apos;s own address.
+                </p>
+                <p className="mt-4">
+                  We remember your answer in a small first-party cookie named
+                  sof_consent for up to 12 months. It holds only your choice and when
+                  you made it, never an identifier. Declining keeps only the basic
+                  measurement above. You can change your choice at any time.
+                </p>
+                <p className="mt-6">
+                  <CookieSettingsLink className="inline-flex items-center justify-center border border-ink/20 px-6 py-3 text-[14px] font-medium tracking-wide text-ink transition-colors duration-200 hover:border-ink/40" />
+                </p>
+              </div>
+            )}
 
             <div>
               <h2 className="text-2xl text-ink sm:text-3xl">Service providers</h2>
               <p className="mt-4">
                 Vercel hosts this site, supplies approximate location, and provides
                 Vercel Web Analytics, which counts page views without cookies.
-                Supabase stores our first-party analytics. PostHog processes
-                optional analytics, heatmaps, and masked session replay only for
-                visitors who accept the banner.
+                Supabase stores our first-party analytics.
+                {POSTHOG_ENABLED && " PostHog processes optional analytics, heatmaps, and masked session replay only for visitors who accept the banner."}
               </p>
             </div>
 

@@ -1,0 +1,11 @@
+{
+  "about": "Analytics files shared byte for byte with scholars-opportunity-fund/sof-web, where each lives under lib/analytics/ with the same name. Each hash is the SHA-256 of the file's UTF-8 text with CRLF normalised to LF. scripts/check-shared-analytics.mjs fails the quality workflow when a file here stops matching. To change one, make the same edit in both repos and update its hash in both manifests.",
+  "files": {
+    "src/lib/analytics/consent-client.ts": "2ab30917049ed15cf0fc8d656534df36f62a617c43a49abb74b267a0d5686581",
+    "src/lib/analytics/posthog-core.ts": "b54ea9d2808f3671f2dc88cf606b6097f650f5632f358e52908d23f6a2ac363c",
+    "src/lib/analytics/posthog-proxy.ts": "3a89daef0769f2cb940475a4eecc6057459d53eec682c6c25ca3c2bee595d32f",
+    "src/lib/analytics/redact.ts": "4a2a47f23e383068e39b7ea53be02685d610dcee3c7c22e9e1bf07a45f45bbaf",
+    "src/lib/analytics/tracker-core.ts": "ef5702e7fefa25332fee62d45e7c80fee6b207983f281b3a818314220d215d8c",
+    "src/lib/analytics/types.ts": "a922e6aa8987caaa8169809a746b7674ff61d36d95beb7f24a9494cd17e5560b"
+  }
+}
