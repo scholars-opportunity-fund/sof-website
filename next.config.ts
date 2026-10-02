@@ -5,7 +5,7 @@ import type { NextConfig } from "next";
 // src/components/analytics/Tracker.tsx.
 const analyticsEndpoint = process.env.NEXT_PUBLIC_ANALYTICS_ENDPOINT
   ?? (process.env.NODE_ENV === "production"
-    ? "https://sof-scholars.vercel.app/api/analytics/collect"
+    ? "https://scholars.scholarsoppfund.com/api/analytics/collect"
     : "http://localhost:3100/api/analytics/collect");
 const analyticsOrigin = new URL(analyticsEndpoint).origin;
 

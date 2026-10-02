@@ -9,7 +9,7 @@ import { startTracker, type Tracker as AnalyticsTracker } from "@/lib/analytics/
 // platform copy first. Global Privacy Control / Do Not Track: nothing starts.
 const ENDPOINT = process.env.NEXT_PUBLIC_ANALYTICS_ENDPOINT
   ?? (process.env.NODE_ENV === "production"
-    ? "https://sof-scholars.vercel.app/api/analytics/collect"
+    ? "https://scholars.scholarsoppfund.com/api/analytics/collect"
     : "http://localhost:3100/api/analytics/collect");
 
 export default function Tracker() {
