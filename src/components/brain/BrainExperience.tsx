@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import type { BrainPhase, LobeAnchors } from '@/lib/brain/scene';
 import type { BrainIntro } from '@/lib/brain/intro';
 import type { ClipStrip } from '@/lib/brain/clip';
+import { clipPreferred } from '@/lib/brain/clip-mode';
 import { isBrainLook, type BrainLookName } from '@/lib/brain/looks';
 import { brainRegions } from '@/lib/brain/regions';
 import { lobeForMesh, LOBE_MOTION } from '@/lib/brain/lobes';
@@ -170,9 +171,10 @@ export default function BrainExperience({ fallback }: { fallback: ReactNode }) {
       if (requested === 'formed' || requested === 'empty') { setPose(requested); setPhase('forming'); return; }
     }
     if (skipRequested.current || navigation.current > .02 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) { finish(); return; }
-    const saveData = Boolean((navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData);
-    // The clip is landscape only and heavy, so portrait stages and metered connections take the drawn trace.
-    setClipMode(previous => previous ?? (!saveData && innerWidth >= innerHeight && innerWidth >= 900));
+    // The clip is landscape only and heavy, so portrait stages and metered connections take the drawn
+    // trace. The hero above asks the same question, to decide whether to resolve into the clip's first
+    // frame or to throw its field past the camera instead.
+    setClipMode(previous => previous ?? clipPreferred());
     revealedRef.current = false; clipOutRef.current = false; formingRef.current = true;
     setRevealed(false); setClipOut(false);
     rendered.current = introStart.current; scrollTarget.current = introStart.current; navStart.current = null;
