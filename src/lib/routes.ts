@@ -61,6 +61,13 @@ export const INDEXABLE_ROUTES: SiteRoute[] = [
     priority: 0.6,
     sources: ["src/app/apply"],
   },
+  {
+    path: "/privacy",
+    title: "Privacy",
+    changeFrequency: "monthly",
+    priority: 0.3,
+    sources: ["src/app/privacy"],
+  },
 ];
 
 /**

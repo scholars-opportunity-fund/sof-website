@@ -7,6 +7,8 @@
 .nav > a,.nav > button { padding:8px 14px; color:var(--gunmetal); cursor:pointer; }
 .nav > [aria-expanded=true] { background:var(--border); }
 .nav small { font-size:10px; opacity:.6; }
+.nav > a.highlight { color:var(--copper); }
+.nav > a.highlight:hover { color:var(--copper-hover); }
 .nav > a.apply { margin-left:16px; padding:10px 18px; background:var(--ink); color:var(--cloud); font-size:13px; letter-spacing:.04em; }
 .panel { position:absolute; left:0; right:0; top:71px; background:var(--cloud); border-bottom:1px solid var(--border); box-shadow:0 24px 48px -24px #0b122140; }
 .panelInner { max-width:1376px; margin:auto; padding:32px 48px 40px; display:grid; grid-template-columns:1.2fr 1fr 1fr 1fr; gap:48px; }
@@ -17,7 +19,8 @@
 .panel strong { font-size:14px; font-weight:500; }
 .panel span { display:block; margin-top:6px; font-size:13px; color:var(--slate); line-height:1.5; }
 .mobileToggle { display:none; }
-@media(max-width:1000px) {
+/* Collapses a little earlier than 1000px so the seven desktop items never crowd the wordmark. */
+@media(max-width:1120px) {
  .inner { padding:0 24px; }
  .brand { font-size:15px; }
  .mobileToggle { display:block; font-size:12px; white-space:nowrap; cursor:pointer; }

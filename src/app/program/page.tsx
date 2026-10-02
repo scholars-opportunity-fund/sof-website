@@ -8,6 +8,7 @@ import WeekInLife from "@/components/program/WeekInLife";
 import GrowthGear from "@/components/program/GrowthGear";
 import WorkThread from "@/components/program/WorkThread";
 import HeadquartersMap from "@/components/program/HeadquartersMap";
+import MicrocapCallout from "@/components/competition/MicrocapCallout";
 import { generatePageMetadata } from "@/lib/seo";
 import { CIO } from "@/lib/team";
 
@@ -52,6 +53,8 @@ export default function ProgramPage() {
           </Reveal>
         </Container>
       </section>
+
+      <MicrocapCallout className="border-b" />
 
       {/* Quick stats with animated counters */}
       <section className="border-b border-border/60 bg-cloud py-14">

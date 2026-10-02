@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useState, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import styles from './Header.module.css';
-import { FUND, SCHOLARS_URL } from '@/lib/constants';
+import { FUND, MICROCAP, SCHOLARS_URL } from '@/lib/constants';
 
 const panels = {
   overview: { label: 'Overview', title: 'A student-run event-driven fund in public equities.', links: [
@@ -44,12 +44,13 @@ export default function Header() {
         <Link href="/" aria-expanded={menu === 'overview'} aria-controls="overview-panel" onPointerEnter={event => { if (event.pointerType === 'mouse') { trigger.current = event.currentTarget; setMenu('overview'); } }} onFocus={event => { trigger.current = event.currentTarget; setMenu('overview'); }} onClick={close}>Overview <small>▾</small></Link>
         <Link href="/team" onPointerEnter={() => setMenu(null)} onClick={close}>Team</Link>
         <button type="button" aria-expanded={menu === 'process'} aria-controls="process-panel" onPointerEnter={event => { if (event.pointerType === 'mouse') { trigger.current = event.currentTarget; setMenu('process'); } }} onClick={event => { trigger.current = event.currentTarget; setMenu(menu === 'process' ? null : 'process'); }}>Process <small>▾</small></button>
+        <a href={MICROCAP.href} className={styles.highlight} onPointerEnter={() => setMenu(null)} onClick={close}>{MICROCAP.shortLabel}</a>
         <a href={SCHOLARS_URL} onPointerEnter={() => setMenu(null)} onClick={close}>SOF Scholars</a>
         <a href={`mailto:${FUND.contactEmail}`} onPointerEnter={() => setMenu(null)} onClick={close}>Contact</a>
         <Link href="/program#apply" className={styles.apply} onPointerEnter={() => setMenu(null)} onClick={close}>Apply</Link>
       </nav>
     </div>
-    <noscript><style>{`[data-menu-toggle],#signal-navigation{display:none!important}[data-nav-word]{opacity:1!important}`}</style><nav className={styles.noScriptNav} aria-label="Main navigation without JavaScript"><Link href="/">Overview</Link><Link href="/team">Team</Link><Link href="/program">Process</Link><a href={SCHOLARS_URL}>SOF Scholars</a><a href={`mailto:${FUND.contactEmail}`}>Contact</a><Link href="/program#apply">Apply</Link></nav></noscript>
+    <noscript><style>{`[data-menu-toggle],#signal-navigation{display:none!important}[data-nav-word]{opacity:1!important}`}</style><nav className={styles.noScriptNav} aria-label="Main navigation without JavaScript"><Link href="/">Overview</Link><Link href="/team">Team</Link><Link href="/program">Process</Link><a href={MICROCAP.href}>{MICROCAP.shortLabel}</a><a href={SCHOLARS_URL}>SOF Scholars</a><a href={`mailto:${FUND.contactEmail}`}>Contact</a><Link href="/program#apply">Apply</Link></nav></noscript>
     {(Object.keys(panels) as (keyof typeof panels)[]).map(key => <div key={key} id={`${key}-panel`} className={styles.panel} hidden={menu !== key}><div className={styles.panelInner}>
       <div><p>{panels[key].label}</p><h3>{panels[key].title}</h3></div>
       {panels[key].links.map(link => <Link key={link.href} href={link.href} onClick={close}><strong>{link.title}</strong><span>{link.text}</span></Link>)}

@@ -1,12 +1,16 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import { Analytics } from "@vercel/analytics/next";
+import VercelAnalytics from "@/components/analytics/VercelAnalytics";
 import "./globals.css";
 import JsonLd from "@/components/seo/JsonLd";
 import { buildGraphSchema } from "@/lib/seo";
 import { SITE_URL, FUND } from "@/lib/constants";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import Tracker from "@/components/analytics/Tracker";
+import PostHogProvider from "@/components/analytics/PostHogProvider";
+import ConsentBanner from "@/components/consent/ConsentBanner";
+import { POSTHOG_ENABLED } from "@/lib/posthog";
 
 // Self-hosted rather than fetched from Google at build time: Turbopack's font downloader panics
 // with "http2 feature is not enabled" in some environments, which fails the dev server and the build.
@@ -82,9 +86,19 @@ export default function RootLayout({
           {children}
         </main>
         <Footer />
+        {/* First-party, cookieless analytics posted to the platform's collector. */}
+        <Tracker />
+        {/* Optional layer, only in builds with a PostHog key: the banner asks,
+            and PostHog loads only after it is accepted. No key, no banner. */}
+        {POSTHOG_ENABLED && (
+          <>
+            <PostHogProvider />
+            <ConsentBanner />
+          </>
+        )}
         {/* Only on Vercel: elsewhere the injected script 404s and fails the
             errors-in-console audit in CI. */}
-        {process.env.VERCEL && <Analytics />}
+        {process.env.VERCEL && <VercelAnalytics />}
       </body>
     </html>
   );

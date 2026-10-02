@@ -14,6 +14,19 @@ if (!ENV_SITE_URL && process.env.NODE_ENV === "production") {
 export const SITE_URL = ENV_SITE_URL || "https://www.scholarsoppfund.com";
 export const SCHOLARS_URL = "https://scholars.scholarsoppfund.com";
 
+/**
+ * The fall 2026 competition, registered on SOF Scholars. The UTM tags let the
+ * platform tell website referrals apart from the QR and link campaigns.
+ * Remove the callouts, nav item and footer link (search for MICROCAP) after
+ * the event ends on November 6, 2026.
+ */
+export const MICROCAP = {
+  name: "SOF Microcap Signal Competition",
+  shortLabel: "Competition",
+  href: `${SCHOLARS_URL}/microcap?utm_source=website&utm_medium=referral&utm_campaign=microcap`,
+  dates: "November 4–6, 2026",
+  registrationCloses: "November 3",
+} as const;
 
 export const FUND = {
   name: "Scholars Opportunity Fund",
@@ -31,6 +44,7 @@ export const NAV_ITEMS = [
   { label: SITE_SECTIONS.approach.name, href: SITE_SECTIONS.approach.href },
   { label: SITE_SECTIONS.team.name, href: SITE_SECTIONS.team.href },
   { label: SITE_SECTIONS.program.name, href: SITE_SECTIONS.program.href },
+  { label: MICROCAP.shortLabel, href: MICROCAP.href },
   { label: "SOF Scholars", href: SCHOLARS_URL },
   { label: "Contact", href: `mailto:${CONTACT_EMAIL}` },
 ] as const;
@@ -45,6 +59,7 @@ export const FOOTER_LINKS = {
   program: [
     { label: SITE_SECTIONS.program.name, href: SITE_SECTIONS.program.href },
     { label: "SOF Scholars", href: SCHOLARS_URL },
+    { label: MICROCAP.name, href: MICROCAP.href },
   ],
   contact: [
     {

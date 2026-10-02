@@ -39,6 +39,7 @@ export function proxy(request: NextRequest) {
 
 export const config = {
   // Exclude every framework path, not just the static ones: the proxy has no business on Next's own
-  // routes, and running on the dev hot-reload socket breaks its handshake.
-  matcher: ["/((?!_next|favicon.ico|images|og).*)"],
+  // routes, and running on the dev hot-reload socket breaks its handshake. /ingest/ is the
+  // PostHog relay (src/app/ingest), whose API paths must keep their trailing slash.
+  matcher: ["/((?!_next|favicon.ico|images|og|ingest/).*)"],
 };
