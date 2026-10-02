@@ -5,7 +5,7 @@
 // relay builds the upstream request from an allowlist instead: the PostHog
 // path and query, the body, and a few content headers. No Cookie,
 // Authorization or forwarding headers ever leave, and no Set-Cookie comes
-// back. apps/website keeps a byte-identical copy.
+// back. The sof-website repo keeps a byte-identical copy.
 
 const API_HOST = "https://us.i.posthog.com";
 const ASSET_HOST = "https://us-assets.i.posthog.com";

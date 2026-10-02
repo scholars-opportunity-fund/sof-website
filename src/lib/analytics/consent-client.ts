@@ -5,7 +5,7 @@
 // {"v":1,"analytics":true|false,"ts":<epoch ms>,"ver":"<banner version>"}.
 // The cookie records only the choice itself, never an identifier. A choice made
 // under an older ANALYTICS_CONSENT_VERSION, or more than 12 months ago, reads
-// as "unset", so a changed notice asks again. apps/website keeps a
+// as "unset", so a changed notice asks again. The sof-website repo keeps a
 // byte-identical copy.
 import { ANALYTICS_CONSENT_VERSION } from "./types";
 

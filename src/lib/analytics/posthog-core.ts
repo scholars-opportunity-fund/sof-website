@@ -14,8 +14,8 @@
 //  - session replay never runs on pages that show a person's own records or
 //    other people's details, and replay data captured while such a page is on
 //    screen is dropped before it is sent.
-// Withdrawal resets, opts out and clears PostHog's stored ids. apps/website
-// keeps a byte-identical copy.
+// Withdrawal resets, opts out and clears PostHog's stored ids. The sof-website
+// repo keeps a byte-identical copy.
 import type { BeforeSendFn, CaptureResult, PostHogConfig } from "posthog-js";
 import { redactUrl } from "./redact";
 import type { AnalyticsApp } from "./types";

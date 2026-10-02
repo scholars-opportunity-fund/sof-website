@@ -1,8 +1,8 @@
 // Client-safe analytics vocabulary, shared by the collector, the platform
-// tracker, and (by copy) the public website's tracker. No imports. apps/website
-// keeps byte-identical copies of this file, consent-client.ts and
-// tracker-core.ts under src/lib/analytics/; lib/analytics/website-copy.test.ts
-// fails when they drift. Edit here, then copy.
+// tracker, and (by copy) the public website's tracker. No imports. The
+// sof-website repo keeps byte-identical copies of this file and the other
+// client-safe files here under src/lib/analytics/; website-copy.test.ts
+// fails when one changes. Edit here, then copy.
 
 /**
  * Version of the analytics banner wording. Re-exported by lib/privacy.ts; a

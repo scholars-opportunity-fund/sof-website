@@ -1,4 +1,4 @@
-// Shared with posthog-core and tracker-core, so apps/website keeps a
+// Shared with posthog-core and tracker-core, so the sof-website repo keeps a
 // byte-identical copy (relative imports only; website-copy.test.ts checks).
 import { ANALYTICS_LIMITS } from "./types";
 

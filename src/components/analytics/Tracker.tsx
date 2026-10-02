@@ -5,8 +5,9 @@ import { startTracker, type Tracker as AnalyticsTracker } from "@/lib/analytics/
 
 // First-party, cookieless analytics posted to the SOF Scholars platform's
 // collector (cross-origin, allowlisted there). The core in src/lib/analytics/
-// is a byte-identical copy of the platform's lib/analytics/ files; edit the
-// platform copy first. Global Privacy Control / Do Not Track: nothing starts.
+// is a byte-identical copy of lib/analytics/ in the sof-web repo, whose
+// website-copy.test.ts pins these copies; edit sof-web first, then copy here.
+// Global Privacy Control / Do Not Track: nothing starts.
 const ENDPOINT = process.env.NEXT_PUBLIC_ANALYTICS_ENDPOINT
   ?? (process.env.NODE_ENV === "production"
     ? "https://scholars.scholarsoppfund.com/api/analytics/collect"

@@ -1,7 +1,8 @@
 // Framework-free browser tracker behind components/analytics/tracker.tsx and
-// the public website's Tracker. apps/website keeps a byte-identical copy (it
-// cannot import from the repo root); lib/analytics/website-copy.test.ts fails
-// when the two drift. No dependencies, no cookies.
+// the public website's Tracker. The sof-website repo keeps a byte-identical
+// copy (it cannot import from this repo); lib/analytics/website-copy.test.ts
+// fails when this file changes, so the copy gets the same edit. No
+// dependencies, no cookies.
 //
 // Anonymous by default: a random per-tab session id in sessionStorage. Only
 // after the banner is accepted does a persistent visitor id live in
