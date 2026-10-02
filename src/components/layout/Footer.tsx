@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { FUND, FOOTER_LINKS } from "@/lib/constants";
+import CookieSettingsLink from "@/components/consent/CookieSettingsLink";
 
 export default function Footer() {
   return (
@@ -85,9 +86,15 @@ export default function Footer() {
         </div>
 
         <div className="mt-12 flex flex-wrap justify-between gap-4 border-t border-border-dark/40 pt-6">
-          <p className="text-[13px] text-foreground-on-dark-muted/60">
-            &copy; {new Date().getFullYear()} {FUND.name}. All rights reserved.
-          </p>
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+            <p className="text-[13px] text-foreground-on-dark-muted/60">
+              &copy; {new Date().getFullYear()} {FUND.name}. All rights reserved.
+            </p>
+            <Link href="/privacy" className="text-[13px] text-foreground-on-dark-muted hover:text-cloud transition-colors">
+              Privacy
+            </Link>
+            <CookieSettingsLink className="text-[13px] text-foreground-on-dark-muted hover:text-cloud transition-colors" />
+          </div>
           <p className="text-[12px] text-foreground-on-dark-muted/60">Nothing on this site is an offer to sell or a solicitation of an offer to buy any security.</p>
         </div>
       </div>
