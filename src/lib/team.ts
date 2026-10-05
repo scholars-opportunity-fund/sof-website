@@ -179,8 +179,8 @@ export const ANALYSTS: TeamMember[] = [
     role: "Analyst",
     image: "/team/greyson-bailey.jpg",
     headline:
-      "Analyst at University Growth Fund and Investment Intern at FJ Management. Helping raise the inaugural fund.",
-    bio: "Bailey is an Analyst at University Growth Fund, leading deals in growth-stage companies, and an Investment Intern at FJ Management. Bailey is applying that experience toward helping raise SOF's inaugural fund, and previously worked at InvestNest Park City in partnership with the Park City Angels. Bailey hopes to pursue a career in asset management; outside of finance, Bailey is an avid reader, a 14-handicap golfer, and fluent in Spanish.",
+      "Analyst at University Growth Fund and Investment Intern at FJ Management.",
+    bio: "Bailey is an Analyst at University Growth Fund, leading deals in growth-stage companies, and an Investment Intern at FJ Management. Bailey previously worked at InvestNest Park City in partnership with the Park City Angels. Bailey hopes to pursue a career in asset management; outside of finance, Bailey is an avid reader, a 14-handicap golfer, and fluent in Spanish.",
     gradYear: "May 2028",
     credentials: "B.S. QAMO, Advanced Financial Analysis minor",
     linkedin: "https://www.linkedin.com/in/greyson-w-bailey/",
