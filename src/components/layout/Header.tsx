@@ -46,10 +46,10 @@ export default function Header() {
         <a href={MICROCAP.href} className={styles.highlight} onPointerEnter={() => setMenu(null)} onClick={close}>{MICROCAP.shortLabel}</a>
         <a href={SCHOLARS_URL} onPointerEnter={() => setMenu(null)} onClick={close}>SOF Scholars</a>
         <a href={`mailto:${FUND.contactEmail}`} onPointerEnter={() => setMenu(null)} onClick={close}>Contact</a>
-        <Link href="/program#apply" className={styles.apply} onPointerEnter={() => setMenu(null)} onClick={close}>Apply</Link>
+        <Link href="/apply" className={styles.apply} onPointerEnter={() => setMenu(null)} onClick={close}>Apply</Link>
       </nav>
     </div>
-    <noscript><style>{`[data-menu-toggle],#signal-navigation{display:none!important}[data-nav-word]{opacity:1!important}`}</style><nav className={styles.noScriptNav} aria-label="Main navigation without JavaScript"><Link href="/">Overview</Link><Link href="/team">Team</Link><Link href="/program">Program</Link><a href={MICROCAP.href}>{MICROCAP.shortLabel}</a><a href={SCHOLARS_URL}>SOF Scholars</a><a href={`mailto:${FUND.contactEmail}`}>Contact</a><Link href="/program#apply">Apply</Link></nav></noscript>
+    <noscript><style>{`[data-menu-toggle],#signal-navigation{display:none!important}[data-nav-word]{opacity:1!important}`}</style><nav className={styles.noScriptNav} aria-label="Main navigation without JavaScript"><Link href="/">Overview</Link><Link href="/team">Team</Link><Link href="/program">Program</Link><a href={MICROCAP.href}>{MICROCAP.shortLabel}</a><a href={SCHOLARS_URL}>SOF Scholars</a><a href={`mailto:${FUND.contactEmail}`}>Contact</a><Link href="/apply">Apply</Link></nav></noscript>
     {(Object.keys(panels) as (keyof typeof panels)[]).map(key => <div key={key} id={`${key}-panel`} className={styles.panel} hidden={menu !== key}><div className={styles.panelInner}>
       <div><p>{panels[key].label}</p><h3>{panels[key].title}</h3></div>
       {panels[key].links.map(link => <Link key={link.href} href={link.href} onClick={close}><strong>{link.title}</strong><span>{link.text}</span></Link>)}
