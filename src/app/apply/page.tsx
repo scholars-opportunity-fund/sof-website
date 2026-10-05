@@ -21,8 +21,9 @@ export default function ApplyPage() {
             Not currently accepting applications
           </h1>
           <p className="mt-8 text-[17px] leading-[1.8] text-foreground-on-dark-muted">
-            The Student Analyst Program is not open to new applicants at this
-            time. Check back for updates on the next cohort.
+            The Student Analyst Program isn&apos;t taking applications right now.
+            Students from any university can apply when the next cycle opens.
+            Questions can go to contact@scholarsoppfund.com.
           </p>
           <div className="mt-10 flex flex-wrap justify-center gap-4">
             <Button href="/program" variant="outline">

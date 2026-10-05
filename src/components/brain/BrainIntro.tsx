@@ -98,13 +98,12 @@ export default function BrainIntro({ children, onReplay }: { children: ReactNode
         <dialog ref={dialog} className={styles.startup} data-brain-startup data-intro-phase={phase}
           aria-label="Welcome to Scholars Opportunity Fund" onCancel={event => { event.preventDefault(); finish(); }}>
           <div className={styles.brand}><span>SOF</span><span>Scholars<br />Opportunity Fund</span></div>
-          <div className={styles.edition}>Independent thinking.<br />Connected.</div>
+          <div className={styles.edition}>Systematic public equities</div>
           <div ref={stage} className={styles.stage} data-startup-stage onAnimationEnd={event => {
             if (phase === 'forming' && event.target instanceof HTMLElement && event.target.hasAttribute('data-brain-material')) setPhase('docking');
           }}>{children}</div>
           <div className={styles.statement}>
-            <p>Research. Judgment. Conviction.</p>
-            <div>It starts with <em>a connection.</em></div>
+            <div>Student research, <em>tested before it trades.</em></div>
           </div>
           <div className={styles.startupFooter}>
             <span>Salt Lake City, Utah<span className={styles.rule} /></span>

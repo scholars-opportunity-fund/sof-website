@@ -440,7 +440,7 @@ export default function BrainExperience({ fallback }: { fallback: ReactNode }) {
   }
   const controlsVisible = exploring || failed;
   const forming = phase === 'forming';
-  return <section ref={root} id="sof-brain" className={styles.home} aria-label="Scholars Opportunity Fund — connected intelligence" data-brain data-brain-home data-brain-phase={phase} data-brain-ready={ready} data-brain-failed={failed} data-exploring={exploring} data-brain-reveal={revealed} data-brain-pose={pose ?? undefined}>
+  return <section ref={root} id="sof-brain" className={styles.home} aria-label="Scholars Opportunity Fund" data-brain data-brain-home data-brain-phase={phase} data-brain-ready={ready} data-brain-failed={failed} data-exploring={exploring} data-brain-reveal={revealed} data-brain-pose={pose ?? undefined}>
     <div className={styles.stage} data-startup-stage>
       <div className={styles.field}><SignalField active={lightVisible} /></div>
       <div className={styles.fallback} data-brain-fallback hidden={!failed}>{fallback}</div>

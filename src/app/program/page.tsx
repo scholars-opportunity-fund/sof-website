@@ -4,10 +4,8 @@ import Container from "@/components/ui/Container";
 import Button from "@/components/ui/Button";
 import Reveal from "@/components/ui/Reveal";
 import CountUp from "@/components/ui/CountUp";
-import WeekInLife from "@/components/program/WeekInLife";
 import GrowthGear from "@/components/program/GrowthGear";
 import WorkThread from "@/components/program/WorkThread";
-import HeadquartersMap from "@/components/program/HeadquartersMap";
 import MicrocapCallout from "@/components/competition/MicrocapCallout";
 import { generatePageMetadata } from "@/lib/seo";
 import { CIO } from "@/lib/team";
@@ -15,7 +13,7 @@ import { CIO } from "@/lib/team";
 export const metadata = generatePageMetadata({
   title: "Analyst Program",
   description:
-    "How Scholars Opportunity Fund sources, researches, and underwrites event-driven opportunities in public equities.",
+    "What student analysts at Scholars Opportunity Fund work on, how the role grows, and who can apply.",
   path: "/program",
 });
 
@@ -37,17 +35,16 @@ export default function ProgramPage() {
               Student Analyst Program
             </p>
             <h1 className="mt-6 max-w-4xl text-5xl text-cloud sm:text-6xl lg:text-[72px] lg:leading-[1.1]">
-              Build what&apos;s next in finance
+              Research that becomes a trading strategy
             </h1>
             <p className="mt-8 max-w-xl text-[17px] leading-[1.8] text-foreground-on-dark-muted">
-              SOF places analysts inside a live event-driven investment
-              process. Real work product under a CIO whose research has
-              shaped the field. Build the paper portfolio track record that
-              determines whether real capital follows.
+              Analysts at SOF build and test systematic strategies under
+              Dr. Jonathan Brogaard. Strategies that hold up in review move
+              on to trading.
             </p>
             <div className="mt-12 flex flex-wrap items-center gap-5">
               <Button href="/team" variant="outline">
-                <span className="text-cloud">Meet the cohort</span>
+                <span className="text-cloud">Meet the team</span>
               </Button>
             </div>
           </Reveal>
@@ -60,14 +57,9 @@ export default function ProgramPage() {
       <section className="border-b border-border/60 bg-cloud py-14">
         <Container>
           <div className="grid grid-cols-3 gap-8">
-            <AnimatedStat label="Structure" value="Analyst Cohort" />
-            <AnimatedStat
-              label="Hours / Week"
-              numeric
-              to={12}
-              prefix="Up to "
-            />
-            <AnimatedStat label="Term" value="Multi-Semester" />
+            <AnimatedStat label="Role" value="Student Analyst" />
+            <AnimatedStat label="Focus" value="Systematic Strategies" />
+            <AnimatedStat label="Term" value="Multiple Semesters" />
           </div>
         </Container>
       </section>
@@ -85,22 +77,18 @@ export default function ProgramPage() {
                   What students do
                 </h2>
                 <p className="mt-6 text-[17px] leading-[1.8] text-foreground-muted">
-                  The fund&apos;s sourcing process surfaces catalyst-driven
-                  candidates across the public equity universe. The analyst
-                  team takes it from there: company-level diligence, internal
-                  pressure-testing, and a collective investment memo
-                  delivered to the Chief Investment Officer.
+                  Analysts work in small teams on one strategy at a time.
+                  They find the idea, test it on historical data, defend it in
+                  review, and keep watching it once it trades.
                 </p>
               </div>
-              {/* One copper thread carries the work from sourcing to the LPs as you scroll */}
+              {/* One copper thread carries the work from idea to reporting as you scroll */}
               <WorkThread />
             </div>
           </Reveal>
         </Container>
       </section>
 
-      {/* A week in the life: a desk calendar that flips as the days scroll sideways */}
-      <WeekInLife />
 
       {/* How responsibility grows */}
       <GrowthGear>
@@ -111,8 +99,7 @@ export default function ProgramPage() {
           How responsibility grows
         </h2>
         <p className="mt-6 text-[17px] leading-[1.8] text-foreground-muted">
-          SOF runs a flat Analyst cohort. Scope expands with judgment,
-          not title.
+          Analysts take on more as they show they can handle it.
         </p>
       </GrowthGear>
 
@@ -135,15 +122,14 @@ export default function ProgramPage() {
                   Who You Learn From
                 </p>
                 <h2 className="mt-6 text-4xl sm:text-5xl">
-                  Mentorship from a top-cited researcher
+                  Learn from Dr. Jonathan Brogaard
                 </h2>
                 <p className="mt-8 max-w-2xl text-[17px] leading-[1.8] text-foreground-secondary">
-                  Analysts work directly under Dr. Jonathan Brogaard, Associate
-                  Dean of Research at the David Eccles School of Business and
-                  founder of the University of Utah&apos;s Institute for
-                  Advanced Investment Management. His research on market
-                  microstructure has shaped both academic understanding and
-                  regulatory policy.
+                  Analysts work directly with Dr. Jonathan Brogaard. His
+                  research on market microstructure and asset pricing has been
+                  published in the Journal of Finance, the Journal of Financial
+                  Economics and the Review of Financial Studies, and he serves
+                  on FINRA&apos;s Market Regulation Committee.
                 </p>
                 <div className="mt-8">
                   <Link
@@ -179,23 +165,21 @@ export default function ProgramPage() {
                 Depth over pedigree
               </h2>
               <p className="mt-8 text-[17px] leading-[1.8] text-foreground-on-dark-muted">
-                SOF draws from the University of Utah and maintains a steady
-                cohort of student analysts. New analysts are admitted each
-                semester to backfill natural attrition, ensuring continuity
-                of process ownership and institutional knowledge across
-                cohort generations. The{" "}
+                We look for students who want to do quantitative research,
+                wherever they study. Our analysts come from finance, math and
+                data science backgrounds. The{" "}
                 <Link
                   href="/apply"
                   className="text-copper underline underline-offset-4 hover:text-cloud transition-colors"
                 >
                   Student Analyst Program application page
                 </Link>{" "}
-                shows the current cohort status.
+                shows whether applications are open.
               </p>
             </div>
             <div className="mt-16 flex flex-wrap items-center gap-5">
               <Button href="/team" variant="outline">
-                <span className="text-cloud">Meet the cohort</span>
+                <span className="text-cloud">Meet the team</span>
               </Button>
             </div>
           </Reveal>
@@ -206,7 +190,7 @@ export default function ProgramPage() {
       <section className="py-16 sm:py-24">
         <Container>
           <Reveal>
-            <div className="grid items-center gap-10 lg:grid-cols-[1fr_1fr]">
+            <div>
               <div>
                 <p className="text-xs font-medium tracking-[0.2em] text-copper uppercase">
                   Where
@@ -215,13 +199,9 @@ export default function ProgramPage() {
                   Headquartered in Salt Lake City
                 </h2>
                 <p className="mt-8 max-w-xl text-[17px] leading-[1.8] text-foreground-secondary">
-                  Headquartered in Salt Lake City. The analyst team is drawn
-                  from the University of Utah, and meets in person each week
-                  for candidate review, memo defense, and CIO handoffs.
+                  SOF is headquartered in Salt Lake City. Our analysts study
+                  at universities around the country.
                 </p>
-              </div>
-              <div className="flex items-stretch justify-center">
-                <HeadquartersMap />
               </div>
             </div>
           </Reveal>

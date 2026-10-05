@@ -6,7 +6,7 @@ import { FUND } from "@/lib/constants";
 import { generatePageMetadata } from "@/lib/seo";
 
 export const metadata = generatePageMetadata({
-  title: `${FUND.name} | Event-Driven Public Equities`,
+  title: `${FUND.name} | Systematic Public Equities`,
   description: FUND.description,
   path: "",
 });

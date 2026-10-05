@@ -23,7 +23,7 @@ export default function SignalProcess() {
     return () => { cancelAnimationFrame(frame); window.removeEventListener('scroll', schedule); window.removeEventListener('resize', schedule); };
   }, []);
   return <section id="pipeline" className={`${styles.section} ${styles.process}`}><div className={styles.grid}>
-    <div className={styles.sticky}><p className={styles.kicker}>Investment process</p><h2>From sourcing to decision</h2><p className={styles.muted}>A disciplined pipeline with clear accountability at every stage.</p><p className={styles.counter}>0{step}<span> / 04</span></p></div>
+    <div className={styles.sticky}><p className={styles.kicker}>Investment process</p><h2>From idea to live trading</h2><p className={styles.muted}>Every strategy goes through the same steps before it trades.</p><p className={styles.counter}>0{step}<span> / 04</span></p></div>
     <div ref={rail} className={styles.rail} data-rail><ol>{steps.map((item, index) => <li key={item.title} data-active={index < step}>
       <span className={styles.cubeWrap} aria-hidden="true"><span className={styles.cube}>{['front', 'back', 'right', 'left', 'top', 'bottom'].map(face => <span key={face} />)}</span></span>
       <p className={styles.kicker}>0{index + 1}</p><h3>{item.title}</h3><p>{item.text}</p><p className={styles.meta}>{item.meta}</p>

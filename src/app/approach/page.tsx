@@ -5,14 +5,14 @@ import { generatePageMetadata } from '@/lib/seo';
 export const metadata = generatePageMetadata({
   title: 'Our Approach',
   description:
-    'How Scholars Opportunity Fund finds event-driven special situations in public equities, and how the fund is independently operated.',
+    'How Scholars Opportunity Fund builds systematic strategies in public equities, and how the fund is run.',
   path: '/approach',
 });
 
 export default function ApproachPage() {
   return <div className={styles.content}>
-    <PageHeadline kicker="How we invest" title={<>Catalysts, special situations, <em>uneven coverage</em>.</>}>
-      We underwrite special situations where a defined catalyst reshapes risk and reward, in corners of the public equity market that institutional coverage leaves thin.
+    <PageHeadline kicker="How we invest" title={<>Systematic strategies, <em>tested before they trade</em>.</>}>
+      We build rules-based strategies in U.S. public equities, with a focus on smaller companies where institutional coverage is thin. Event-driven special situations, like mergers, spin-offs and index changes, are one of the areas we work in.
     </PageHeadline>
     <ApproachSection full />
     <FundStructureSection />

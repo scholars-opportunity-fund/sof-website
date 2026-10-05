@@ -227,10 +227,7 @@ export default function TeamDirectory({ cio, cofounders, analysts }: Props) {
         <div className="mx-auto w-full max-w-7xl px-8 lg:px-12">
           <div className="flex items-baseline justify-between">
             <p className="text-xs font-medium tracking-[0.2em] text-copper uppercase">
-              Analyst Cohort
-            </p>
-            <p className="text-[12px] font-medium tracking-[0.15em] text-foreground-muted uppercase">
-              {analysts.length} members
+              Associates and Analysts
             </p>
           </div>
           <div className="mt-8 grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4">

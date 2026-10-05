@@ -4,9 +4,9 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 
 const STATIONS = [
   {
-    title: "Candidate Analysis",
-    note: "Challenged before it reaches the CIO",
-    text: "Build a collective investment case on each screened candidate. Conclusions are challenged internally before they reach the CIO. The standard is whether the work is fit to inform a real capital decision.",
+    title: "Research and Testing",
+    note: "Reviewed before it trades",
+    text: "Analysts build the strategy and test it on historical data. Someone outside the team then tries to break it. It moves on only if the evidence holds up.",
     icon: (
       <>
         <circle cx="9.5" cy="9.5" r="5.5" />
@@ -16,16 +16,16 @@ const STATIONS = [
     offset: "ml-5 sm:ml-[16%]",
   },
   {
-    title: "Position Monitoring",
-    note: "Update within 24 hours",
-    text: "When a position drifts from thesis or a material event occurs, the team investigates and delivers an update within 24 hours.",
+    title: "Monitoring",
+    note: "Checked against the research",
+    text: "Once a strategy trades, analysts compare its results with what the backtest predicted and flag anything that doesn't match.",
     icon: <path d="M2 11h4l2.5-6 3.5 11 2.5-7 1.5 2h4" />,
     offset: "ml-0",
   },
   {
-    title: "Quarterly Reporting",
-    note: "Straight to the LPs",
-    text: "Students produce the analytical inputs for LP reporting, a direct line of accountability from their work product to the people whose capital is deployed.",
+    title: "Reporting",
+    note: "Regular updates",
+    text: "Analysts write regular updates on how their strategies are performing.",
     icon: (
       <>
         <rect x="4" y="3" width="14" height="16" rx="1" />
@@ -45,7 +45,7 @@ export default function WorkThread() {
   const threadRef = useRef<SVGPathElement>(null);
   const beadRef = useRef<SVGCircleElement>(null);
   const nodeRefs = useRef<(HTMLElement | null)[]>([]);
-  // Sourcing, the three stations, then the LPs.
+  // The idea, then the three stations.
   const [lit, setLit] = useState(-1);
 
   useEffect(() => {
@@ -155,8 +155,8 @@ export default function WorkThread() {
           node={<span className="h-2.5 w-2.5 rounded-full bg-current" />}
           size="h-11 w-11 border-transparent"
         >
-          <p className="text-[11px] font-medium tracking-[0.2em] uppercase">Sourcing</p>
-          <p className="mt-1 text-[15px] text-foreground-muted">A catalyst-driven candidate surfaces.</p>
+          <p className="text-[11px] font-medium tracking-[0.2em] uppercase">Idea</p>
+          <p className="mt-1 text-[15px] text-foreground-muted">An idea worth testing.</p>
         </Stop>
 
         {STATIONS.map((s, i) => (
@@ -178,16 +178,6 @@ export default function WorkThread() {
             <p className="mt-3 max-w-md text-[15px] leading-relaxed text-foreground-muted">{s.text}</p>
           </Stop>
         ))}
-
-        <Stop
-          nodeRef={(el) => { nodeRefs.current[STATIONS.length + 1] = el; }}
-          lit={on(STATIONS.length + 1)}
-          className="ml-5 sm:ml-[30%]"
-          node={<span className="h-3 w-3 rounded-full border-2 border-current" />}
-        >
-          <p className="text-[11px] font-medium tracking-[0.2em] uppercase">Limited Partners</p>
-          <p className="mt-1 text-[15px] text-foreground-muted">The people whose capital is deployed.</p>
-        </Stop>
       </div>
     </div>
   );
