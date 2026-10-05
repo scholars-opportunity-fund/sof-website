@@ -21,7 +21,9 @@ export function ApproachSection({ full = false }: { full?: boolean }) {
   return <section id="approach" className={`${styles.section} ${styles.approach}`}><div className={styles.grid}>
     <Reveal><p className={styles.kicker}>Our approach</p><h2>Several strategies, <em>one shared process.</em></h2></Reveal>
     <Reveal className={styles.prose}>
-      <p className={styles.lead}>We run several independent strategies. Each one looks for a specific, repeatable inefficiency in stock prices, often in smaller companies that most of the market doesn&apos;t cover closely.</p>
+      <p className={styles.lead}>{full
+        ? <>We run several independent strategies. Each one looks for a specific, repeatable inefficiency in stock prices, often in smaller companies that most of the market doesn&apos;t cover closely.</>
+        : <>Each strategy targets one repeatable inefficiency in stock prices, often in smaller companies.</>}</p>
       {full ? <>
         <p>Each strategy is built and tested by a small team of analysts. Before it trades, someone outside that team reviews the work and looks for what&apos;s wrong with it.</p>
         <p>All strategies run through one shared trading and risk system, so every trade goes through the same checks and is recorded the same way.</p>
@@ -46,7 +48,7 @@ export function ProcessTeaser() {
   return <section id="pipeline" className={`${styles.section} ${styles.process}`}><div className={styles.grid}>
     <Reveal><p className={styles.kicker}>Investment process</p><h2>From idea to live trading</h2><p className={styles.muted}>Every strategy goes through the same steps before it trades.</p></Reveal>
     <Reveal className={styles.prose}>
-      <ol className={styles.stageList}>{PROCESS_STEPS.map((step, index) => <li key={step.title}><span>0{index + 1}</span><div><h3>{step.title}</h3><p>{step.meta}</p></div></li>)}</ol>
+      <ol className={styles.stageList}>{PROCESS_STEPS.map((step, index) => <li key={step.title}><span>0{index + 1}</span><div><h3>{step.title}</h3></div></li>)}</ol>
       <Link className={styles.textLink} href="/process"><span>Follow the process</span> →</Link>
     </Reveal>
   </div></section>;

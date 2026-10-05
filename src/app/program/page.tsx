@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import Container from "@/components/ui/Container";
 import Button from "@/components/ui/Button";
@@ -8,7 +7,6 @@ import GrowthGear from "@/components/program/GrowthGear";
 import WorkThread from "@/components/program/WorkThread";
 import MicrocapCallout from "@/components/competition/MicrocapCallout";
 import { generatePageMetadata } from "@/lib/seo";
-import { CIO } from "@/lib/team";
 
 export const metadata = generatePageMetadata({
   title: "Analyst Program",
@@ -103,56 +101,6 @@ export default function ProgramPage() {
         </p>
       </GrowthGear>
 
-      {/* Mentorship / learn from */}
-      <section className="border-t border-border/60 bg-cloud py-16 sm:py-24">
-        <Container>
-          <Reveal>
-            <div className="grid items-center gap-12 lg:grid-cols-[240px_1fr] lg:gap-20">
-              <div className="relative aspect-[4/5] w-full max-w-[240px] overflow-hidden bg-gunmetal/10">
-                <Image
-                  src={CIO.image}
-                  alt={CIO.name}
-                  fill
-                  sizes="(min-width: 1024px) 240px, 60vw"
-                  className="object-cover"
-                />
-              </div>
-              <div>
-                <p className="text-xs font-medium tracking-[0.2em] text-copper uppercase">
-                  Who You Learn From
-                </p>
-                <h2 className="mt-6 text-4xl sm:text-5xl">
-                  Learn from Dr. Jonathan Brogaard
-                </h2>
-                <p className="mt-8 max-w-2xl text-[17px] leading-[1.8] text-foreground-secondary">
-                  Analysts work directly with Dr. Jonathan Brogaard. His
-                  research on market microstructure and asset pricing has been
-                  published in the Journal of Finance, the Journal of Financial
-                  Economics and the Review of Financial Studies, and he serves
-                  on FINRA&apos;s Market Regulation Committee.
-                </p>
-                <div className="mt-8">
-                  <Link
-                    href="/team"
-                    className="group inline-flex items-center gap-2 text-[15px] font-medium text-ink hover:text-copper"
-                  >
-                    <span className="border-b border-copper/60 pb-0.5 transition-colors group-hover:border-copper">
-                      Read Dr. Brogaard&apos;s full bio
-                    </span>
-                    <span
-                      aria-hidden="true"
-                      className="transition-transform group-hover:translate-x-1"
-                    >
-                      &rarr;
-                    </span>
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </Reveal>
-        </Container>
-      </section>
-
       {/* Who We Recruit */}
       <section id="apply" className="bg-ink py-16 sm:py-24">
         <Container>
@@ -176,33 +124,15 @@ export default function ProgramPage() {
                 </Link>{" "}
                 shows whether applications are open.
               </p>
+              <p className="mt-6 text-[17px] leading-[1.8] text-foreground-on-dark-muted">
+                SOF is headquartered in Salt Lake City, and our analysts study
+                at universities around the country.
+              </p>
             </div>
             <div className="mt-16 flex flex-wrap items-center gap-5">
               <Button href="/team" variant="outline">
                 <span className="text-cloud">Meet the team</span>
               </Button>
-            </div>
-          </Reveal>
-        </Container>
-      </section>
-
-      {/* Location */}
-      <section className="py-16 sm:py-24">
-        <Container>
-          <Reveal>
-            <div>
-              <div>
-                <p className="text-xs font-medium tracking-[0.2em] text-copper uppercase">
-                  Where
-                </p>
-                <h2 className="mt-6 text-4xl sm:text-5xl">
-                  Headquartered in Salt Lake City
-                </h2>
-                <p className="mt-8 max-w-xl text-[17px] leading-[1.8] text-foreground-secondary">
-                  SOF is headquartered in Salt Lake City. Our analysts study
-                  at universities around the country.
-                </p>
-              </div>
             </div>
           </Reveal>
         </Container>
