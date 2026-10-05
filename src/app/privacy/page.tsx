@@ -3,9 +3,9 @@ import CookieSettingsLink from "@/components/consent/CookieSettingsLink";
 import { generatePageMetadata } from "@/lib/seo";
 import { POSTHOG_ENABLED } from "@/lib/posthog";
 
-// Draft — pending counsel review. Mirrors the analytics disclosures in the SOF
-// Scholars platform notice (app/privacy/page.tsx at the repo root); keep the two
-// in step when either changes. The PostHog and banner passages render only in
+// Mirrors the analytics disclosures in the SOF Scholars platform notice
+// (app/privacy/page.tsx at the repo root); keep the two in step when either
+// changes. The PostHog and banner passages render only in
 // builds with a PostHog key (src/lib/posthog.ts), the same builds that show the
 // banner, so the notice matches what the deploy actually runs.
 const PRIVACY_CONTACT = "ronan@scholarsoppfund.com";
