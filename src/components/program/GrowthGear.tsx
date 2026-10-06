@@ -15,7 +15,7 @@ const PHASES = [
     text: "Own part of a strategy from research through testing. Present your work in review and help monitor strategies that trade.",
   },
   {
-    phase: "Senior Cohort",
+    phase: "Senior Analyst",
     text: "Lead a strategy team, review other teams' work, and help train new analysts.",
   },
 ];

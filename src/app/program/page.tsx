@@ -126,7 +126,11 @@ export default function ProgramPage() {
               </p>
               <p className="mt-6 text-[17px] leading-[1.8] text-foreground-on-dark-muted">
                 SOF is headquartered in Salt Lake City, and our analysts study
-                at universities around the country.
+                at universities around the country. Research here happens in
+                code and in writing, and every strategy is reviewed by someone
+                who didn&apos;t build it, so where you study doesn&apos;t limit
+                what you can do. We look for students who can take an idea,
+                test it honestly, and drop it when the evidence says to.
               </p>
             </div>
             <div className="mt-16 flex flex-wrap items-center gap-5">

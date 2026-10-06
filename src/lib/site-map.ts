@@ -9,9 +9,9 @@ export const SITE_SECTIONS = {
   approach: { name: 'The approach', href: '/approach', description: 'How we build systematic strategies in public equities.' },
   team: { name: 'The team', href: '/team', description: 'Meet the leadership and the student analysts.' },
   program: { name: 'Analyst program', href: '/program#analyst-program', description: 'What student analysts work on and how the role grows.' },
-  structure: { name: 'Fund structure', href: '/approach#fund-structure', description: 'How the fund is run and who makes the final call.' },
-  leadership: { name: 'Leadership', href: '/team', description: 'The Chief Investment Officer who owns every capital decision.' },
+  structure: { name: 'Fund structure', href: '/approach#fund-structure', description: 'How the fund is run and who oversees it.' },
+  leadership: { name: 'Leadership', href: '/team', description: 'Dr. Jonathan Brogaard, Chief Investment Officer.' },
   insights: { name: 'Insights', href: '/insights', description: 'Research notes from the SOF team.' },
-  apply: { name: 'Apply', href: '/apply', description: 'Join the analyst cohort.' },
+  apply: { name: 'Apply', href: '/apply', description: 'See whether applications are open.' },
   contact: { name: 'Contact', href: `mailto:${CONTACT_EMAIL}`, description: 'Reach the fund directly.' },
 } as const;
