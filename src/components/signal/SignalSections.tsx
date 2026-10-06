@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react';
 import Link from 'next/link';
 import Reveal from '@/components/ui/Reveal';
-import { PROCESS_STEPS } from './process-steps';
 import styles from './Signal.module.css';
 
 /**
@@ -44,12 +43,3 @@ export function FundStructureSection() {
 }
 
 /** The homepage's short telling of the pipeline: the four stages and a way out to the full rail. */
-export function ProcessTeaser() {
-  return <section id="pipeline" className={`${styles.section} ${styles.process}`}><div className={styles.grid}>
-    <Reveal><p className={styles.kicker}>Investment process</p><h2>From idea to live trading</h2><p className={styles.muted}>Every strategy goes through the same steps before it trades.</p></Reveal>
-    <Reveal className={styles.prose}>
-      <ol className={styles.stageList}>{PROCESS_STEPS.map((step, index) => <li key={step.title}><span>0{index + 1}</span><div><h3>{step.title}</h3></div></li>)}</ol>
-      <Link className={styles.textLink} href="/process"><span>Follow the process</span> →</Link>
-    </Reveal>
-  </div></section>;
-}

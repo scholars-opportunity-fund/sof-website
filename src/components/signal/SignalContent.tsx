@@ -4,7 +4,8 @@ import Reveal from '@/components/ui/Reveal';
 import { CIO } from '@/lib/team';
 import { FUND } from '@/lib/constants';
 import SignalField from './SignalField';
-import { ApproachSection, ProcessTeaser } from './SignalSections';
+import SignalProcess from './SignalProcess';
+import { ApproachSection } from './SignalSections';
 import styles from './Signal.module.css';
 
 export default function SignalContent() {
@@ -13,9 +14,10 @@ export default function SignalContent() {
       <div><p className={styles.kicker}><span className={styles.rule} />Est. {FUND.foundedYear}</p><h1>Systematic strategies in <em>public equities</em>.</h1></div>
       <div><p>A student-run fund that builds systematic strategies in U.S. stocks, led by {CIO.name}.</p><div className={styles.actions}><Link className={styles.button} href="/approach">How we invest →</Link><Link className={styles.outline} href="/team">Meet the team</Link></div></div>
     </div></section>
-    {/* The homepage carries the short version of each; the full telling lives on /approach and /process. */}
+    {/* The approach is told short here and in full on /approach; the process is the real rail, the same
+        component /process is built from, so the pipeline is read rather than linked to. */}
     <ApproachSection />
-    <ProcessTeaser />
+    <SignalProcess />
     <section id="leadership" className={styles.section}><div className={`${styles.grid} ${styles.leadership}`}>
       <Reveal className={styles.portrait}><div><Image src={CIO.image} alt={CIO.name} fill sizes="(min-width:1024px) 400px, 80vw" className="object-cover" /></div><div className={styles.nameplate}><p>{CIO.name}</p><span>{CIO.role}</span></div></Reveal>
       <Reveal><p className={styles.kicker}>Leadership</p><h2>Led by Dr. Jonathan Brogaard</h2><p className={styles.bio}>Associate Dean of Research and Kendall D. Garff Chaired Professor of Finance at the University of Utah&apos;s David Eccles School of Business. Published in the Journal of Finance, Journal of Financial Economics and Review of Financial Studies. Member of FINRA&apos;s Market Regulation Committee. Founded the University of Utah&apos;s Institute for Advanced Investment Management (IAIM) in 2023.</p><div className={styles.credentials}>{[['JF · JFE · RFS', 'Published'], ['FINRA', 'Market Regulation Committee'], ['2023', 'Founded IAIM']].map(([title, label]) => <div key={title}><p>{title}</p><span>{label}</span></div>)}</div><Link href="/team" className={styles.textLink}><span>Full biography</span> →</Link></Reveal>
