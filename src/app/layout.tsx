@@ -31,7 +31,7 @@ const libreBaskerville = localFont({
 
 export const metadata: Metadata = {
   title: {
-    default: `${FUND.name} | Event-Driven Public Equities`,
+    default: `${FUND.name} | Systematic Public Equities`,
     template: `%s | ${FUND.name}`,
   },
   description: FUND.description,

@@ -8,15 +8,15 @@ import styles from "./GrowthGear.module.css";
 const PHASES = [
   {
     phase: "First Semester",
-    text: "Learn the research methodology, shadow live sourcing and diligence, and contribute to collective memos under supervision.",
+    text: "Learn how the fund researches and tests strategies. Join an existing strategy team with support from returning analysts.",
   },
   {
     phase: "Returning Analyst",
-    text: "Own candidate memos end-to-end. Position monitoring, event-driven updates, and direct input into LP reporting.",
+    text: "Own part of a strategy from research through testing. Present your work in review and help monitor strategies that trade.",
   },
   {
-    phase: "Senior Cohort",
-    text: "Co-lead the research process, mentor new analysts, and run internal review sessions before memos reach the CIO.",
+    phase: "Senior Analyst",
+    text: "Lead a strategy team, review other teams' work, and help train new analysts.",
   },
 ];
 

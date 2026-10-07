@@ -25,7 +25,7 @@ export function GET() {
 
 ${FUND.description} The fund is based in ${FUND.location}.
 
-It is led by ${CIO.name}, ${CIO.role}. ${CIO.headline}
+${CIO.role}: ${CIO.name}. ${CIO.headline}
 
 Contact: ${FUND.contactEmail}
 

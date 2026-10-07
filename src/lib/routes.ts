@@ -49,7 +49,7 @@ export const INDEXABLE_ROUTES: SiteRoute[] = [
   },
   {
     path: "/program",
-    title: "Process",
+    title: "Analyst program",
     changeFrequency: "monthly",
     priority: 0.8,
     sources: ["src/app/program"],

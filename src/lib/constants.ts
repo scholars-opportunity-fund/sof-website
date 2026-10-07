@@ -32,7 +32,7 @@ export const FUND = {
   name: "Scholars Opportunity Fund",
   shortName: "SOF",
   description:
-    "Student-run event-driven fund in public equities, led by Professor Jonathan Brogaard. Focused on special situations and catalyst-driven opportunities.",
+    "A student-run fund that builds systematic strategies in U.S. public equities, including event-driven special situations. Led by Dr. Jonathan Brogaard.",
   foundedYear: 2025,
   cio: "Dr. Jonathan Brogaard",
   cioTitle: "Chief Investment Officer",

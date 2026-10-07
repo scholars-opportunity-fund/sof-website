@@ -121,11 +121,11 @@ export default function Frontier() {
     return () => { cancelAnimationFrame(frame); removeEventListener('scroll', schedule); removeEventListener('resize', schedule); };
   }, []);
 
-  return <section ref={root} className={styles.hero} data-lit={lit} aria-label="Scholars at the Frontier">
+  return <section ref={root} className={styles.hero} data-lit={lit} aria-label="Scholars Opportunity Fund">
     <div className={styles.stage}>
       <canvas ref={canvas} className={styles.field} aria-hidden="true" />
       <div className={styles.copy}>
-        <h1 className={styles.line}>Scholars at the <em>Frontier</em></h1>
+        <h1 className={styles.line}>Scholars <em>Opportunity</em> Fund</h1>
       </div>
       <a href="#sof-brain" className={styles.cue}>
         <span className={styles.track}><i /></span>Scroll

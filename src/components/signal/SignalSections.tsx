@@ -18,12 +18,14 @@ export function PageHeadline({ kicker, title, children }: { kicker: string; titl
 
 export function ApproachSection({ full = false }: { full?: boolean }) {
   return <section id="approach" className={`${styles.section} ${styles.approach}`}><div className={styles.grid}>
-    <Reveal><p className={styles.kicker}>Our approach</p><h2>Event-driven.<br />Catalyst-focused.<br /><em>Selective.</em></h2></Reveal>
+    <Reveal><p className={styles.kicker}>Our approach</p><h2>Several strategies, <em>one shared process.</em></h2></Reveal>
     <Reveal className={styles.prose}>
-      <p className={styles.lead}>We look for situations where a defined event reshapes the risk-reward and institutional coverage is thin.</p>
+      <p className={styles.lead}>{full
+        ? <>We run several independent strategies. Each one looks for a specific, repeatable inefficiency in stock prices, often in smaller companies that most of the market doesn&apos;t cover closely.</>
+        : <>Each strategy targets one repeatable inefficiency in stock prices, often in smaller companies.</>}</p>
       {full ? <>
-        <p>Sourcing, screening and diligence feed a structured investment memo, pressure-tested by the analyst team before it reaches the investment committee.</p>
-        <p>The Chief Investment Officer owns every capital decision. Positions are monitored continuously against the original thesis, and every step from idea to outcome is documented and auditable.</p>
+        <p>Each strategy is built and tested by a small team of analysts. Before it trades, someone outside that team reviews the work and looks for what&apos;s wrong with it.</p>
+        <p>All strategies run through one shared trading and risk system, so every trade goes through the same checks and is recorded the same way.</p>
         <Link className={styles.textLink} href="/process"><span>Follow the process</span> →</Link>
       </> : <Link className={styles.textLink} href="/approach"><span>Read the full approach</span> →</Link>}
     </Reveal>
@@ -34,9 +36,8 @@ export function FundStructureSection() {
   return <section id="fund-structure" className={styles.section}><div className={styles.grid}>
     <Reveal><p className={styles.kicker}>Fund structure</p><h2>Independently <em>operated</em></h2></Reveal>
     <Reveal className={styles.prose}>
-      <p>Scholars Opportunity Fund is independently operated. The fund combines experienced GP oversight with a structured student analyst program that produces institutional-grade analytical throughput and exceptional talent development.</p>
-      <p>The structural parallel to established student-run investment programs is direct: independent operation, student analysts at the center, experienced leadership making every capital decision.</p>
-      <p>Every step from idea to investment outcome is documented and auditable. Process integrity drives performance.</p>
+      <p>Scholars Opportunity Fund is independently operated. Students run the research, and experienced leadership oversees every strategy that trades.</p>
+      <p>We keep a written record of every strategy, from the first idea to how it performed, including the ones we stopped.</p>
     </Reveal>
   </div></section>;
 }
