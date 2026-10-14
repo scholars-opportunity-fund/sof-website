@@ -1,0 +1,95 @@
+/* One screen that pins under the header (72px tall at every width) for 80svh of scroll, 55svh on phones,
+   then lets go. The stage is the sticky screen; the section's extra height is the hold. --hold runs 0 to
+   1 across it and carries the words and the line along the base; --release runs across its last stretch
+   and carries the lift. */
+.events { position: relative; height: calc(100svh - 72px + 80svh); background: var(--ink); color: var(--cloud); scroll-margin-top: 72px; --hold: 0; --release: 0; }
+.stage { position: sticky; top: 72px; height: calc(100svh - 72px); min-height: 560px; overflow: clip; isolation: isolate; border-top: 1px solid #1b2537; }
+/* The field fades up on its first frame and is softened a touch so it reads as surface, not pixels. */
+.field { position: absolute; inset: 0; width: 100%; height: 100%; display: block; opacity: 0; transition: opacity 1.6s ease; filter: blur(.6px); pointer-events: none; }
+.field[data-lit=true] { opacity: .8; }
+/* Quiet ground under the kicker, the line on the left, and the bottom row. */
+.veil { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, #0b122180 0%, #0b122100 46%), linear-gradient(180deg, #0b1221d9 0%, #0b122100 24%, #0b122100 64%, #0b1221e6 100%); }
+.inner { position: relative; z-index: 1; display: flex; flex-direction: column; height: 100%; max-width: 1376px; margin: auto; padding: 40px 48px 40px; }
+.topline { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+.kicker { display: flex; align-items: center; gap: 12px; margin: 0; font-size: 12px; font-weight: 500; letter-spacing: .22em; text-transform: uppercase; color: #C49A7A; }
+.rule { width: 32px; height: 1px; background: #C49A7A; }
+.season { margin: 0; font-size: 11px; font-weight: 500; letter-spacing: .2em; text-transform: uppercase; color: #8892A0; }
+
+/* The middle of the screen: the line, and the cue that says the scroll is what changes it. The line lifts
+   and dims a little as the hold runs out, so the stage reads as letting go. */
+.middle { position: relative; flex: 1; display: flex; flex-direction: column; justify-content: center; }
+.headline {
+  margin: 0; padding: 28px 0 48px;
+  font-family: var(--font-heading); font-weight: 400; font-size: clamp(42px, 6.4vw, 98px); line-height: 1.06; letter-spacing: -.035em; color: var(--cloud);
+  transform: translateY(calc(var(--release) * -44px)); opacity: calc(1 - var(--release) * .4);
+}
+.lines { display: block; max-width: 11.6em; }
+.typed { display: block; }
+.word { white-space: nowrap; }
+.letter { position: relative; }
+.letter[data-on=false] { visibility: hidden; }
+.accent { color: #C49A7A; }
+/* The caret: on the last letter shown, or at home before anything is. It is placed outside the flow so it never
+   changes how the line wraps, and it blinks only while the words rest. */
+.home { position: relative; display: inline-block; width: 0; height: 1em; vertical-align: baseline; }
+.home::after, .letter[data-caret=true]::after {
+  content: ''; position: absolute; left: calc(100% + .05em); top: .1em; width: .055em; height: .78em; background: #C49A7A;
+}
+.typed[data-idle=true] .home::after, .typed[data-idle=true] .letter[data-caret=true]::after { animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+/* The cue, in the same vocabulary as the hero's: gone as soon as the scroll has begun. */
+.cue { position: absolute; left: 0; bottom: 10px; display: flex; align-items: center; gap: 14px; margin: 0; font-size: 10px; font-weight: 500; letter-spacing: .24em; text-transform: uppercase; color: #8892A0; opacity: calc(1 - var(--hold) * 5); }
+.track { display: block; position: relative; width: 1px; height: 30px; background: #8892a059; overflow: hidden; }
+.track i { position: absolute; left: -1px; width: 3px; height: 10px; background: #C49A7A; animation: fall 1.8s cubic-bezier(.4, 0, .2, 1) infinite; }
+@keyframes fall { 0% { top: -10px; } 60%, 100% { top: 30px; } }
+
+/* The bottom row: the event on the left, the way in on the right. */
+.bottom { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 48px; padding-top: 28px; border-top: 1px solid #f3f5f81f; transform: translateY(calc(var(--release) * -12px)); }
+.event { min-width: 0; }
+.nowrap { white-space: nowrap; }
+.eyebrow { margin: 0; font-size: 11px; font-weight: 500; letter-spacing: .2em; text-transform: uppercase; color: #C49A7A; }
+.title { margin: 12px 0 0; font-family: var(--font-heading); font-weight: 400; font-size: clamp(24px, 2.5vw, 34px); line-height: 1.15; letter-spacing: -.02em; color: var(--cloud); text-wrap: balance; }
+.description { margin: 12px 0 0; max-width: 540px; font-size: 15px; line-height: 1.7; color: #AAB6C7; }
+/* The way in: a wide, tall outline with a faint copper fill, solid copper under the pointer. */
+.register {
+  display: inline-flex; align-items: center; justify-content: space-between; gap: 48px; min-width: 400px; padding: 28px 32px;
+  border: 1px solid #C49A7A; background: #c49a7a14; color: var(--cloud); font-size: 17px; font-weight: 500; letter-spacing: .02em; white-space: nowrap;
+  transition: background-color .25s, color .25s;
+}
+.register span { font-size: 24px; line-height: 1; transition: transform .25s; }
+.register:hover { background: #C49A7A; color: var(--ink); }
+.register:hover span { transform: translateX(5px); }
+.register:focus-visible { outline-offset: 4px; }
+/* A line along the base that fills as the hold runs, so the pin reads as deliberate. */
+.progress { position: absolute; left: 0; right: 0; bottom: 0; z-index: 1; height: 1px; background: #8892a033; }
+.progress i { display: block; height: 100%; background: #C49A7A; transform: scaleX(var(--hold)); transform-origin: left; }
+
+@media (max-width: 1100px) { .inner { padding: 36px 40px; } .register { min-width: 340px; padding: 24px 28px; font-size: 16px; } }
+@media (max-width: 767px) {
+  .events { height: calc(100svh - 72px + 55svh); }
+  .stage { min-height: 640px; }
+  .inner { padding: 26px 24px 30px; }
+  .kicker { font-size: 10px; }
+  .season { font-size: 9px; }
+  .headline { font-size: clamp(38px, 10.4vw, 60px); line-height: 1.1; padding: 20px 0 44px; }
+  .cue { bottom: 8px; font-size: 9px; gap: 10px; }
+  .track { height: 24px; }
+  .bottom { grid-template-columns: 1fr; gap: 22px; padding-top: 22px; }
+  .title { font-size: 24px; }
+  .description { font-size: 14px; line-height: 1.6; }
+  .register { width: 100%; min-width: 0; padding: 22px 24px; font-size: 16px; }
+}
+/* Short screens and reduced motion get the same screen without the pin: it simply sits in the page. */
+@media (max-height: 640px), (prefers-reduced-motion: reduce) {
+  .events { height: auto; }
+  .stage { position: relative; top: 0; height: auto; min-height: 0; }
+  .inner { min-height: calc(100svh - 72px); }
+  .headline, .bottom { transform: none; opacity: 1; }
+  .headline { padding-bottom: 32px; }
+  .cue, .progress { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .field { transition: none; }
+  .home::after, .letter[data-caret=true]::after, .track i { animation: none; }
+  .register, .register span { transition: none; }
+}
