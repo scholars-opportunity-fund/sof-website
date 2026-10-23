@@ -25,7 +25,11 @@ export const MICROCAP = {
   shortLabel: "Competition",
   href: `${SCHOLARS_URL}/microcap?utm_source=website&utm_medium=referral&utm_campaign=microcap`,
   dates: "November 4–6, 2026",
+  /** The exact times, matching the event page on SOF Scholars. Mountain time is MST after November 1. */
+  starts: "Wednesday, November 4 at 10:00 AM MST",
+  ends: "Friday, November 6 at 10:00 AM MST",
   registrationCloses: "November 3",
+  registrationClosesAt: "November 3 at 5:00 PM MST",
 } as const;
 
 export const FUND = {
