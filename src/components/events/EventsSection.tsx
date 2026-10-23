@@ -84,9 +84,12 @@ export default function EventsSection() {
             <article id="competition" className={styles.event} aria-labelledby="competition-title">
               <p className={styles.eyebrow}>Student competition · {MICROCAP.dates}</p>
               <h3 id="competition-title" className={styles.title}>{MICROCAP.name}</h3>
+              <p className={styles.when}>
+                Starts {MICROCAP.starts}.<br />Ends {MICROCAP.ends}, when your GitHub repo and deck are due.
+              </p>
               <p className={styles.description}>
                 A hybrid case competition for student teams of <span className={styles.nowrap}>2–3</span>, run on SOF Scholars.
-                Registration is free and closes {MICROCAP.registrationCloses}.
+                Registration is free and closes {MICROCAP.registrationClosesAt}.
               </p>
             </article>
             <a href={MICROCAP.href} className={styles.register}>

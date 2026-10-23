@@ -16,11 +16,16 @@ export default function MicrocapCallout({ id = "competition", className = "" }: 
           <h2 id={`${id}-title`} className="mt-5 text-[34px] text-ink text-balance break-words sm:text-[44px]">
             {MICROCAP.name}
           </h2>
+          <p className="mt-5 text-[17px] leading-[1.6] font-medium text-ink">
+            Starts {MICROCAP.starts}.
+            <br />
+            Ends {MICROCAP.ends}, when your GitHub repo and deck are due.
+          </p>
         </div>
         <div className="min-w-0">
           <p className="text-[17px] leading-[1.7] text-foreground-secondary">
             A hybrid case competition for student teams of 2–3, run on SOF Scholars.
-            Registration is free and closes {MICROCAP.registrationCloses}.
+            Registration is free and closes {MICROCAP.registrationClosesAt}.
           </p>
           <a
             href={MICROCAP.href}
