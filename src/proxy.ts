@@ -28,10 +28,12 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(url, 301);
   }
 
-  // Strip trailing slashes (except root)
+  // Strip trailing slashes (except root). Built from a plain URL: NextURL remembers
+  // the incoming trailing slash and adds it back, which made this redirect loop.
   if (url.pathname !== "/" && url.pathname.endsWith("/")) {
-    url.pathname = url.pathname.slice(0, -1);
-    return NextResponse.redirect(url, 301);
+    const target = new URL(request.url);
+    target.pathname = target.pathname.replace(/\/+$/, "") || "/";
+    return NextResponse.redirect(target, 301);
   }
 
   return NextResponse.next();
