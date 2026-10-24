@@ -36,6 +36,8 @@ export function getAllInsights(): InsightMeta[] {
 }
 
 export function getInsightBySlug(slug: string) {
+  // Slugs are file names in content/insights: never let a URL walk out of it.
+  if (!/^[a-z0-9-]+$/.test(slug)) return null;
   const filePath = path.join(INSIGHTS_DIR, `${slug}.mdx`);
 
   if (!fs.existsSync(filePath)) return null;

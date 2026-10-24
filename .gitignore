@@ -43,3 +43,6 @@ next-env.d.ts
 
 # lighthouse ci
 .lighthouseci/
+
+# Personal Claude Code permissions stay on each machine.
+.claude/settings.local.json

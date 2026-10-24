@@ -38,7 +38,7 @@ const nextConfig: NextConfig = {
             // React's development build calls eval() for its debugging features, so the dev server
             // cannot hydrate under a policy without 'unsafe-eval'. Production keeps the strict policy.
             // worker-src blob: lets PostHog's session replay compress off the main thread.
-            value: `default-src 'self'; script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === "production" ? "" : " 'unsafe-eval'"}; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob:; font-src 'self' https://fonts.gstatic.com; frame-src 'none'; connect-src 'self' ${analyticsOrigin}; worker-src 'self' blob:`,
+            value: `default-src 'self'; script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === "production" ? "" : " 'unsafe-eval'"}; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob:; font-src 'self' https://fonts.gstatic.com; frame-src 'none'; connect-src 'self' ${analyticsOrigin}; worker-src 'self' blob:; base-uri 'none'; object-src 'none'; form-action 'self'; frame-ancestors 'none'`,
           },
         ],
       },

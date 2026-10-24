@@ -10,6 +10,9 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
+// Only the posts that exist at build time; any other slug is a 404 without touching the disk.
+export const dynamicParams = false;
+
 export async function generateStaticParams() {
   return getAllInsightSlugs().map((slug) => ({ slug }));
 }
